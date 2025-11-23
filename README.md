@@ -61,6 +61,12 @@ Il portale permette la gestione operativa di eventi, comunicazioni, turni e anag
     npm run build
     ```
 
+6.  **Anteprima della build**
+    Per visualizzare l'anteprima della build di produzione (accessibile anche da rete locale):
+    ```bash
+    npm run preview -- --host
+    ```
+
 ## 📂 Struttura del Progetto
 
 ```

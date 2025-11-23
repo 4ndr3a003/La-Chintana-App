@@ -14,7 +14,7 @@ export default function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('pc_profile_id'));
   const [loading, setLoading] = useState(true);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,13 +51,13 @@ export default function App() {
     }
 
     const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', activeProfileId);
-    
+
     const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         setUserProfile({ id: docSnap.id, ...docSnap.data() });
         // If on login page and profile loaded, go to dashboard
         if (location.pathname === '/login') {
-            navigate('/');
+          navigate('/');
         }
       } else {
         localStorage.removeItem('pc_profile_id');
@@ -84,7 +84,7 @@ export default function App() {
   const handleLoginSuccess = (profileId) => {
     localStorage.setItem('pc_profile_id', profileId);
     setActiveProfileId(profileId);
-    setLoading(true); 
+    setLoading(true);
     navigate('/');
   };
 
@@ -95,22 +95,22 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col selection:bg-blue-100 pb-24 md:pb-0">
-      
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col selection:bg-blue-100 pb-24 xl:pb-0">
+
       {/* HEADER */}
       {userProfile && location.pathname !== '/login' && (
-        <Header 
-          userProfile={userProfile} 
+        <Header
+          userProfile={userProfile}
         />
       )}
 
       <main className="flex-grow container mx-auto px-4 py-6 w-full max-w-full">
         <div className="animate-in fade-in zoom-in-95 duration-300">
-            <AppRoutes 
-                userProfile={userProfile} 
-                onLoginSuccess={handleLoginSuccess} 
-                onLogout={handleLogout} 
-            />
+          <AppRoutes
+            userProfile={userProfile}
+            onLoginSuccess={handleLoginSuccess}
+            onLogout={handleLogout}
+          />
         </div>
       </main>
 
