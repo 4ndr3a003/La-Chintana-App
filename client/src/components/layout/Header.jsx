@@ -1,17 +1,22 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
 import { LayoutDashboard, Calendar, MessageSquare, Settings } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import Avatar from '../ui/Avatar';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
 
 const NavButton = ({ children, to, active, icon }) => (
-  <Link
-    to={to}
-    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${active ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
+  <IonButton
+    routerLink={to}
+    shape="round"
+    fill={active ? "solid" : "clear"}
+    className={`font-bold text-sm nav-button ${active ? 'nav-button-active' : 'nav-button-inactive'}`}
   >
-    {icon} {children}
-  </Link>
+    <span className="flex items-center gap-2 normal-case">
+      {icon} {children}
+    </span>
+  </IonButton>
 );
 
 const Header = ({ userProfile }) => {
@@ -19,42 +24,53 @@ const Header = ({ userProfile }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center relative">
+    <IonHeader className="ion-no-border">
+      <IonToolbar className="header-toolbar">
+        <div className="flex justify-between items-center w-full px-4 lg:px-6">
+          {/* Logo Section */}
+          <IonButtons slot="start">
+            <IonButton routerLink="/" fill="clear" className="h-auto">
+              <div className="flex items-center gap-3">
+                <img src={logo} alt="Logo" className="h-11 w-auto" />
+                <div className="leading-none text-left hidden sm:block">
+                  <h1 className="text-base font-black tracking-tight text-slate-900">LA CHINTANA</h1>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Protezione Civile</p>
+                </div>
+              </div>
+            </IonButton>
+          </IonButtons>
 
-          <Link to="/" className="flex items-center gap-3 cursor-pointer group">
-            <img src={logo} alt="Logo" className="h-10 w-auto sm:h-12 group-hover:scale-105 transition-transform" />
-            <div className="leading-none">
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900">LA CHINTANA</h1>
-              <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest">Protezione Civile</p>
-            </div>
-          </Link>
-
-          <div className="hidden xl:flex items-center gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {/* Navigation Buttons - Desktop Only */}
+          <IonButtons slot="primary" className="hidden xl:flex gap-2">
             <NavButton active={isActive('/')} to="/" icon={<LayoutDashboard size={16} />}>Home</NavButton>
             <NavButton active={isActive('/events')} to="/events" icon={<Calendar size={16} />}>Bacheca</NavButton>
             <NavButton active={isActive('/comms')} to="/comms" icon={<MessageSquare size={16} />}>Comunicazioni</NavButton>
             {hasAdminAccess(userProfile) && (
               <NavButton active={isActive('/admin')} to="/admin" icon={<Settings size={16} />}>Gestione</NavButton>
             )}
-          </div>
+          </IonButtons>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link
-              to="/profile"
-              className={`flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full transition-all border ${isActive('/profile') ? 'bg-blue-50 border-blue-200 text-blue-700 ring-2 ring-blue-100' : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'}`}
+          {/* User Profile Section */}
+          <IonButtons slot="end">
+            <IonButton
+              routerLink="/profile"
+              shape="round"
+              fill={isActive('/profile') ? "solid" : "clear"}
+              className={`nav-button ${isActive('/profile') ? 'nav-button-active' : 'nav-button-inactive'}`}
+              style={{ height: 'auto' }}
             >
-              <div className="text-right leading-none hidden lg:block">
-                <div className="text-xs font-bold">{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
-                <div className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">{ROLE_LABELS[userProfile.role]}</div>
+              <div className="flex items-center gap-3 py-1">
+                <div className="text-right leading-none hidden lg:block">
+                  <div className={`text-sm font-bold ${isActive('/profile') ? 'text-blue-700' : 'text-slate-800'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
+                  <div className={`text-[10px] font-medium uppercase mt-0.5 ${isActive('/profile') ? 'text-blue-500' : 'text-slate-500'}`}>{ROLE_LABELS[userProfile.role]}</div>
+                </div>
+                <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className="ring-2 ring-slate-200 shadow-sm" />
               </div>
-              <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className="ring-2 ring-white shadow-sm" />
-            </Link>
-          </div>
+            </IonButton>
+          </IonButtons>
         </div>
-      </div>
-    </header>
+      </IonToolbar>
+    </IonHeader>
   );
 };
 

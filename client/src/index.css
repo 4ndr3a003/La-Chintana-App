@@ -9,8 +9,8 @@
   
   /* Force light mode defaults for this app design */
   color-scheme: light;
-  color: #213547;
-  background-color: #ffffff;
+  color: var(--color-slate-800);
+  background-color: var(--color-white);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,10 +18,89 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+html, body {
+  height: 100%;
   margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent body scroll, let the app handle it */
+}
+
+body {
   min-width: 320px;
-  min-height: 100vh;
-  /* Removed display: flex and place-items: center to allow full screen layout */
+}
+
+/* Header Styles */
+.nav-button {
+  --border-radius: 9999px;
+  --padding-start: 18px;
+  --padding-end: 18px;
+  height: 40px;
+  margin: 0 4px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+}
+
+.nav-button-active {
+  --background: rgba(0, 76, 151, 0.1) !important; /* Very light blue transparent */
+  --background-hover: rgba(0, 76, 151, 0.15) !important;
+  --background-activated: rgba(0, 76, 151, 0.2) !important;
+  --color: var(--color-pc-blue) !important;
+  --box-shadow: none; /* Removed border for cleaner look */
+}
+
+.nav-button-inactive {
+  --color: var(--color-slate-500);
+  --background: transparent;
+  --background-hover: var(--color-slate-50);
+}
+
+.header-toolbar {
+  --background: var(--color-white);
+  border-bottom: 1px solid var(--color-slate-200);
+  --min-height: 64px;
+}
+
+/* Mobile Nav Styles */
+.mobile-tab-bar {
+  --background: var(--color-white);
+}
+
+.mobile-tab-btn {
+  --background: var(--color-white);
+  --color-selected: var(--color-pc-blue);
+  --color: var(--color-slate-400);
+  position: relative;
+}
+
+.mobile-tab-icon-active {
+  color: var(--color-pc-blue);
+  transform: scale(1.1);
+  transition-property: all;
+  transition-duration: 200ms;
+}
+
+.mobile-tab-icon-inactive {
+  color: var(--color-slate-400);
+  transition-property: all;
+  transition-duration: 200ms;
+}
+
+.mobile-tab-label-active {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  color: var(--color-pc-blue);
+  transition-property: all;
+  transition-duration: 200ms;
+}
+
+.mobile-tab-label-inactive {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  color: var(--color-slate-400);
+  transition-property: all;
+  transition-duration: 200ms;
 }
 

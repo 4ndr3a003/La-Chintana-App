@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { IonApp } from '@ionic/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -95,29 +96,39 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col selection:bg-blue-100 pb-24 xl:pb-0">
+    <IonApp>
+      <div className="flex flex-col h-full w-full bg-slate-50">
+        {/* HEADER */}
+        {userProfile && location.pathname !== '/login' && (
+          <div className="flex-none z-20">
+            <Header
+              userProfile={userProfile}
+            />
+          </div>
+        )}
 
-      {/* HEADER */}
-      {userProfile && location.pathname !== '/login' && (
-        <Header
-          userProfile={userProfile}
-        />
-      )}
-
-      <main className="flex-grow container mx-auto px-4 py-6 w-full max-w-full">
-        <div className="animate-in fade-in zoom-in-95 duration-300">
-          <AppRoutes
-            userProfile={userProfile}
-            onLoginSuccess={handleLoginSuccess}
-            onLogout={handleLogout}
-          />
+        {/* MAIN CONTENT - SCROLLABLE */}
+        <div className="flex-grow overflow-y-auto z-10 relative">
+          <div className={`${location.pathname !== '/login' ? 'max-w-6xl mx-auto p-4 md:p-6 lg:p-10' : ''}`}>
+            <AppRoutes
+              userProfile={userProfile}
+              onLoginSuccess={handleLoginSuccess}
+              onLogout={handleLogout}
+            />
+            {/* Spacer for bottom nav on mobile */}
+            {userProfile && location.pathname !== '/login' && (
+               <div className="h-24 xl:hidden"></div>
+            )}
+          </div>
         </div>
-      </main>
 
-      {/* MOBILE BOTTOM NAV */}
-      {userProfile && location.pathname !== '/login' && (
-        <MobileNav />
-      )}
-    </div>
+        {/* MOBILE BOTTOM NAV */}
+        {userProfile && location.pathname !== '/login' && (
+          <div className="flex-none z-20 xl:hidden">
+            <MobileNav />
+          </div>
+        )}
+      </div>
+    </IonApp>
   );
 }

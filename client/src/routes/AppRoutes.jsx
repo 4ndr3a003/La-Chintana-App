@@ -11,49 +11,49 @@ import UserProfileView from '../pages/UserProfileView';
 import AdminDashboard from '../pages/AdminDashboard';
 
 const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
-  return (
-    <Routes>
-        <Route path="/login" element={
-            !userProfile ? (
-                <LoginRegister onLoginSuccess={onLoginSuccess} />
-            ) : (
-                <Navigate to="/" replace />
-            )
-        } />
-        
-        <Route path="/" element={
-            <ProtectedRoute userProfile={userProfile}>
-                <HomeDashboard userProfile={userProfile} />
-            </ProtectedRoute>
-        } />
-        
-        <Route path="/events" element={
-            <ProtectedRoute userProfile={userProfile}>
-                <EventsDashboard userProfile={userProfile} />
-            </ProtectedRoute>
-        } />
-        
-        <Route path="/comms" element={
-            <ProtectedRoute userProfile={userProfile}>
-                <CommunicationsView userProfile={userProfile} />
-            </ProtectedRoute>
-        } />
-        
-        <Route path="/profile" element={
-            <ProtectedRoute userProfile={userProfile}>
-                <UserProfileView userProfile={userProfile} onLogout={onLogout} />
-            </ProtectedRoute>
-        } />
-        
-        <Route path="/admin" element={
-            <ProtectedRoute userProfile={userProfile}>
-                <AdminDashboard userProfile={userProfile} />
-            </ProtectedRoute>
-        } />
+    return (
+        <Routes>
+            <Route path="/login" element={
+                !userProfile ? (
+                    <LoginRegister onLoginSuccess={onLoginSuccess} />
+                ) : (
+                    <Navigate to="/" replace />
+                )
+            } />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+            <Route path="/" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <HomeDashboard userProfile={userProfile} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/events" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <EventsDashboard userProfile={userProfile} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/comms" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <CommunicationsView userProfile={userProfile} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/profile" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <UserProfileView userProfile={userProfile} onLogout={onLogout} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/admin" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <AdminDashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
 };
 
 export default AppRoutes;

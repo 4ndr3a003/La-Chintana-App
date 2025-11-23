@@ -43,27 +43,27 @@ const AdminDashboard = () => {
           <Card key={user.id} noPadding>
              <div 
                onClick={() => openView(user)}
-               className="flex flex-row items-start p-4 gap-4 cursor-pointer hover:bg-slate-50 transition-colors relative group"
+               className="user-card-inner group"
              >
                 <Avatar src={user.photoUrl} name={user.name} size="md" />
-                <div className="flex-grow text-left">
-                  <h4 className="font-bold text-slate-800">{user.name}</h4>
-                  <div className="flex flex-col gap-1 mt-1">
+                <div className="user-card-content">
+                  <h4 className="user-name">{user.name}</h4>
+                  <div className="user-details">
                     {user.phone && (
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <div className="user-detail-item">
                         <Phone size={12} /> {user.phone}
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                    <div className="user-detail-item">
                       <Award size={12} /> {(user.specializations || []).length} Abilitazioni
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="user-actions">
                   <Badge text={ROLE_LABELS[user.role]} color={user.role === ROLES.PRESIDENT ? 'blue' : user.role === ROLES.BOARD ? 'purple' : 'green'} />
                   <button 
                     onClick={(e) => { e.stopPropagation(); openEdit(user); }}
-                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                    className="edit-button"
                     title="Modifica Dati"
                   >
                     <Edit2 size={16} />
@@ -87,42 +87,42 @@ const AdminDashboard = () => {
           <div className="modal-content max-w-lg">
              <div className="modal-header">
                 <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
-                <button onClick={() => setIsViewing(false)} className="p-1 rounded-full hover:bg-slate-200 text-slate-500"><X size={20} /></button>
+                <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
              </div>
              <div className="modal-body">
-                <div className="flex flex-col items-center mb-6">
+                <div className="modal-profile-header">
                    <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
-                   <h2 className="text-xl font-black text-slate-800">{selectedUser.name}</h2>
+                   <h2 className="modal-profile-name">{selectedUser.name}</h2>
                    <Badge text={ROLE_LABELS[selectedUser.role]} color="blue" className="mt-1" />
                    {selectedUser.boardRole && <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />}
                 </div>
                 
                 <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-slate-50 rounded-xl">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Email</p>
-                            <p className="font-medium text-slate-700 text-sm break-all">{selectedUser.email}</p>
+                    <div className="info-grid">
+                        <div className="info-card">
+                            <p className="info-label">Email</p>
+                            <p className="info-value break-all">{selectedUser.email}</p>
                         </div>
-                        <div className="p-3 bg-slate-50 rounded-xl">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Telefono</p>
-                            <p className="font-medium text-slate-700 text-sm">{selectedUser.phone || '-'}</p>
+                        <div className="info-card">
+                            <p className="info-label">Telefono</p>
+                            <p className="info-value">{selectedUser.phone || '-'}</p>
                         </div>
-                        <div className="p-3 bg-slate-50 rounded-xl">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Codice Fiscale</p>
-                            <p className="font-medium text-slate-700 text-sm uppercase">{selectedUser.cf || '-'}</p>
+                        <div className="info-card">
+                            <p className="info-label">Codice Fiscale</p>
+                            <p className="info-value uppercase">{selectedUser.cf || '-'}</p>
                         </div>
-                        <div className="p-3 bg-slate-50 rounded-xl">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Data di Nascita</p>
-                            <p className="font-medium text-slate-700 text-sm">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
+                        <div className="info-card">
+                            <p className="info-label">Data di Nascita</p>
+                            <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                         </div>
-                        <div className="p-3 bg-slate-50 rounded-xl col-span-2">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Residenza</p>
-                            <p className="font-medium text-slate-700 text-sm">{selectedUser.city || '-'}</p>
+                        <div className="info-card col-span-2">
+                            <p className="info-label">Residenza</p>
+                            <p className="info-value">{selectedUser.city || '-'}</p>
                         </div>
                     </div>
 
                     <div>
-                        <h4 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
+                        <h4 className="specs-section-title">
                            <Shield size={14} /> Abilitazioni ({selectedUser.specializations?.length || 0})
                         </h4>
                         <div className="space-y-3">
@@ -130,13 +130,13 @@ const AdminDashboard = () => {
                                 const userSpecs = data.items.filter(i => selectedUser.specializations?.includes(i));
                                 if (userSpecs.length === 0) return null;
                                 return (
-                                    <div key={category} className="bg-slate-50/50 rounded-xl p-3 border border-slate-100">
-                                        <h5 className={`text-[10px] font-bold uppercase mb-2 flex items-center gap-2 ${data.color.split(' ')[1]}`}>
+                                    <div key={category} className="spec-category-card">
+                                        <h5 className={`spec-category-title ${data.color.split(' ')[1]}`}>
                                             {data.icon} {category}
                                         </h5>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="spec-tags-wrapper">
                                             {userSpecs.map(item => (
-                                                <span key={item} className={`px-2.5 py-1 rounded-lg text-xs font-bold border shadow-sm ${data.color}`}>
+                                                <span key={item} className={`spec-tag ${data.color}`}>
                                                     {item}
                                                 </span>
                                             ))}
@@ -145,11 +145,11 @@ const AdminDashboard = () => {
                                 );
                             })}
                             {selectedUser.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).length > 0 && (
-                                <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100">
+                                <div className="spec-category-card">
                                     <h5 className="text-[10px] font-bold uppercase mb-2 text-slate-400">Altro</h5>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="spec-tags-wrapper">
                                         {selectedUser.specializations.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
-                                            <span key={s} className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-600 shadow-sm">
+                                            <span key={s} className="custom-spec-tag">
                                                 {s}
                                             </span>
                                         ))}
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
                     </div>
                 </div>
                 
-                <div className="mt-8 pt-4 border-t border-slate-100 flex justify-end">
+                <div className="modal-footer">
                     <Button onClick={() => { setIsViewing(false); openEdit(selectedUser); }} variant="outline" size="sm">
                         <Edit2 size={16} /> Modifica Dati
                     </Button>
@@ -178,7 +178,7 @@ const AdminDashboard = () => {
           <div className="modal-content max-w-2xl">
              <div className="modal-header">
                 <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
-                <button onClick={closeAll} className="p-1 rounded-full hover:bg-slate-200 text-slate-500"><X size={20} /></button>
+                <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
              </div>
              
              <div className="modal-body">
@@ -186,46 +186,46 @@ const AdminDashboard = () => {
                    
                    {/* DATI PERSONALI */}
                    <section>
-                     <h4 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                     <h4 className="form-section-title">
                        <User size={16} className="text-blue-500"/> Dati Personali
                      </h4>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div className="form-grid">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome</label>
-                          <input type="text" required className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+                          <label className="info-label">Nome</label>
+                          <input type="text" required className="form-input" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cognome</label>
-                          <input type="text" required className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+                          <label className="info-label">Cognome</label>
+                          <input type="text" required className="form-input" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data di Nascita</label>
-                          <input type="date" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} />
+                          <label className="info-label">Data di Nascita</label>
+                          <input type="date" className="form-input" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Luogo di Nascita</label>
-                          <input type="text" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.birthPlace} onChange={e => setFormData({...formData, birthPlace: e.target.value})} />
+                          <label className="info-label">Luogo di Nascita</label>
+                          <input type="text" className="form-input" value={formData.birthPlace} onChange={e => setFormData({...formData, birthPlace: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Codice Fiscale</label>
-                          <input type="text" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm uppercase" value={formData.cf} onChange={e => setFormData({...formData, cf: e.target.value})} />
+                          <label className="info-label">Codice Fiscale</label>
+                          <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({...formData, cf: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Città di Residenza</label>
-                          <input type="text" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
+                          <label className="info-label">Città di Residenza</label>
+                          <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Telefono</label>
-                          <input type="tel" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                          <label className="info-label">Telefono</label>
+                          <input type="tel" className="form-input" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email</label>
-                          <input type="email" required className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                          <label className="info-label">Email</label>
+                          <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                         </div>
                         {isCreating && (
                           <div className="md:col-span-2">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password Iniziale</label>
-                            <input type="text" required className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                            <label className="info-label">Password Iniziale</label>
+                            <input type="text" required className="form-input" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
                           </div>
                         )}
                      </div>
@@ -233,15 +233,15 @@ const AdminDashboard = () => {
 
                    {/* RUOLO & ABILITAZIONI */}
                    <section>
-                     <h4 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                     <h4 className="form-section-title">
                        <Shield size={16} className="text-purple-500"/> Ruolo & Abilitazioni
                      </h4>
                      
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                        <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ruolo Organizzativo</label>
+                          <label className="info-label">Ruolo Organizzativo</label>
                           <select 
-                            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"
+                            className="form-select"
                             value={formData.role}
                             onChange={e => setFormData({...formData, role: e.target.value})}
                           >
@@ -250,9 +250,9 @@ const AdminDashboard = () => {
                        </div>
                        {formData.role === ROLES.BOARD && (
                          <div>
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Incarico Direttivo</label>
+                            <label className="info-label">Incarico Direttivo</label>
                             <select 
-                              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none"
+                              className="form-select"
                               value={formData.boardRole || ''}
                               onChange={e => setFormData({...formData, boardRole: e.target.value})}
                             >
@@ -271,14 +271,14 @@ const AdminDashboard = () => {
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {data.items.map(item => (
-                                <label key={item} className="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded-lg transition-colors">
+                                <label key={item} className="spec-checkbox-label">
                                   <input 
                                     type="checkbox" 
                                     checked={formData.specializations?.includes(item)}
                                     onChange={() => toggleSpec(item)}
-                                    className="rounded text-blue-600 focus:ring-blue-500"
+                                    className="spec-checkbox-input"
                                   />
-                                  <span className="text-xs font-medium text-slate-700">{item}</span>
+                                  <span className="spec-checkbox-text">{item}</span>
                                 </label>
                               ))}
                             </div>
@@ -291,19 +291,19 @@ const AdminDashboard = () => {
                              <input 
                                type="text" 
                                placeholder="Aggiungi..." 
-                               className="flex-grow p-2 bg-white border border-slate-200 rounded-lg text-xs"
+                               className="custom-spec-input"
                                value={customSpec}
                                onChange={e => setCustomSpec(e.target.value)}
                              />
-                             <button type="button" onClick={addCustomSpec} className="bg-slate-200 hover:bg-slate-300 text-slate-600 px-3 rounded-lg font-bold text-xs">
+                             <button type="button" onClick={addCustomSpec} className="custom-spec-add-btn">
                                +
                              </button>
                            </div>
                            <div className="flex flex-wrap gap-2 mt-3">
                              {formData.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
-                               <span key={s} className="bg-white border border-slate-200 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                               <span key={s} className="custom-spec-tag-edit">
                                  {s}
-                                 <button type="button" onClick={() => toggleSpec(s)} className="text-slate-400 hover:text-red-500"><X size={12}/></button>
+                                 <button type="button" onClick={() => toggleSpec(s)} className="custom-spec-remove-btn"><X size={12}/></button>
                                </span>
                              ))}
                            </div>
@@ -311,7 +311,7 @@ const AdminDashboard = () => {
                      </div>
                    </section>
 
-                   <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                   <div className="form-footer">
                       <Button type="button" variant="ghost" onClick={closeAll}>Annulla</Button>
                       <Button type="submit">Salva Modifiche</Button>
                    </div>

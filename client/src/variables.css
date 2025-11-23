@@ -1,0 +1,204 @@
+/* Global Color Palette */
+:root {
+  /* Slate */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+
+  /* Base */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  /* Protezione Civile Official Colors */
+
+  --color-pc-orange-50: #fff8ed;
+  --color-pc-orange-100: #ffedd5;
+  --color-pc-orange-200: #fed7aa;
+  --color-pc-orange-300: #fdba74;
+  --color-pc-orange-400: #fb923c;
+  --color-pc-orange-500: #ec6907; /* Orange - Pantone 1505 C / RAL 2008 */
+  --color-pc-orange-600: #ea580c;
+  --color-pc-orange-700: #c2410c;
+  --color-pc-orange-800: #9a3412;
+  --color-pc-orange-900: #7c2d12;
+  --color-pc-orange: var(--color-pc-orange-500);
+
+  
+  --color-pc-blue-50: #f0f7ff;
+  --color-pc-blue-100: #e0f0ff;
+  --color-pc-blue-200: #bae0ff;
+  --color-pc-blue-300: #7cc0ff;
+  --color-pc-blue-400: #369eff;
+  --color-pc-blue-500: #004d9d;  /* Blue - Pantone 2945 C / RAL 5017 */
+  --color-pc-blue-600: #003d7a;
+  --color-pc-blue-700: #002e5c;
+  --color-pc-blue-800: #001f3d;
+  --color-pc-blue-900: #000f1f;
+  --color-pc-blue: var(--color-pc-blue-500);
+
+  
+  --color-pc-yellow-50: #fefce8;
+  --color-pc-yellow-100: #fef9c3;
+  --color-pc-yellow-200: #fef08a;
+  --color-pc-yellow-300: #fde047;
+  --color-pc-yellow-400: #facc15;
+  --color-pc-yellow-500: #ffdf00; /* Yellow - Pantone 115 C / RAL 1018 */
+  --color-pc-yellow-600: #ca8a04;
+  --color-pc-yellow-700: #a16207;
+  --color-pc-yellow-800: #854d0e;
+  --color-pc-yellow-900: #713f12;
+  --color-pc-yellow: var(--color-pc-yellow-500);
+
+  
+  --color-pc-green-50: #f0fdf4;
+  --color-pc-green-100: #dcfce7;
+  --color-pc-green-200: #bbf7d0;
+  --color-pc-green-300: #86efac;
+  --color-pc-green-400: #4ade80;
+  --color-pc-green-500: #009453; /* Green - Pantone 347 C / RAL 6032 */
+  --color-pc-green-600: #007c3a;
+  --color-pc-green-700: #005d2b;
+  --color-pc-green-800: #003e1d;
+  --color-pc-green-900: #001f0f;
+  --color-pc-green: var(--color-pc-green-500);
+
+  --color-pc-red-50: #fef2f2;
+  --color-pc-red-100: #fee2e2;
+  --color-pc-red-200: #fecaca;
+  --color-pc-red-300: #fca5a5;
+  --color-pc-red-400: #f87171;
+  --color-pc-red-500: #e63329; /* Red - Pantone Red 032 C / RAL 2002 */
+  --color-pc-red-600: #dc2626;
+  --color-pc-red-700: #b91c1c;
+  --color-pc-red-800: #991b1b;
+  --color-pc-red-900: #7f1d1d;
+  --color-pc-red: var(--color-pc-red-500);
+
+  /* Ionic Theme Overrides */
+  --ion-color-primary: var(--color-pc-blue);
+  --ion-color-primary-rgb: 0, 77, 157;
+  --ion-color-primary-contrast: var(--color-white);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: var(--color-pc-blue-600);
+  --ion-color-primary-tint: var(--color-pc-blue-400);
+
+  --ion-color-secondary: var(--color-pc-blue-600);
+  --ion-color-secondary-rgb: 0, 61, 122;
+  --ion-color-secondary-contrast: var(--color-white);
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: var(--color-pc-blue-700);
+  --ion-color-secondary-tint: var(--color-pc-blue-300);
+
+  --ion-color-tertiary: var(--color-pc-green);
+  --ion-color-tertiary-rgb: 0, 148, 83;
+  --ion-color-tertiary-contrast: var(--color-white);
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: var(--color-pc-green-600);
+  --ion-color-tertiary-tint: var(--color-pc-green-400);
+
+  --ion-color-success: var(--color-pc-green);
+  --ion-color-success-rgb: 0, 148, 83;
+  --ion-color-success-contrast: var(--color-white);
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: var(--color-pc-green-600);
+  --ion-color-success-tint: var(--color-pc-green-400);
+
+  --ion-color-warning: var(--color-pc-orange);
+  --ion-color-warning-rgb: 236, 105, 7;
+  --ion-color-warning-contrast: var(--color-white);
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: var(--color-pc-orange-600);
+  --ion-color-warning-tint: var(--color-pc-orange-400);
+
+  --ion-color-danger: var(--color-pc-red);
+  --ion-color-danger-rgb: 230, 51, 41;
+  --ion-color-danger-contrast: var(--color-white);
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: var(--color-pc-red-600);
+  --ion-color-danger-tint: var(--color-pc-red-400);
+
+  --ion-color-dark: var(--color-slate-800);
+  --ion-color-dark-rgb: 30, 41, 59;
+  --ion-color-dark-contrast: var(--color-white);
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: var(--color-slate-900);
+  --ion-color-dark-tint: var(--color-slate-700);
+
+  --ion-color-medium: var(--color-slate-400);
+  --ion-color-medium-rgb: 148, 163, 184;
+  --ion-color-medium-contrast: var(--color-white);
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: var(--color-slate-500);
+  --ion-color-medium-tint: var(--color-slate-300);
+
+  --ion-color-light: var(--color-slate-50);
+  --ion-color-light-rgb: 248, 250, 252;
+  --ion-color-light-contrast: var(--color-slate-800);
+  --ion-color-light-contrast-rgb: 30, 41, 59;
+  --ion-color-light-shade: var(--color-slate-100);
+  --ion-color-light-tint: var(--color-white);
+
+  /* App Background */
+  --ion-background-color: var(--color-slate-50);
+  --ion-background-color-rgb: 248, 250, 252;
+  --ion-text-color: var(--color-slate-800);
+  --ion-text-color-rgb: 30, 41, 59;
+}
+
+/* Ionic Component Styles */
+ion-content {
+  --background: var(--color-slate-50);
+}
+
+ion-card {
+  --background: var(--color-white);
+  --color: var(--color-slate-800);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
+}
+
+ion-item {
+  --background: var(--color-white);
+  --color: var(--color-slate-800);
+  --border-color: var(--color-slate-200);
+}
+
+ion-button {
+  --border-radius: 0.5rem;
+  font-weight: 700;
+}
+
+ion-input {
+  --background: var(--color-slate-50);
+  --color: var(--color-slate-800);
+  --placeholder-color: var(--color-slate-400);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-slate-200);
+}
+
+ion-segment {
+  --background: var(--color-slate-100);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+}
+
+ion-segment-button {
+  --color: var(--color-slate-400);
+  --color-checked: var(--color-pc-blue);
+  --indicator-color: var(--color-white);
+  --border-radius: 0.5rem;
+  font-weight: 700;
+}
