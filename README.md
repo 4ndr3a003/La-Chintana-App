@@ -103,3 +103,13 @@ Per generare l'applicazione Android installabile (.apk):
     - In Android Studio, vai su **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
     - Al termine, clicca su "locate" nella notifica per trovare il file `.apk` (solitamente in `client/android/app/build/outputs/apk/debug/app-debug.apk`).
 
+## Credenziali di Test
+
+**Presidente**
+- email: presidente@mail.it
+- password: 1234
+
+**Volontario**
+- email: andrea8102003gmail.com
+- password: 1234
+

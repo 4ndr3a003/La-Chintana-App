@@ -1,22 +1,17 @@
 import React from 'react';
-import { IonPage, IonContent, IonCard, IonCardContent, IonSegment, IonSegmentButton, IonLabel, IonItem, IonInput, IonButton, IonIcon, IonText, IonGrid, IonRow, IonCol } from '@ionic/react';
-import { ROLES } from '../../utils/constants';
-import { CheckCircle, Mail, Lock, ArrowRight, User } from 'lucide-react';
+import { IonPage, IonContent, IonCard, IonCardContent, IonItem, IonInput, IonButton } from '@ionic/react';
+import { CheckCircle, Mail, Lock, ArrowRight } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import { useLoginRegister } from './LoginRegisterLogic';
 import './LoginRegister.css';
 
 const LoginRegisterView = ({ onLoginSuccess }) => {
   const {
-    mode,
     formData,
     error,
     loading,
-    setMode,
     setFormData,
-    handleLogin,
-    handleRegister,
-    quickLogin
+    handleLogin
   } = useLoginRegister(onLoginSuccess);
 
   return (
@@ -30,15 +25,6 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
           </div>
 
           <IonCard className="login-card">
-            <IonSegment value={mode} onIonChange={e => setMode(e.detail.value)}>
-              <IonSegmentButton value="login">
-                <IonLabel>Accedi</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="register">
-                <IonLabel>Registrati</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-
             <IonCardContent className="login-card-content">
               {error && (
                 <div className="error-message">
@@ -46,20 +32,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
                 </div>
               )}
 
-              <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="login-form">
-                {mode === 'register' && (
-                  <IonItem fill="outline" className="form-item" lines="none">
-                    <User slot="start" size={18} className="form-icon" />
-                    <IonInput
-                      label="Nome Completo"
-                      labelPlacement="floating"
-                      placeholder="Mario Rossi"
-                      value={formData.name}
-                      onIonInput={e => setFormData({ ...formData, name: e.detail.value })}
-                    />
-                  </IonItem>
-                )}
-
+              <form onSubmit={handleLogin} className="login-form">
                 <IonItem fill="outline" className="form-item" lines="none">
                   <Mail slot="start" size={18} className="form-icon" />
                   <IonInput
@@ -85,25 +58,10 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
                 </IonItem>
 
                 <IonButton type="submit" expand="block" className="submit-btn" disabled={loading}>
-                  {loading ? 'Elaborazione...' : (mode === 'login' ? 'Entra nel Portale' : 'Crea Account')}
+                  {loading ? 'Elaborazione...' : 'Entra nel Portale'}
                   <ArrowRight slot="end" size={16} />
                 </IonButton>
               </form>
-
-              <div className="demo-section">
-                <p className="demo-title">Accesso Rapido (Demo)</p>
-                <div className="demo-buttons">
-                  <IonButton fill="outline" size="small" color="primary" onClick={() => quickLogin(ROLES.PRESIDENT)}>
-                    Presidente
-                  </IonButton>
-                  <IonButton fill="outline" size="small" color="tertiary" onClick={() => quickLogin(ROLES.BOARD)}>
-                    Direttivo
-                  </IonButton>
-                  <IonButton fill="outline" size="small" color="success" onClick={() => quickLogin(ROLES.VOLUNTEER)}>
-                    Volontario
-                  </IonButton>
-                </div>
-              </div>
             </IonCardContent>
           </IonCard>
         </div>
