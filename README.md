@@ -75,3 +75,25 @@ src/
 ## 🔐 Sicurezza e Privacy
 
 L'applicazione gestisce dati sensibili dei volontari. L'accesso è protetto tramite autenticazione Firebase e le regole di sicurezza del database garantiscono che solo gli utenti autorizzati possano accedere alle informazioni riservate.
+
+## 📱 Build Android (APK)
+
+Per generare l'applicazione Android installabile (.apk):
+
+1.  **Genera la build web e sincronizza con Android**
+    Esegui questi comandi nella cartella `client`:
+    ```bash
+    npm run build
+    npx cap sync
+    ```
+
+2.  **Apri Android Studio**
+    ```bash
+    npx cap open android
+    ```
+    Oppure apri manualmente la cartella `client/android` con Android Studio.
+
+3.  **Genera l'APK**
+    - In Android Studio, vai su **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+    - Al termine, clicca su "locate" nella notifica per trovare il file `.apk` (solitamente in `client/android/app/build/outputs/apk/debug/app-debug.apk`).
+

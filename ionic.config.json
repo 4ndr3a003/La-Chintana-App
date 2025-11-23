@@ -1,0 +1,8 @@
+{
+    "name": "La Chintana",
+    "integrations": {
+        "capacitor": {}
+    },
+    "type": "react",
+    "root": "client"
+}
