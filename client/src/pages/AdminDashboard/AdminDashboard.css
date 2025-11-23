@@ -1,0 +1,39 @@
+.admin-dashboard-container {
+    @apply space-y-6 pb-24;
+}
+
+.dashboard-header {
+    @apply flex justify-between items-center px-1;
+}
+
+.dashboard-title {
+    @apply text-lg font-bold text-slate-800 flex items-center gap-2;
+}
+
+.user-count-badge {
+    @apply text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg;
+}
+
+.users-grid {
+    @apply grid grid-cols-1 gap-4;
+}
+
+.fab-button {
+    @apply fixed bottom-32 right-6 md:bottom-10 md:right-10 bg-purple-600 text-white p-4 rounded-full shadow-xl shadow-purple-300 hover:bg-purple-700 hover:scale-110 transition-all z-40;
+}
+
+.modal-overlay {
+    @apply fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[100] p-4 backdrop-blur-sm;
+}
+
+.modal-content {
+    @apply bg-white rounded-2xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden;
+}
+
+.modal-header {
+    @apply px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50;
+}
+
+.modal-body {
+    @apply p-6 overflow-y-auto;
+}

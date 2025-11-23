@@ -1,0 +1,55 @@
+.home-dashboard-container {
+    @apply space-y-8 pb-20;
+}
+
+.welcome-header {
+    @apply relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-xl shadow-blue-200;
+}
+
+.welcome-header-bg-1 {
+    @apply absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white opacity-10 blur-3xl;
+}
+
+.welcome-header-bg-2 {
+    @apply absolute bottom-0 left-0 -ml-16 -mb-16 h-64 w-64 rounded-full bg-blue-400 opacity-20 blur-3xl;
+}
+
+.welcome-content {
+    @apply relative z-10;
+}
+
+.date-badge {
+    @apply text-xs font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded-lg backdrop-blur-sm;
+}
+
+.section-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+.section-header {
+    @apply flex justify-between items-end px-1;
+}
+
+.section-title {
+    @apply font-bold text-slate-800 text-lg flex items-center gap-2;
+}
+
+.see-all-link {
+    @apply text-xs font-bold text-blue-600 hover:underline;
+}
+
+.dashboard-card {
+    @apply bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden;
+}
+
+.empty-state-card {
+    @apply bg-slate-50 rounded-2xl p-6 border border-dashed border-slate-200 text-center flex flex-col items-center justify-center h-32;
+}
+
+.quick-actions-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+.quick-action-button {
+    @apply bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center gap-3;
+}
