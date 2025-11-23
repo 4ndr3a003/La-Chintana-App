@@ -7,9 +7,15 @@
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
     "dev": "node scripts/dev.js",
-    "build:client": "npm run build --prefix client"
+    "build:client": "npm run build --prefix client",
+    "build": "npm run build:client"
   },
   "devDependencies": {
     "concurrently": "^8.0.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4"
   }
 }

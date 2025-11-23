@@ -1,5 +1,5 @@
 {
   "appId": "com.lachintana.app",
   "appName": "La Chintana",
-  "webDir": "dist"
+  "webDir": "client/dist"
 }
