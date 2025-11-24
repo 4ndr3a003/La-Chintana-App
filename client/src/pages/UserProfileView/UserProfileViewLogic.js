@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, storage, appId } from '../../services/firebase';
+import { db, appId } from '../../services/firebase';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useUserProfileView = (userProfile) => {
@@ -13,10 +12,23 @@ export const useUserProfileView = (userProfile) => {
 
     setUploading(true);
     try {
-      const storageRef = ref(storage, `avatars/${userProfile.id}_${Date.now()}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      // Upload to local server
+      const response = await fetch('http://localhost:3000/api/upload-avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      const url = data.url;
+
+      // Update Firestore with the new URL
       const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
       await updateDoc(userRef, { photoUrl: url });
     } catch (error) {
