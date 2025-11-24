@@ -29,6 +29,14 @@ export const ROLE_LABELS = {
   [ROLES.VOLUNTEER]: 'Volontario'
 };
 
+export const EVENT_TYPES = {
+  'Servizio': { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Servizio' },
+  'Esercitazione': { color: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Esercitazione' },
+  'Riunione': { color: 'bg-slate-200 text-slate-700 border-slate-300', label: 'Riunione' },
+  'Emergenza': { color: 'bg-red-50 text-red-700 border-red-200', label: 'Emergenza' },
+  'Formazione': { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Formazione' }
+};
+
 export const SPECIALIZATIONS_DATA = {
   "Formazione Base & Sicurezza": {
     items: [
@@ -52,7 +60,8 @@ export const SPECIALIZATIONS_DATA = {
     items: [
       "HACCP",
       "BLSD",
-      "Primo soccorso"
+      "Primo soccorso",
+      "Visita medica"
     ],
     icon: <HeartPulse size={18} className="text-red-600" />,
     color: "bg-red-50 text-red-700 border-red-100"
@@ -72,7 +81,7 @@ export const SPECIALIZATIONS_DATA = {
       "Patente D1", "Patente D", "Patente D1E", "Patente DE"
     ],
     icon: <Truck size={18} className="text-slate-600" />,
-    color: "bg-slate-50 text-slate-700 border-slate-100"
+    color: "bg-slate-100 text-slate-700 border-slate-200"
   }
 };
 

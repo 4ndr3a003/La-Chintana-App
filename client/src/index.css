@@ -10,7 +10,7 @@
   /* Force light mode defaults for this app design */
   color-scheme: light;
   color: var(--color-slate-800);
-  background-color: var(--color-white);
+  background-color: var(--color-slate-50);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -102,5 +102,10 @@ body {
   color: var(--color-slate-400);
   transition-property: all;
   transition-duration: 200ms;
+}
+
+/* Override bg-slate-50 to be transparent as requested */
+.bg-slate-50 {
+  background-color: transparent !important;
 }
 

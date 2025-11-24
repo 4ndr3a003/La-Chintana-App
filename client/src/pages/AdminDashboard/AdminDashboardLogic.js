@@ -44,7 +44,9 @@ export const useAdminDashboard = () => {
       ...user,
       firstName: firstName || '',
       lastName: lastName || '',
-      specializations: user.specializations || []
+      specializations: user.specializations || [],
+      emercomnetId: user.emercomnetId || '',
+      status: user.status || 'Operativo'
     });
     setSelectedUser(user);
     setIsEditing(true);
@@ -61,6 +63,8 @@ export const useAdminDashboard = () => {
       birthDate: '',
       birthPlace: '',
       city: '',
+      emercomnetId: '',
+      status: 'Operativo',
       role: ROLES.VOLUNTEER,
       boardRole: '',
       specializations: [],
@@ -90,6 +94,8 @@ export const useAdminDashboard = () => {
       birthDate: formData.birthDate || '',
       birthPlace: formData.birthPlace || '',
       city: formData.city || '',
+      emercomnetId: formData.emercomnetId || '',
+      status: formData.status || 'Operativo',
       // Keep existing fields if editing
       ...(isEditing ? {} : { 
         joinedAt: new Date().toISOString(),

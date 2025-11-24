@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react';
-import { query, collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { query, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
 
 export const useEventsDashboard = (userProfile) => {
-  const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [allProfiles, setAllProfiles] = useState({}); 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [filterType, setFilterType] = useState('Tutti');
   const [filterParticipation, setFilterParticipation] = useState('Tutti');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEventId, setCurrentEventId] = useState(null);
   const [newEvent, setNewEvent] = useState({
     title: '', date: '', time: '', location: '', type: 'Servizio', description: ''
   });
@@ -17,15 +24,27 @@ export const useEventsDashboard = (userProfile) => {
   useEffect(() => {
     const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
     const unsubEvents = onSnapshot(q, (snap) => {
-      const eventsData = [];
+      const upcoming = [];
+      const past = [];
+      const today = new Date(new Date().setHours(0,0,0,0));
+
       snap.forEach((doc) => {
         const data = doc.data();
-        if (new Date(data.date) >= new Date(new Date().setHours(0,0,0,0))) {
-           eventsData.push({ id: doc.id, ...data });
+        const eventDate = new Date(data.date);
+        const eventObj = { id: doc.id, ...data };
+        
+        if (eventDate >= today) {
+           upcoming.push(eventObj);
+        } else {
+           past.push(eventObj);
         }
       });
-      eventsData.sort((a, b) => new Date(a.date) - new Date(b.date));
-      setEvents(eventsData);
+      
+      upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+      past.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      setUpcomingEvents(upcoming);
+      setPastEvents(past);
     });
 
     const qProfiles = query(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'));
@@ -54,44 +73,124 @@ export const useEventsDashboard = (userProfile) => {
     }
   };
 
+  const openCreateModal = () => {
+    setIsEditing(false);
+    setCurrentEventId(null);
+    setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '' });
+    setIsCreateModalOpen(true);
+  };
+
+  const openEditModal = (event) => {
+    setIsEditing(true);
+    setCurrentEventId(event.id);
+    const dateObj = new Date(event.date);
+    // Adjust for timezone offset to get correct YYYY-MM-DD
+    const offset = dateObj.getTimezoneOffset();
+    const localDate = new Date(dateObj.getTime() - (offset*60*1000));
+    const dateStr = localDate.toISOString().split('T')[0];
+    
+    const timeStr = dateObj.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+    
+    setNewEvent({
+      title: event.title,
+      date: dateStr,
+      time: timeStr,
+      location: event.location,
+      type: event.type,
+      description: event.description || ''
+    });
+    setIsCreateModalOpen(true);
+  };
+
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
       const fullDate = new Date(`${newEvent.date}T${newEvent.time || '08:00'}`);
-      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), {
-        ...newEvent,
-        date: fullDate.toISOString(),
-        participants: [],
-        createdBy: userProfile.id
-      });
+      
+      if (isEditing && currentEventId) {
+        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', currentEventId), {
+          ...newEvent,
+          date: fullDate.toISOString()
+        });
+      } else {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), {
+          ...newEvent,
+          date: fullDate.toISOString(),
+          participants: [],
+          createdBy: userProfile.id
+        });
+      }
+
       setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '' });
       setIsCreateModalOpen(false);
-    } catch (err) { console.error(err); alert("Errore creazione evento"); }
+      setIsEditing(false);
+      setCurrentEventId(null);
+    } catch (err) { console.error(err); alert("Errore salvataggio evento"); }
   };
 
-  const filteredEvents = events.filter(event => {
+  const handleDeleteEvent = (eventId) => {
+    setEventToDelete(eventId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+    try {
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventToDelete));
+        if (selectedEvent?.id === eventToDelete) setSelectedEvent(null);
+        setIsDeleteModalOpen(false);
+        setEventToDelete(null);
+    } catch (error) {
+        console.error(error);
+        alert("Errore durante l'eliminazione.");
+    }
+  };
+
+  const cancelDeleteEvent = () => {
+    setIsDeleteModalOpen(false);
+    setEventToDelete(null);
+  };
+
+  const filteredEvents = upcomingEvents.filter(event => {
     if (filterType !== 'Tutti' && event.type !== filterType) return false;
     if (filterParticipation === 'I miei eventi' && !event.participants?.includes(userProfile.id)) return false;
+    if (searchTerm && !event.title.toLowerCase().includes(searchTerm.toLowerCase()) && !event.description?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (searchDate) {
+        const eventDate = new Date(event.date).toISOString().split('T')[0];
+        if (eventDate !== searchDate) return false;
+    }
     return true;
   });
 
   return {
-    events,
+    upcomingEvents,
+    pastEvents,
     allProfiles,
     isCreateModalOpen,
     viewMode,
     selectedEvent,
     filterType,
     filterParticipation,
+    searchTerm,
+    searchDate,
     newEvent,
     filteredEvents,
     setViewMode,
     setFilterType,
     setFilterParticipation,
+    setSearchTerm,
+    setSearchDate,
     setSelectedEvent,
     setIsCreateModalOpen,
     setNewEvent,
     toggleParticipation,
-    handleCreateEvent
+    handleCreateEvent,
+    handleDeleteEvent,
+    confirmDeleteEvent,
+    cancelDeleteEvent,
+    isDeleteModalOpen,
+    openCreateModal,
+    openEditModal,
+    isEditing
   };
 };

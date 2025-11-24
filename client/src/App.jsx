@@ -124,7 +124,7 @@ export default function App() {
 
         {/* MOBILE BOTTOM NAV */}
         {userProfile && location.pathname !== '/login' && (
-          <div className="flex-none z-20 xl:hidden">
+          <div className="fixed bottom-0 left-0 right-0 z-20 xl:hidden pointer-events-none">
             <MobileNav />
           </div>
         )}

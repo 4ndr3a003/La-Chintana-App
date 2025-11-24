@@ -5,7 +5,9 @@
     justify-content: center;
     min-height: 100%;
     padding: 2rem 1rem;
-    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-pc-blue-50) 100%);
+    background: radial-gradient(circle at top right, var(--color-pc-blue-50), transparent 40%),
+        radial-gradient(circle at bottom left, var(--color-pc-yellow-50), transparent 40%),
+        linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 100%);
 }
 
 .login-header {
@@ -73,7 +75,7 @@
     align-items: center;
     gap: 0.75rem;
     border: 1px solid var(--color-pc-red-200);
-    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 .login-form {
@@ -83,7 +85,7 @@
 }
 
 .form-item {
-    --background: transparent;
+    --background: var(--color-slate-50);
     --border-color: var(--color-slate-200);
     --border-radius: 0.75rem;
     --padding-start: 0;
@@ -91,18 +93,25 @@
     margin-bottom: 0;
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-item:focus-within {
+    --background: var(--color-white);
     border-color: var(--color-pc-blue);
-    box-shadow: 0 0 0 3px var(--color-pc-blue-100);
+    box-shadow: 0 4px 12px rgba(0, 77, 157, 0.1);
+    transform: translateY(-1px);
 }
 
 .form-icon {
-    color: var(--color-slate-400);
+    color: var(--color-pc-yellow-600);
     margin-left: 1rem;
     margin-right: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.form-item:focus-within .form-icon {
+    color: var(--color-pc-yellow-500);
 }
 
 .submit-btn {
@@ -110,10 +119,13 @@
     --border-radius: 0.75rem;
     --background: var(--color-pc-blue);
     --background-hover: var(--color-pc-blue-600);
-    --box-shadow: 0 4px 6px -1px rgba(0, 77, 157, 0.2), 0 2px 4px -1px rgba(0, 77, 157, 0.1);
-    font-weight: 700;
+    --color: var(--color-white);
+    --box-shadow: 0 4px 6px -1px rgba(0, 77, 157, 0.3), 0 2px 4px -1px rgba(0, 77, 157, 0.15);
+    font-weight: 800;
     letter-spacing: 0.025em;
-    height: 3rem;
+    height: 3.5rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
 }
 
 /* Animations */
@@ -122,6 +134,7 @@
         opacity: 0;
         transform: translate3d(0, -20px, 0);
     }
+
     to {
         opacity: 1;
         transform: translate3d(0, 0, 0);
@@ -133,6 +146,7 @@
         opacity: 0;
         transform: translate3d(0, 20px, 0);
     }
+
     to {
         opacity: 1;
         transform: translate3d(0, 0, 0);
@@ -140,10 +154,27 @@
 }
 
 @keyframes shake {
-    10%, 90% { transform: translate3d(-1px, 0, 0); }
-    20%, 80% { transform: translate3d(2px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-    40%, 60% { transform: translate3d(4px, 0, 0); }
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }
 
 /* Ionic Overrides for this page */
@@ -167,4 +198,5 @@ ion-input {
     --padding-start: 0.5rem !important;
     --padding-top: 1rem;
     --padding-bottom: 1rem;
+    border: none !important;
 }

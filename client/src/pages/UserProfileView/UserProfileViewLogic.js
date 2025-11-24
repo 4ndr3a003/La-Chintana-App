@@ -53,10 +53,33 @@ export const useUserProfileView = (userProfile) => {
   const allKnownSpecs = Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items);
   const otherSpecs = userProfile.specializations?.filter(s => !allKnownSpecs.includes(s)) || [];
 
+  // Calcolo automatico dello stato operativo
+  const calculateStatus = () => {
+    if (!userProfile.birthDate) return 'Non Operativo'; 
+    
+    const birthDate = new Date(userProfile.birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    const has12HoursCourse = userProfile.specializations?.includes('Corso 12 ore');
+
+    if (age > 75 || !has12HoursCourse) {
+        return 'Non Operativo';
+    }
+    return 'Operativo';
+  };
+
+  const status = calculateStatus();
+
   return {
     uploading,
     handlePhotoUpload,
     groupedSpecs,
-    otherSpecs
+    otherSpecs,
+    status
   };
 };

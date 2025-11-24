@@ -1,7 +1,7 @@
 /* Global Color Palette */
 :root {
   /* Slate */
-  --color-slate-50: #f8fafc;
+  --color-slate-50: #f7f7f7;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
   --color-slate-300: #cbd5e1;
@@ -141,7 +141,7 @@
   --ion-color-medium-tint: var(--color-slate-300);
 
   --ion-color-light: var(--color-slate-50);
-  --ion-color-light-rgb: 248, 250, 252;
+  --ion-color-light-rgb: 247, 247, 247;
   --ion-color-light-contrast: var(--color-slate-800);
   --ion-color-light-contrast-rgb: 30, 41, 59;
   --ion-color-light-shade: var(--color-slate-100);
@@ -149,7 +149,7 @@
 
   /* App Background */
   --ion-background-color: var(--color-slate-50);
-  --ion-background-color-rgb: 248, 250, 252;
+  --ion-background-color-rgb: 247, 247, 247;
   --ion-text-color: var(--color-slate-800);
   --ion-text-color-rgb: 30, 41, 59;
 }

@@ -211,6 +211,10 @@ const AdminDashboard = () => {
                           <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({...formData, cf: e.target.value})} />
                         </div>
                         <div>
+                          <label className="info-label">Codice Identificativo Emercomnet</label>
+                          <input type="text" className="form-input" value={formData.emercomnetId} onChange={e => setFormData({...formData, emercomnetId: e.target.value})} />
+                        </div>
+                        <div>
                           <label className="info-label">Città di Residenza</label>
                           <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
                         </div>
@@ -238,6 +242,17 @@ const AdminDashboard = () => {
                      </h4>
                      
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                       <div>
+                          <label className="info-label">Stato Operativo</label>
+                          <select 
+                            className="form-select"
+                            value={formData.status}
+                            onChange={e => setFormData({...formData, status: e.target.value})}
+                          >
+                            <option value="Operativo">Operativo</option>
+                            <option value="Non Operativo">Non Operativo</option>
+                          </select>
+                       </div>
                        <div>
                           <label className="info-label">Ruolo Organizzativo</label>
                           <select 
