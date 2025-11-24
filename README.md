@@ -110,6 +110,6 @@ Per generare l'applicazione Android installabile (.apk):
 - password: 1234
 
 **Volontario**
-- email: andrea8102003gmail.com
+- email: andrea8102003@gmail.com
 - password: 1234
 
