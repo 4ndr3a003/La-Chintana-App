@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, appId } from '../../services/firebase';
+import { db, storage, appId } from '../../services/firebase';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useUserProfileView = (userProfile) => {
@@ -12,28 +13,28 @@ export const useUserProfileView = (userProfile) => {
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('avatar', file);
+      console.log("Starting upload to Firebase Storage...");
+      const storageRef = ref(storage, `avatars/${userProfile.id}_${Date.now()}`);
 
-      // Upload to local server
-      const response = await fetch('http://localhost:3000/api/upload-avatar', {
-        method: 'POST',
-        body: formData,
-      });
+      console.log("Uploading bytes...");
+      await uploadBytes(storageRef, file);
+      console.log("Upload complete. Getting download URL...");
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
+      const url = await getDownloadURL(storageRef);
+      console.log("Download URL obtained:", url);
 
-      const data = await response.json();
-      const url = data.url;
-
-      // Update Firestore with the new URL
       const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
       await updateDoc(userRef, { photoUrl: url });
+      console.log("Firestore updated.");
+
     } catch (error) {
       console.error("Error uploading photo:", error);
-      alert("Errore caricamento foto");
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      if (error.customData) {
+        console.error("Custom data:", error.customData);
+      }
+      alert(`Errore caricamento foto: ${error.message}`);
     } finally {
       setUploading(false);
     }
