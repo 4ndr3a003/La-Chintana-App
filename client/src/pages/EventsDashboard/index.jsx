@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search } from 'lucide-react';
+import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
 import { hasAdminAccess, EVENT_TYPES } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -37,7 +37,9 @@ const EventsDashboard = ({ userProfile }) => {
     isDeleteModalOpen,
     openCreateModal,
     openEditModal,
-    isEditing
+    isEditing,
+    isFiltersOpen,
+    toggleFilters
   } = useEventsDashboard(userProfile);
 
   return (
@@ -68,8 +70,8 @@ const EventsDashboard = ({ userProfile }) => {
 
          <div className="flex flex-col gap-4 mb-6">
             {/* Search Bar Row */}
-            <div className="flex flex-col md:flex-row gap-3 mb-2">
-                <div className="relative w-full md:w-[600px]">
+            <div className="flex flex-row gap-3 mb-2">
+                <div className="relative flex-grow">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
                     <input 
                         type="text" 
@@ -79,10 +81,10 @@ const EventsDashboard = ({ userProfile }) => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="relative w-full md:w-48">
+                <div className="relative">
                     <input 
                         type="date" 
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600"
+                        className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600"
                         value={searchDate}
                         onChange={(e) => setSearchDate(e.target.value)}
                     />
@@ -90,7 +92,7 @@ const EventsDashboard = ({ userProfile }) => {
                 {hasAdminAccess(userProfile) && (
                     <button
                         onClick={openCreateModal}
-                        className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
+                        className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
                     >
                         <PlusCircle size={18} />
                         Nuovo Evento
@@ -98,7 +100,57 @@ const EventsDashboard = ({ userProfile }) => {
                 )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+            {/* Mobile Filters Toggle */}
+            <div className="relative md:hidden">
+              <button
+                onClick={toggleFilters}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-200 bg-white"
+              >
+                <span className="font-bold text-slate-700">Filtri</span>
+                <SlidersHorizontal className="text-slate-500" size={20} />
+              </button>
+
+              {isFiltersOpen && (
+                <div className="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-xl mt-2 shadow-lg z-10 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex flex-col gap-3">
+                    <p className="font-bold text-sm text-slate-500 px-1">Tipologia</p>
+                    <div className="flex flex-wrap gap-2">
+                       <button 
+                          onClick={() => { setFilterType('Tutti'); toggleFilters(); }}
+                          className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                        >
+                          Tutti
+                        </button>
+                        {Object.entries(EVENT_TYPES).map(([type, data]) => {
+                          const isSelected = filterType === type;
+                          let selectedClass = isSelected ? 'bg-slate-500 text-white border-slate-500' : data.color;
+                          return (
+                            <button
+                              key={type}
+                              onClick={() => { setFilterType(type); toggleFilters(); }}
+                              className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${selectedClass} hover:brightness-95`}
+                            >
+                              {type}
+                            </button>
+                          );
+                        })}
+                    </div>
+                    <div className="w-full h-px bg-slate-200 my-2"></div>
+                    <p className="font-bold text-sm text-slate-500 px-1">Partecipazione</p>
+                    <button
+                        onClick={() => { setFilterParticipation(filterParticipation === 'Tutti' ? 'I miei eventi' : 'Tutti'); toggleFilters(); }}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border flex items-center justify-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`}
+                    >
+                        <User size={16} />
+                        Filtra i miei eventi
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Filters */}
+            <div className="hidden md:flex flex-wrap items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
                 <button 
                   onClick={() => setFilterType('Tutti')}
                   className={`px-4 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 text-white border-slate-800 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
@@ -230,7 +282,7 @@ const EventsDashboard = ({ userProfile }) => {
       {hasAdminAccess(userProfile) && (
         <button 
           onClick={openCreateModal}
-          className="fab-btn md:hidden"
+          className="fab-btn lg:hidden"
         >
           <PlusCircle size={28} />
         </button>

@@ -17,6 +17,7 @@ export const useEventsDashboard = (userProfile) => {
   const [eventToDelete, setEventToDelete] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEventId, setCurrentEventId] = useState(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: '', date: '', time: '', location: '', type: 'Servizio', description: ''
   });
@@ -151,6 +152,8 @@ export const useEventsDashboard = (userProfile) => {
     setEventToDelete(null);
   };
 
+  const toggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
+
   const filteredEvents = upcomingEvents.filter(event => {
     if (filterType !== 'Tutti' && event.type !== filterType) return false;
     if (filterParticipation === 'I miei eventi' && !event.participants?.includes(userProfile.id)) return false;
@@ -191,6 +194,8 @@ export const useEventsDashboard = (userProfile) => {
     isDeleteModalOpen,
     openCreateModal,
     openEditModal,
-    isEditing
+    isEditing,
+    isFiltersOpen,
+    toggleFilters
   };
 };
