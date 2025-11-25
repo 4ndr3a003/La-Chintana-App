@@ -3,7 +3,8 @@ import { IonApp } from '@ionic/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
-import { auth, db, appId } from './services/firebase';
+import { getToken, onMessage } from 'firebase/messaging';
+import { auth, db, appId, messaging } from './services/firebase';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 
@@ -137,6 +138,45 @@ export default function App() {
 
         } catch (e) {
           console.error('Error initializing push notifications', e);
+        }
+      } else {
+        // Web Implementation
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            
+            // IMPORTANTE: Inserisci qui la tua VAPID Key presa da Firebase Console
+            const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
+            
+            if (vapidKey === "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk") {
+                console.warn("VAPID Key mancante. Inseriscila in App.jsx per abilitare le notifiche web.");
+            } else {
+                const currentToken = await getToken(messaging, { vapidKey });
+                if (currentToken) {
+                  console.log('Web Push Token:', currentToken);
+                  const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+                  await updateDoc(profileRef, {
+                    fcmTokens: arrayUnion(currentToken)
+                  });
+                } else {
+                  console.log('No registration token available.');
+                }
+            }
+
+            onMessage(messaging, (payload) => {
+              console.log('Message received. ', payload);
+              new Notification(payload.notification.title, {
+                body: payload.notification.body,
+                icon: '/logo_chintana.png'
+              });
+            });
+
+          } else {
+            console.log('Unable to get permission to notify.');
+          }
+        } catch (err) {
+          console.error('An error occurred while retrieving token. ', err);
         }
       }
     };
