@@ -2,8 +2,10 @@
 import { IonApp } from '@ionic/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
 import { auth, db, appId } from './services/firebase';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
 
 // Components
 import Header from './components/layout/Header';
@@ -75,6 +77,67 @@ export default function App() {
     return () => unsubscribeProfile();
   }, [authUser, activeProfileId, navigate, location.pathname]);
 
+  // Push Notifications Initialization
+  useEffect(() => {
+    if (!userProfile) return;
+
+    const initPushNotifications = async () => {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const permission = await PushNotifications.requestPermissions();
+          if (permission.receive === 'granted') {
+            await PushNotifications.register();
+          } else {
+            console.log('Push notification permission denied');
+          }
+        } catch (e) {
+          console.error('Error initializing push notifications', e);
+        }
+      }
+    };
+
+    initPushNotifications();
+
+    const addListeners = async () => {
+      if (Capacitor.isNativePlatform()) {
+        await PushNotifications.addListener('registration', async token => {
+          console.log('Push registration success, token: ' + token.value);
+          // Save token to user profile
+          try {
+            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+            await updateDoc(profileRef, {
+              fcmTokens: arrayUnion(token.value)
+            });
+          } catch (err) {
+            console.error('Error saving FCM token:', err);
+          }
+        });
+
+        await PushNotifications.addListener('registrationError', err => {
+          console.error('Push registration error: ', err.error);
+        });
+
+        await PushNotifications.addListener('pushNotificationReceived', notification => {
+          console.log('Push received: ', notification);
+          // You can show a toast or alert here if needed
+        });
+
+        await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+          console.log('Push action performed: ', notification);
+          // Navigate to specific page if needed
+        });
+      }
+    };
+
+    addListeners();
+
+    return () => {
+      if (Capacitor.isNativePlatform()) {
+        PushNotifications.removeAllListeners();
+      }
+    };
+  }, [userProfile]);
+
   const handleLogout = async () => {
     localStorage.removeItem('pc_profile_id');
     setActiveProfileId(null);
@@ -125,7 +188,7 @@ export default function App() {
         {/* MOBILE BOTTOM NAV */}
         {userProfile && location.pathname !== '/login' && (
           <div className="fixed bottom-0 left-0 right-0 z-20 xl:hidden pointer-events-none">
-            <MobileNav />
+            <MobileNav userProfile={userProfile} />
           </div>
         )}
       </div>

@@ -55,6 +55,23 @@ export const useUserProfileView = (userProfile) => {
 
   // Calcolo automatico dello stato operativo
   const calculateStatus = () => {
+    // Recuperiamo lo stato direttamente dal DB
+    // Se nel DB è "Non Operativo", lo mostriamo come tale.
+    // Se nel DB è "Operativo", verifichiamo comunque le regole per sicurezza (opzionale, ma richiesto dall'utente)
+    // L'utente ha detto: "fai in modo che anche nella sezione del prfilo il dato venga recuperato dal db"
+    // E anche: "voglio che cambi in 'Non operativo' quando non e presente il corso delle 12 ore o quando si ha piu di 75 anni"
+    
+    // Quindi:
+    // 1. Se il DB dice "Non Operativo", è "Non Operativo".
+    // 2. Se il DB dice "Operativo", controlliamo se dovrebbe essere "Non Operativo" secondo le regole.
+    
+    const dbStatus = userProfile.status || 'Operativo';
+    
+    if (dbStatus.toLowerCase() === 'non operativo') {
+        return 'Non Operativo';
+    }
+
+    // Regole di validazione extra (se nel DB è Operativo ma non dovrebbe esserlo)
     if (!userProfile.birthDate) return 'Non Operativo'; 
     
     const birthDate = new Date(userProfile.birthDate);
@@ -70,6 +87,7 @@ export const useUserProfileView = (userProfile) => {
     if (age > 75 || !has12HoursCourse) {
         return 'Non Operativo';
     }
+    
     return 'Operativo';
   };
 

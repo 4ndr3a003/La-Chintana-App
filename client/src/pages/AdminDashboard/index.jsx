@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
@@ -11,7 +11,6 @@ import './AdminDashboard.css';
 
 const AdminDashboard = ({ userProfile }) => {
   const {
-    users,
     selectedUser,
     isEditing,
     isCreating,
@@ -32,6 +31,13 @@ const AdminDashboard = ({ userProfile }) => {
     handleDeleteUser,
     confirmDeleteUser,
     cancelDeleteUser,
+    selectedUserIds,
+    toggleUserSelection,
+    toggleAllUsers,
+    handleDeleteSelected,
+    confirmDeleteSelected,
+    cancelDeleteSelected,
+    isBulkDeleteModalOpen,
     searchTerm,
     setSearchTerm,
     filterRole,
@@ -40,7 +46,11 @@ const AdminDashboard = ({ userProfile }) => {
     setFilterStatus,
     filteredUsers,
     isFiltersOpen,
-    toggleFilters
+    toggleFilters,
+    handleExportCSV,
+    handleImportCSV,
+    notification,
+    closeNotification
   } = useAdminDashboard();
 
   const formatName = (fullName) => {
@@ -83,7 +93,7 @@ const AdminDashboard = ({ userProfile }) => {
     <div className="admin-dashboard-container">
       <div className="dashboard-header">
          <h3 className="dashboard-title">
-            <Users className="text-purple-600" size={20} /> Gestione Organico
+            <Users className="text-blue-600" size={28} /> Gestione Volontari
          </h3>
          <span className="user-count-badge">{filteredUsers.length} Volontari</span>
       </div>
@@ -110,7 +120,16 @@ const AdminDashboard = ({ userProfile }) => {
             </button>
             
             {/* Desktop Filters */}
-            <div className="hidden lg:flex gap-4">
+            <div className="hidden lg:flex gap-4 items-center">
+                {selectedUserIds.length > 0 && userProfile?.role === ROLES.PRESIDENT && (
+                    <button
+                        onClick={handleDeleteSelected}
+                        className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors shadow-sm shrink-0 animate-in fade-in"
+                    >
+                        <Trash2 size={18} />
+                        Elimina ({selectedUserIds.length})
+                    </button>
+                )}
                 <div className="w-48">
                     <CustomSelect 
                         options={filterRoleOptions}
@@ -162,6 +181,14 @@ const AdminDashboard = ({ userProfile }) => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-200" style={{ backgroundColor: 'var(--color-pc-yellow)' }}>
+                <th className="p-4 w-10">
+                    <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        checked={filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.filter(u => u.role !== ROLES.PRESIDENT).length}
+                        onChange={toggleAllUsers}
+                    />
+                </th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Volontario</th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Codice Emercomnet</th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Ruolo</th>
@@ -176,6 +203,16 @@ const AdminDashboard = ({ userProfile }) => {
                   onClick={() => openView(user)}
                   className="hover:bg-slate-50 transition-colors cursor-pointer group"
                 >
+                  <td className="p-4" onClick={e => e.stopPropagation()}>
+                    {user.role !== ROLES.PRESIDENT && (
+                        <input 
+                            type="checkbox" 
+                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            checked={selectedUserIds.includes(user.id)}
+                            onChange={() => toggleUserSelection(user.id)}
+                        />
+                    )}
+                  </td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <Avatar src={user.photoUrl} name={user.name} size="sm" />
@@ -198,8 +235,8 @@ const AdminDashboard = ({ userProfile }) => {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${user.status === 'Non Operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                      <span className={`text-sm font-medium ${user.status === 'Non Operativo' ? 'text-red-700' : 'text-green-700'}`}>
+                      <span className={`w-2 h-2 rounded-full ${user.status?.trim().toLowerCase() === 'non operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                      <span className={`text-sm font-medium ${user.status?.trim().toLowerCase() === 'non operativo' ? 'text-red-700' : 'text-green-700'}`}>
                         {user.status || 'Operativo'}
                       </span>
                     </div>
@@ -213,7 +250,7 @@ const AdminDashboard = ({ userProfile }) => {
                       >
                           <Edit2 size={18} />
                       </button>
-                      {userProfile?.role === ROLES.PRESIDENT && (
+                      {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
                           <button 
                               onClick={() => handleDeleteUser(user)}
                               className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
@@ -254,7 +291,7 @@ const AdminDashboard = ({ userProfile }) => {
                         >
                             <Edit2 size={16} />
                         </button>
-                        {userProfile?.role === ROLES.PRESIDENT && (
+                        {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
                             <button 
                                 onClick={() => handleDeleteUser(user)} 
                                 className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
@@ -277,8 +314,8 @@ const AdminDashboard = ({ userProfile }) => {
                     <div className="bg-slate-50 p-2.5 rounded-lg">
                         <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
                         <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${user.status === 'Non Operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                            <span className={`font-bold text-xs ${user.status === 'Non Operativo' ? 'text-red-700' : 'text-green-700'}`}>
+                            <span className={`w-2 h-2 rounded-full ${user.status?.trim().toLowerCase() === 'non operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                            <span className={`font-bold text-xs ${user.status?.trim().toLowerCase() === 'non operativo' ? 'text-red-700' : 'text-green-700'}`}>
                                 {user.status || 'Operativo'}
                             </span>
                         </div>
@@ -290,6 +327,30 @@ const AdminDashboard = ({ userProfile }) => {
                 </div>
             </div>
         ))}
+      </div>
+
+      {/* Import/Export Actions */}
+      <div className="flex justify-end gap-3 mt-6 mb-20 px-4 md:px-0">
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleImportCSV}
+          style={{ display: 'none' }}
+          id="csv-upload"
+        />
+        <label htmlFor="csv-upload">
+            <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+                <Upload size={18} />
+                Importa CSV
+            </div>
+        </label>
+        <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
+        >
+            <Download size={18} />
+            Esporta CSV
+        </button>
       </div>
 
       <button 
@@ -444,10 +505,19 @@ const AdminDashboard = ({ userProfile }) => {
                           <label className="info-label">Email</label>
                           <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                         </div>
-                        {isCreating && (
+                        {(isCreating || (isEditing && userProfile?.role === ROLES.PRESIDENT)) && (
                           <div className="md:col-span-2">
-                            <label className="info-label">Password Iniziale</label>
-                            <input type="text" required className="form-input" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                            <label className="info-label">
+                                {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
+                            </label>
+                            <input 
+                                type="text" 
+                                required={isCreating} 
+                                className="form-input" 
+                                value={formData.password || ''} 
+                                onChange={e => setFormData({...formData, password: e.target.value})} 
+                                placeholder={isEditing ? "Inserisci nuova password..." : ""}
+                            />
                           </div>
                         )}
                      </div>
@@ -573,6 +643,74 @@ const AdminDashboard = ({ userProfile }) => {
                   Elimina
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {isBulkDeleteModalOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="text-amber-600" size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina {selectedUserIds.length} Volontari</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Sei sicuro di voler eliminare i volontari selezionati? Questa azione non può essere annullata.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={cancelDeleteSelected}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button 
+                  onClick={confirmDeleteSelected}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Elimina Tutto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Modal */}
+      {notification.isOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 120}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
+            <button 
+                onClick={closeNotification}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+                <X size={20} />
+            </button>
+            <div className="flex flex-col items-center text-center">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+                  notification.type === 'success' ? 'bg-green-100 text-green-600' :
+                  notification.type === 'error' ? 'bg-red-100 text-red-600' :
+                  notification.type === 'warning' ? 'bg-amber-100 text-amber-600' :
+                  'bg-blue-100 text-blue-600'
+              }`}>
+                {notification.type === 'success' && <CheckCircle size={24} />}
+                {notification.type === 'error' && <XCircle size={24} />}
+                {notification.type === 'warning' && <AlertTriangle size={24} />}
+                {notification.type === 'info' && <Info size={24} />}
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">{notification.title}</h3>
+              <div className="text-sm text-slate-600 mb-6 whitespace-pre-wrap text-left w-full bg-slate-50 p-3 rounded-lg border border-slate-100 max-h-60 overflow-y-auto font-mono">
+                {notification.message}
+              </div>
+              <button 
+                onClick={closeNotification}
+                className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors"
+              >
+                Chiudi
+              </button>
             </div>
           </div>
         </div>

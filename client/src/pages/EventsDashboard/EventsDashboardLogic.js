@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useEventsDashboard = (userProfile) => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -120,6 +121,8 @@ export const useEventsDashboard = (userProfile) => {
           participants: [],
           createdBy: userProfile.id
         });
+
+        // Notification is now handled by Cloud Functions
       }
 
       setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '' });

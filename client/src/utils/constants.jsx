@@ -61,24 +61,25 @@ export const SPECIALIZATIONS_DATA = {
       "HACCP",
       "BLSD",
       "Primo soccorso",
-      "Visita medica"
+      "Visita medica",
+      "Manovre di disostruzione"
     ],
     icon: <HeartPulse size={18} className="text-red-600" />,
     color: "bg-red-50 text-red-700 border-red-100"
   },
   "Operatività": {
     items: [
-      "Motosega"
+      "Motosega",
+      "Muletto"
     ],
     icon: <HardHat size={18} className="text-orange-600" />,
     color: "bg-orange-50 text-orange-700 border-orange-100"
   },
   "Patenti di Guida": {
     items: [
-      "Patente AM", "Patente A1", "Patente A2", "Patente A",
-      "Patente B1", "Patente B", "Patente BE",
-      "Patente C1", "Patente C", "Patente C1E", "Patente CE",
-      "Patente D1", "Patente D", "Patente D1E", "Patente DE"
+      "Patente B", "Patente BE",
+      "Patente C", "Patente CE",
+      "Patente D", "Patente DE"
     ],
     icon: <Truck size={18} className="text-slate-600" />,
     color: "bg-slate-100 text-slate-700 border-slate-200"

@@ -66,7 +66,7 @@ const EventsDashboard = ({ userProfile }) => {
          <div className="events-title-row">
             <div className="events-title-group">
                 <h3 className="events-title">
-                    <Calendar className="text-blue-600" size={20} /> Calendario Attività
+                    <Calendar className="text-blue-600" size={28} /> Calendario Attività
                 </h3>
                 <span className="events-count-badge">{filteredEvents.length} Eventi</span>
             </div>

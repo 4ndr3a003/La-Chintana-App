@@ -1,5 +1,10 @@
 {
   "appId": "com.lachintana.app",
   "appName": "La Chintana",
-  "webDir": "client/dist"
+  "webDir": "client/dist",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
 }

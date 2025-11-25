@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useCommunicationsView = (userProfile) => {
   const [messages, setMessages] = useState([]);
@@ -60,6 +61,8 @@ export const useCommunicationsView = (userProfile) => {
           authorName: userProfile.name,
           authorPhotoURL: userProfile.photoURL || null
         });
+
+        // Notification is now handled by Cloud Functions
       }
       setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale' });
       setIsCreateModalOpen(false);

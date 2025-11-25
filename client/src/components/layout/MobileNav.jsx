@@ -1,30 +1,69 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonTabBar, IonTabButton, IonLabel } from '@ionic/react';
-import { MessageSquare, LayoutDashboard, Calendar } from 'lucide-react';
+import { MessageSquare, LayoutDashboard, Calendar, Users } from 'lucide-react';
+import { ROLES } from '../../utils/constants';
 
-const MobileNav = () => {
+const MobileNav = ({ userProfile }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
 
+  const showAdmin = userProfile && (userProfile.role === ROLES.PRESIDENT || userProfile.role === ROLES.BOARD);
+
   return (
     <div className="px-6 pb-6 pt-2 bg-transparent pointer-events-none">
-      <IonTabBar className="rounded-2xl shadow-xl border border-slate-100 overflow-hidden h-16 md:max-w-md md:mx-auto mobile-tab-bar pointer-events-auto">
-        <IonTabButton tab="comms" onClick={() => navigate('/comms')} selected={isActive('/comms')} className="mobile-tab-btn">
-          <MessageSquare size={24} className={isActive('/comms') ? "mobile-tab-icon-active" : "mobile-tab-icon-inactive"} />
-          <IonLabel className={isActive('/comms') ? "mobile-tab-label-active" : "mobile-tab-label-inactive"}>Avvisi</IonLabel>
+      <IonTabBar 
+        className="rounded-2xl shadow-xl border border-white/10 overflow-hidden h-16 md:max-w-md md:mx-auto pointer-events-auto backdrop-blur-xl"
+        style={{
+          '--background': 'var(--color-pc-blue-700)',
+        }}
+      >
+        <IonTabButton 
+          tab="comms" 
+          onClick={() => navigate('/comms')} 
+          selected={isActive('/comms')} 
+          className="mobile-tab-btn"
+          style={{ '--background': 'transparent' }}
+        >
+          <MessageSquare size={24} className={isActive('/comms') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
+          <IonLabel className={isActive('/comms') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Avvisi</IonLabel>
         </IonTabButton>
 
-        <IonTabButton tab="home" onClick={() => navigate('/')} selected={isActive('/')} className="mobile-tab-btn">
-          <LayoutDashboard size={24} className={isActive('/') ? "mobile-tab-icon-active" : "mobile-tab-icon-inactive"} />
-          <IonLabel className={isActive('/') ? "mobile-tab-label-active" : "mobile-tab-label-inactive"}>Home</IonLabel>
+        <IonTabButton 
+          tab="home" 
+          onClick={() => navigate('/')} 
+          selected={isActive('/')} 
+          className="mobile-tab-btn"
+          style={{ '--background': 'transparent' }}
+        >
+          <LayoutDashboard size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
+          <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Home</IonLabel>
         </IonTabButton>
 
-        <IonTabButton tab="events" onClick={() => navigate('/events')} selected={isActive('/events')} className="mobile-tab-btn">
-          <Calendar size={24} className={isActive('/events') ? "mobile-tab-icon-active" : "mobile-tab-icon-inactive"} />
-          <IonLabel className={isActive('/events') ? "mobile-tab-label-active" : "mobile-tab-label-inactive"}>Eventi</IonLabel>
+        <IonTabButton 
+          tab="events" 
+          onClick={() => navigate('/events')} 
+          selected={isActive('/events')} 
+          className="mobile-tab-btn"
+          style={{ '--background': 'transparent' }}
+        >
+          <Calendar size={24} className={isActive('/events') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
+          <IonLabel className={isActive('/events') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Eventi</IonLabel>
         </IonTabButton>
+
+        {showAdmin && (
+          <IonTabButton 
+            tab="admin" 
+            onClick={() => navigate('/admin')} 
+            selected={isActive('/admin')} 
+            className="mobile-tab-btn"
+            style={{ '--background': 'transparent' }}
+          >
+            <Users size={24} className={isActive('/admin') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
+            <IonLabel className={isActive('/admin') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Gestione</IonLabel>
+          </IonTabButton>
+        )}
       </IonTabBar>
     </div>
   );
