@@ -1,14 +1,15 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import CustomSelect from '../../components/ui/CustomSelect';
 import { useAdminDashboard } from './AdminDashboardLogic';
 import './AdminDashboard.css';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ userProfile }) => {
   const {
     users,
     selectedUser,
@@ -26,8 +27,57 @@ const AdminDashboard = () => {
     toggleSpec,
     addCustomSpec,
     closeAll,
-    setIsViewing
+    setIsViewing,
+    isDeleteModalOpen,
+    handleDeleteUser,
+    confirmDeleteUser,
+    cancelDeleteUser,
+    searchTerm,
+    setSearchTerm,
+    filterRole,
+    setFilterRole,
+    filterStatus,
+    setFilterStatus,
+    filteredUsers,
+    isFiltersOpen,
+    toggleFilters
   } = useAdminDashboard();
+
+  const formatName = (fullName) => {
+    if (!fullName) return '';
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length < 2) return fullName;
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(' ');
+    return `${lastName} ${firstName}`;
+  };
+
+  const statusOptions = [
+    { value: 'Operativo', label: 'Operativo', color: 'bg-green-500' },
+    { value: 'Non Operativo', label: 'Non Operativo', color: 'bg-red-500' }
+  ];
+
+  const roleOptions = Object.values(ROLES).map(r => ({
+    value: r,
+    label: ROLE_LABELS[r],
+    color: r === ROLES.PRESIDENT ? 'bg-yellow-500' : r === ROLES.BOARD ? 'bg-purple-500' : 'bg-blue-500'
+  }));
+
+  const filterRoleOptions = [
+    { value: 'Tutti', label: 'Tutti i Ruoli' },
+    ...roleOptions
+  ];
+
+  const filterStatusOptions = [
+    { value: 'Tutti', label: 'Tutti gli Stati' },
+    ...statusOptions
+  ];
+
+  const boardRoleOptions = Object.values(BOARD_ROLES).map(r => ({
+    value: r,
+    label: r,
+    color: 'bg-purple-500'
+  }));
 
   return (
     <div className="admin-dashboard-container">
@@ -35,48 +85,216 @@ const AdminDashboard = () => {
          <h3 className="dashboard-title">
             <Users className="text-purple-600" size={20} /> Gestione Organico
          </h3>
-         <span className="user-count-badge">{users.length} Volontari</span>
+         <span className="user-count-badge">{filteredUsers.length} Volontari</span>
       </div>
 
-      <div className="users-grid">
-        {users.map(user => (
-          <Card key={user.id} noPadding>
-             <div 
-               onClick={() => openView(user)}
-               className="user-card-inner group"
-             >
-                <Avatar src={user.photoUrl} name={user.name} size="md" />
-                <div className="user-card-content">
-                  <h4 className="user-name">{user.name}</h4>
-                  <div className="user-details">
-                    {user.phone && (
-                      <div className="user-detail-item">
-                        <Phone size={12} /> {user.phone}
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex gap-3">
+            <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                    type="text" 
+                    placeholder="Cerca volontario..." 
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* Mobile Filter Toggle Button */}
+            <button
+                onClick={toggleFilters}
+                className={`lg:hidden flex items-center justify-center px-4 rounded-xl border transition-colors ${isFiltersOpen ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200'}`}
+            >
+                <SlidersHorizontal size={20} />
+            </button>
+            
+            {/* Desktop Filters */}
+            <div className="hidden lg:flex gap-4">
+                <div className="w-48">
+                    <CustomSelect 
+                        options={filterRoleOptions}
+                        value={filterRole}
+                        onChange={setFilterRole}
+                        placeholder="Filtra per Ruolo"
+                    />
+                </div>
+                <div className="w-48">
+                    <CustomSelect 
+                        options={filterStatusOptions}
+                        value={filterStatus}
+                        onChange={setFilterStatus}
+                        placeholder="Filtra per Stato"
+                    />
+                </div>
+                <button
+                    onClick={openCreate}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0"
+                >
+                    <PlusCircle size={18} />
+                    Nuovo Volontario
+                </button>
+            </div>
+        </div>
+
+        {/* Mobile Filters Content */}
+        {isFiltersOpen && (
+            <div className="lg:hidden flex flex-col gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2">
+                <CustomSelect 
+                    options={filterRoleOptions}
+                    value={filterRole}
+                    onChange={setFilterRole}
+                    placeholder="Filtra per Ruolo"
+                />
+                <CustomSelect 
+                    options={filterStatusOptions}
+                    value={filterStatus}
+                    onChange={setFilterStatus}
+                    placeholder="Filtra per Stato"
+                />
+            </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200" style={{ backgroundColor: 'var(--color-pc-yellow)' }}>
+                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Volontario</th>
+                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Codice Emercomnet</th>
+                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Ruolo</th>
+                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Stato</th>
+                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider text-right">Azioni</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredUsers.map(user => (
+                <tr 
+                  key={user.id} 
+                  onClick={() => openView(user)}
+                  className="hover:bg-slate-50 transition-colors cursor-pointer group"
+                >
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar src={user.photoUrl} name={user.name} size="sm" />
+                      <div>
+                        <p className="font-bold text-slate-800 text-sm">{formatName(user.name)}</p>
+                        <p className="text-xs text-slate-500">{user.email}</p>
                       </div>
-                    )}
-                    <div className="user-detail-item">
-                      <Award size={12} /> {(user.specializations || []).length} Abilitazioni
                     </div>
-                  </div>
+                  </td>
+                  <td className="p-4">
+                    <span className="font-mono text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
+                      {user.emercomnetId || '-'}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                     <Badge 
+                       text={ROLE_LABELS[user.role]} 
+                       color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'} 
+                     />
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${user.status === 'Non Operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                      <span className={`text-sm font-medium ${user.status === 'Non Operativo' ? 'text-red-700' : 'text-green-700'}`}>
+                        {user.status || 'Operativo'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                      <button 
+                          onClick={() => openEdit(user)}
+                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                          title="Modifica Dati"
+                      >
+                          <Edit2 size={18} />
+                      </button>
+                      {userProfile?.role === ROLES.PRESIDENT && (
+                          <button 
+                              onClick={() => handleDeleteUser(user)}
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                              title="Elimina Volontario"
+                          >
+                              <Trash2 size={18} />
+                          </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3 pb-20">
+        {filteredUsers.map(user => (
+            <div 
+                key={user.id} 
+                onClick={() => openView(user)} 
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform"
+            >
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <Avatar src={user.photoUrl} name={user.name} size="md" />
+                        <div>
+                            <h4 className="font-bold text-slate-800">{formatName(user.name)}</h4>
+                            <p className="text-xs text-slate-500">{user.email}</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={() => openEdit(user)} 
+                            className="p-2 text-slate-400 hover:text-blue-600 bg-slate-50 rounded-full"
+                        >
+                            <Edit2 size={16} />
+                        </button>
+                        {userProfile?.role === ROLES.PRESIDENT && (
+                            <button 
+                                onClick={() => handleDeleteUser(user)} 
+                                className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="user-actions">
-                  <Badge text={ROLE_LABELS[user.role]} color={user.role === ROLES.PRESIDENT ? 'blue' : user.role === ROLES.BOARD ? 'purple' : 'green'} />
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); openEdit(user); }}
-                    className="edit-button"
-                    title="Modifica Dati"
-                  >
-                    <Edit2 size={16} />
-                  </button>
+                
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-slate-50 p-2.5 rounded-lg">
+                        <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
+                        <Badge 
+                            text={ROLE_LABELS[user.role]} 
+                            color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'} 
+                            size="sm"
+                        />
+                    </div>
+                    <div className="bg-slate-50 p-2.5 rounded-lg">
+                        <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full ${user.status === 'Non Operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                            <span className={`font-bold text-xs ${user.status === 'Non Operativo' ? 'text-red-700' : 'text-green-700'}`}>
+                                {user.status || 'Operativo'}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="col-span-2 bg-slate-50 p-2.5 rounded-lg flex justify-between items-center">
+                        <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Codice Emercomnet</span>
+                        <span className="font-mono text-slate-700 font-bold">{user.emercomnetId || '-'}</span>
+                    </div>
                 </div>
-             </div>
-          </Card>
+            </div>
         ))}
       </div>
 
       <button 
         onClick={openCreate}
-        className="fab-button"
+        className="fab-button lg:hidden"
       >
         <PlusCircle size={28} />
       </button>
@@ -93,7 +311,7 @@ const AdminDashboard = () => {
                 <div className="modal-profile-header">
                    <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
                    <h2 className="modal-profile-name">{selectedUser.name}</h2>
-                   <Badge text={ROLE_LABELS[selectedUser.role]} color="blue" className="mt-1" />
+                   <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
                    {selectedUser.boardRole && <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />}
                 </div>
                 
@@ -244,36 +462,29 @@ const AdminDashboard = () => {
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                        <div>
                           <label className="info-label">Stato Operativo</label>
-                          <select 
-                            className="form-select"
+                          <CustomSelect 
                             value={formData.status}
-                            onChange={e => setFormData({...formData, status: e.target.value})}
-                          >
-                            <option value="Operativo">Operativo</option>
-                            <option value="Non Operativo">Non Operativo</option>
-                          </select>
+                            onChange={val => setFormData({...formData, status: val})}
+                            options={statusOptions}
+                          />
                        </div>
                        <div>
                           <label className="info-label">Ruolo Organizzativo</label>
-                          <select 
-                            className="form-select"
+                          <CustomSelect 
                             value={formData.role}
-                            onChange={e => setFormData({...formData, role: e.target.value})}
-                          >
-                            {Object.values(ROLES).map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
-                          </select>
+                            onChange={val => setFormData({...formData, role: val})}
+                            options={roleOptions}
+                          />
                        </div>
                        {formData.role === ROLES.BOARD && (
                          <div>
                             <label className="info-label">Incarico Direttivo</label>
-                            <select 
-                              className="form-select"
+                            <CustomSelect 
                               value={formData.boardRole || ''}
-                              onChange={e => setFormData({...formData, boardRole: e.target.value})}
-                            >
-                              <option value="">Seleziona...</option>
-                              {Object.values(BOARD_ROLES).map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
+                              onChange={val => setFormData({...formData, boardRole: val})}
+                              options={boardRoleOptions}
+                              placeholder="Seleziona..."
+                            />
                          </div>
                        )}
                      </div>
@@ -332,6 +543,37 @@ const AdminDashboard = () => {
                    </div>
                 </form>
              </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="text-amber-600" size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Volontario</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Sei sicuro di voler eliminare questo volontario? Questa azione non può essere annullata.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={cancelDeleteUser}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button 
+                  onClick={confirmDeleteUser}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Elimina
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

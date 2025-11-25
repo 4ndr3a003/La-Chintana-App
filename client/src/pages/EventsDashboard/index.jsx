@@ -6,6 +6,7 @@ import Button from '../../components/ui/Button';
 import CalendarGrid from '../../components/events/CalendarGrid';
 import EventCard from '../../components/events/EventCard';
 import { useEventsDashboard } from './EventsDashboardLogic';
+import CustomSelect from '../../components/ui/CustomSelect';
 import './EventsDashboard.css';
 
 const EventsDashboard = ({ userProfile }) => {
@@ -41,6 +42,23 @@ const EventsDashboard = ({ userProfile }) => {
     isFiltersOpen,
     toggleFilters
   } = useEventsDashboard(userProfile);
+
+  const eventTypeOptions = Object.entries(EVENT_TYPES).map(([type, data]) => {
+      let colorClass = '';
+      // Simple mapping based on type or data.color
+      if (type === 'Servizio') colorClass = 'bg-amber-500';
+      else if (type === 'Riunione') colorClass = 'bg-slate-500';
+      else if (type === 'Emergenza') colorClass = 'bg-red-500';
+      else if (type === 'Esercitazione') colorClass = 'bg-blue-500';
+      else if (type === 'Formazione') colorClass = 'bg-emerald-500';
+      else colorClass = 'bg-slate-500';
+
+      return {
+          value: type,
+          label: type,
+          color: colorClass
+      };
+  });
 
   return (
     <div className="events-container">
@@ -333,13 +351,11 @@ const EventsDashboard = ({ userProfile }) => {
                 </div>
                 <div>
                   <label className="form-label">Tipologia</label>
-                  <select className="form-select" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})}>
-                    <option>Servizio</option>
-                    <option>Esercitazione</option>
-                    <option>Riunione</option>
-                    <option>Emergenza</option>
-                    <option>Formazione</option>
-                  </select>
+                  <CustomSelect 
+                    value={newEvent.type} 
+                    onChange={val => setNewEvent({...newEvent, type: val})} 
+                    options={eventTypeOptions}
+                  />
                 </div>
                 <div className="form-grid">
                   <div>

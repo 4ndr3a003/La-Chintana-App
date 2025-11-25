@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { query, collection, onSnapshot, doc, updateDoc, addDoc } from 'firebase/firestore';
+import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
 import { ROLES } from '../../utils/constants';
 
@@ -9,6 +9,16 @@ export const useAdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  
+  // Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState('Tutti');
+  const [filterStatus, setFilterStatus] = useState('Tutti');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const toggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
   
   // Form State
   const [formData, setFormData] = useState({});
@@ -35,6 +45,16 @@ export const useAdminDashboard = () => {
     });
     return () => unsub();
   }, []);
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           user.emercomnetId?.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesRole = filterRole === 'Tutti' || user.role === filterRole;
+    const matchesStatus = filterStatus === 'Tutti' || user.status === filterStatus;
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   const openEdit = (user) => {
     const [firstName, ...lastNameParts] = user.name ? user.name.split(' ') : ['', ''];
@@ -145,6 +165,28 @@ export const useAdminDashboard = () => {
       setSelectedUser(null);
   }
 
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userToDelete.id));
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Errore durante l'eliminazione del volontario.");
+    }
+  };
+
+  const cancelDeleteUser = () => {
+    setIsDeleteModalOpen(false);
+    setUserToDelete(null);
+  };
+
   return {
     users,
     selectedUser,
@@ -164,6 +206,19 @@ export const useAdminDashboard = () => {
     closeAll,
     setIsViewing,
     setIsEditing,
-    setIsCreating
+    setIsCreating,
+    isDeleteModalOpen,
+    handleDeleteUser,
+    confirmDeleteUser,
+    cancelDeleteUser,
+    searchTerm,
+    setSearchTerm,
+    filterRole,
+    setFilterRole,
+    filterStatus,
+    setFilterStatus,
+    filteredUsers,
+    isFiltersOpen,
+    toggleFilters
   };
 };

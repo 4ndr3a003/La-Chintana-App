@@ -47,7 +47,7 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
 
             <Route path="/admin" element={
                 <ProtectedRoute userProfile={userProfile}>
-                    <AdminDashboard />
+                    <AdminDashboard userProfile={userProfile} />
                 </ProtectedRoute>
             } />
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Camera, LogOut } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
+import Badge from '../../components/ui/Badge';
+import { ROLES, ROLE_LABELS } from '../../utils/constants';
 import { useUserProfileView } from './UserProfileViewLogic';
 import './UserProfileView.css';
 
@@ -24,7 +26,14 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       <h1 className="text-3xl font-extrabold text-[var(--color-slate-900)] mb-8">Profilo Volontario</h1>
 
       {/* Top Card: Profile Header */}
-      <div className="bg-white rounded-3xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)]">
+      <div className="bg-white rounded-3xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)] relative">
+        <div className="absolute top-6 right-6">
+            <Badge 
+                text={ROLE_LABELS[userProfile.role]} 
+                color={userProfile.role === ROLES.PRESIDENT ? 'yellow' : userProfile.role === ROLES.BOARD ? 'purple' : 'blue'} 
+            />
+        </div>
+
         {/* Avatar Section */}
         <div className="relative group">
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--color-slate-50)] shadow-sm">
