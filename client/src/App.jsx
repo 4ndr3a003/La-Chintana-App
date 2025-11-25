@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { IonApp } from '@ionic/react';
+import { IonApp, IonToast } from '@ionic/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
@@ -18,6 +18,7 @@ export default function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('pc_profile_id'));
   const [loading, setLoading] = useState(true);
+  const [toastInfo, setToastInfo] = useState({ isOpen: false, message: '' });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -170,17 +171,21 @@ export default function App() {
 
                 if (currentToken) {
                   console.log('Web Push Token:', currentToken);
+                  setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
+                  
                   const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
                   await updateDoc(profileRef, {
                     fcmTokens: arrayUnion(currentToken)
                   });
                 } else {
                   console.log('No registration token available.');
+                  setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
                 }
             }
 
             onMessage(messaging, (payload) => {
               console.log('Message received. ', payload);
+              setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
               new Notification(payload.notification.title, {
                 body: payload.notification.body,
                 icon: '/logo_chintana.png'
@@ -189,9 +194,11 @@ export default function App() {
 
           } else {
             console.log('Unable to get permission to notify.');
+            setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
           }
         } catch (err) {
           console.error('An error occurred while retrieving token. ', err);
+          setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
         }
       }
     };
@@ -258,6 +265,15 @@ export default function App() {
             <MobileNav userProfile={userProfile} />
           </div>
         )}
+
+        <IonToast
+          isOpen={toastInfo.isOpen}
+          onDidDismiss={() => setToastInfo({ ...toastInfo, isOpen: false })}
+          message={toastInfo.message}
+          duration={3000}
+          position="top"
+          color="dark"
+        />
       </div>
     </IonApp>
   );
