@@ -84,12 +84,57 @@ export default function App() {
     const initPushNotifications = async () => {
       if (Capacitor.isNativePlatform()) {
         try {
-          const permission = await PushNotifications.requestPermissions();
-          if (permission.receive === 'granted') {
-            await PushNotifications.register();
-          } else {
-            console.log('Push notification permission denied');
+          // 1. Register listeners FIRST
+          await PushNotifications.addListener('registration', async token => {
+            console.log('Push registration success, token: ' + token.value);
+            try {
+              const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+              await updateDoc(profileRef, {
+                fcmTokens: arrayUnion(token.value)
+              });
+            } catch (err) {
+              console.error('Error saving FCM token:', err);
+            }
+          });
+
+          await PushNotifications.addListener('registrationError', err => {
+            console.error('Push registration error: ', err.error);
+            // alert('Push registration error: ' + JSON.stringify(err)); // Debug only
+          });
+
+          await PushNotifications.addListener('pushNotificationReceived', notification => {
+            console.log('Push received: ', notification);
+          });
+
+          await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+            console.log('Push action performed: ', notification);
+          });
+
+          // 2. Request permissions
+          let permStatus = await PushNotifications.checkPermissions();
+
+          if (permStatus.receive === 'prompt') {
+            permStatus = await PushNotifications.requestPermissions();
           }
+
+          if (permStatus.receive !== 'granted') {
+            console.log('User denied permissions!');
+            return;
+          }
+
+          // 3. Register with FCM
+          await PushNotifications.register();
+
+          // 4. Create Notification Channel (Required for Android O+)
+          await PushNotifications.createChannel({
+              id: 'default',
+              name: 'Notifiche Generali',
+              description: 'Notifiche generali dell\'app',
+              importance: 5,
+              visibility: 1,
+              vibration: true,
+          });
+
         } catch (e) {
           console.error('Error initializing push notifications', e);
         }
@@ -97,39 +142,6 @@ export default function App() {
     };
 
     initPushNotifications();
-
-    const addListeners = async () => {
-      if (Capacitor.isNativePlatform()) {
-        await PushNotifications.addListener('registration', async token => {
-          console.log('Push registration success, token: ' + token.value);
-          // Save token to user profile
-          try {
-            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-            await updateDoc(profileRef, {
-              fcmTokens: arrayUnion(token.value)
-            });
-          } catch (err) {
-            console.error('Error saving FCM token:', err);
-          }
-        });
-
-        await PushNotifications.addListener('registrationError', err => {
-          console.error('Push registration error: ', err.error);
-        });
-
-        await PushNotifications.addListener('pushNotificationReceived', notification => {
-          console.log('Push received: ', notification);
-          // You can show a toast or alert here if needed
-        });
-
-        await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-          console.log('Push action performed: ', notification);
-          // Navigate to specific page if needed
-        });
-      }
-    };
-
-    addListeners();
 
     return () => {
       if (Capacitor.isNativePlatform()) {
