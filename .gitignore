@@ -32,4 +32,3 @@ dist-ssr
 
 # Firebase
 server/serviceAccountKey.json
-android/app/google-services.json

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1008502310698",
+    "project_id": "chintana-events-handler",
+    "storage_bucket": "chintana-events-handler.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008502310698:android:713c073d60eeca3ccc8053",
+        "android_client_info": {
+          "package_name": "com.lachintana.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGtlvr_8S1bIHan3RwI0jVRDvpkzaR8pI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
