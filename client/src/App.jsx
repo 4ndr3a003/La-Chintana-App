@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { IonApp, IonToast } from '@ionic/react';
+import { IonApp, IonToast, IonButton, IonIcon } from '@ionic/react';
+import { notificationsOutline } from 'ionicons/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
@@ -19,6 +20,7 @@ export default function App() {
   const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('pc_profile_id'));
   const [loading, setLoading] = useState(true);
   const [toastInfo, setToastInfo] = useState({ isOpen: false, message: '' });
+  const [showNotifButton, setShowNotifButton] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,8 +85,7 @@ export default function App() {
   useEffect(() => {
     if (!userProfile) return;
 
-    const initPushNotifications = async () => {
-      if (Capacitor.isNativePlatform()) {
+    const initNativeNotifications = async () => {
         try {
           // 1. Register listeners FIRST
           await PushNotifications.addListener('registration', async token => {
@@ -140,17 +141,49 @@ export default function App() {
         } catch (e) {
           console.error('Error initializing push notifications', e);
         }
-      } else {
-        // Web Implementation
+    };
+
+    const checkPermissionStatus = async () => {
+        if (!Capacitor.isNativePlatform()) {
+            if (Notification.permission === 'default' || Notification.permission === 'denied') {
+                setShowNotifButton(true);
+            } else if (Notification.permission === 'granted') {
+                // Se già concesso, prova ad abilitare direttamente
+                // Nota: enableWebNotifications è definita fuori, ma per useEffect dobbiamo gestirla qui o spostarla
+                // Per semplicità, chiamiamo la logica qui o usiamo un ref, ma meglio definire la funzione fuori e usarla qui
+                // Tuttavia, per evitare loop, definisco la logica web qui dentro o la rendo accessibile
+                enableWebNotifications();
+            }
+        } else {
+            // Native initialization
+            initNativeNotifications();
+        }
+    };
+
+    checkPermissionStatus();
+
+    return () => {
+      if (Capacitor.isNativePlatform()) {
+        PushNotifications.removeAllListeners();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile]);
+
+  const enableWebNotifications = async () => {
         try {
+          setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
           const permission = await Notification.requestPermission();
+          
           if (permission === 'granted') {
             console.log('Notification permission granted.');
+            setShowNotifButton(false);
             
             const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
             
-            if (vapidKey === "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk") {
+            if (vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
                 console.warn("VAPID Key mancante.");
+                setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
             } else {
                 // Registra esplicitamente il Service Worker per stabilità
                 let registration;
@@ -160,9 +193,11 @@ export default function App() {
                         console.log('Service Worker registration successful with scope: ', registration.scope);
                     } catch (err) {
                         console.error('Service Worker registration failed: ', err);
+                        setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
                     }
                 }
 
+                setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
                 // Passa la registrazione a getToken
                 const currentToken = await getToken(messaging, { 
                     vapidKey, 
@@ -200,17 +235,7 @@ export default function App() {
           console.error('An error occurred while retrieving token. ', err);
           setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
         }
-      }
-    };
-
-    initPushNotifications();
-
-    return () => {
-      if (Capacitor.isNativePlatform()) {
-        PushNotifications.removeAllListeners();
-      }
-    };
-  }, [userProfile]);
+  };
 
   const handleLogout = async () => {
     localStorage.removeItem('pc_profile_id');
@@ -258,6 +283,21 @@ export default function App() {
             )}
           </div>
         </div>
+
+        {/* Notification Permission Button (Floating) */}
+        {showNotifButton && !loading && userProfile && (
+            <div className="fixed bottom-24 right-4 z-50">
+                <IonButton 
+                    shape="round" 
+                    color="warning" 
+                    onClick={enableWebNotifications}
+                    className="shadow-lg"
+                >
+                    <IonIcon slot="start" icon={notificationsOutline} />
+                    Attiva Notifiche
+                </IonButton>
+            </div>
+        )}
 
         {/* MOBILE BOTTOM NAV */}
         {userProfile && location.pathname !== '/login' && (
