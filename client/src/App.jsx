@@ -146,13 +146,28 @@ export default function App() {
           if (permission === 'granted') {
             console.log('Notification permission granted.');
             
-            // IMPORTANTE: Inserisci qui la tua VAPID Key presa da Firebase Console
             const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
             
             if (vapidKey === "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk") {
-                console.warn("VAPID Key mancante. Inseriscila in App.jsx per abilitare le notifiche web.");
+                console.warn("VAPID Key mancante.");
             } else {
-                const currentToken = await getToken(messaging, { vapidKey });
+                // Registra esplicitamente il Service Worker per stabilità
+                let registration;
+                if ('serviceWorker' in navigator) {
+                    try {
+                        registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                        console.log('Service Worker registration successful with scope: ', registration.scope);
+                    } catch (err) {
+                        console.error('Service Worker registration failed: ', err);
+                    }
+                }
+
+                // Passa la registrazione a getToken
+                const currentToken = await getToken(messaging, { 
+                    vapidKey, 
+                    serviceWorkerRegistration: registration 
+                });
+
                 if (currentToken) {
                   console.log('Web Push Token:', currentToken);
                   const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
