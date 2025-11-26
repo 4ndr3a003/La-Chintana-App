@@ -1,6 +1,6 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
+import { IonModal, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton } from '@ionic/react';
 import { hasAdminAccess, EVENT_TYPES } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -9,8 +9,6 @@ import EventCard from '../../components/events/EventCard';
 import { useEventsDashboard } from './EventsDashboardLogic';
 import CustomSelect from '../../components/ui/CustomSelect';
 import './EventsDashboard.css';
-
-const Portal = ({ children }) => createPortal(children, document.body);
 
 const EventsDashboard = ({ userProfile }) => {
   const {
@@ -278,16 +276,24 @@ const EventsDashboard = ({ userProfile }) => {
         </div>
       )}
 
-      {selectedEvent && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-content-wrapper modal-wide">
-            <button 
-              onClick={() => setSelectedEvent(null)} 
-              className="modal-close-btn-large"
-            >
-              <X size={32} />
-            </button>
+      <IonModal
+        isOpen={!!selectedEvent}
+        onDidDismiss={() => setSelectedEvent(null)}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">Dettagli Evento</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setSelectedEvent(null)} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
             <EventCard 
               event={selectedEvent} 
               userProfile={userProfile} 
@@ -297,10 +303,8 @@ const EventsDashboard = ({ userProfile }) => {
               onDelete={handleDeleteEvent}
               onEdit={openEditModal}
             />
-          </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
       {hasAdminAccess(userProfile) && (
         <button 
@@ -311,11 +315,15 @@ const EventsDashboard = ({ userProfile }) => {
         </button>
       )}
 
-      {isDeleteModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
+      <IonModal
+        isOpen={isDeleteModalOpen}
+        onDidDismiss={cancelDeleteEvent}
+        breakpoints={[0, 0.4]}
+        initialBreakpoint={0.4}
+        className="custom-modal"
+      >
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="flex flex-col items-center text-center h-full justify-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={24} />
               </div>
@@ -338,20 +346,28 @@ const EventsDashboard = ({ userProfile }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
-      {isCreateModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h3 className="modal-title">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
-            </div>
-            <div className="modal-body">
+      <IonModal
+        isOpen={isCreateModalOpen}
+        onDidDismiss={() => setIsCreateModalOpen(false)}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="modal-body-content">
               <form onSubmit={handleCreateEvent} className="form-space">
                 <div>
                   <label className="form-label">Titolo Evento</label>
@@ -387,11 +403,9 @@ const EventsDashboard = ({ userProfile }) => {
                   <Button type="submit" className="form-submit-btn">{isEditing ? 'Salva Modifiche' : 'Pubblica Evento'}</Button>
                 </div>
               </form>
-            </div>
           </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
     </div>
   );
 };

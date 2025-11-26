@@ -1,6 +1,6 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { MessageSquare, ChevronDown, Trash2, PlusCircle, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
+import { IonModal, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton } from '@ionic/react';
 import { hasAdminAccess } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -8,8 +8,6 @@ import CommunicationCard from '../../components/communications/CommunicationCard
 import CustomSelect from '../../components/ui/CustomSelect';
 import { useCommunicationsView } from './CommunicationsViewLogic';
 import './CommunicationsView.css';
-
-const Portal = ({ children }) => createPortal(children, document.body);
 
 const getTheme = (topic) => {
   switch(topic) {
@@ -333,15 +331,25 @@ const CommunicationsView = ({ userProfile }) => {
       )}
 
       {/* View Details Modal */}
-      {selectedMessage && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in" onClick={() => setSelectedMessage(null)}>
-          <div className="modal-container" onClick={e => e.stopPropagation()}>
-            <div className={`modal-header ${getTheme(selectedMessage.topic).bg} border-b ${getTheme(selectedMessage.topic).border}`}>
-              <h3 className={`modal-title ${getTheme(selectedMessage.topic).text}`}>Dettagli Comunicazione</h3>
-              <button onClick={() => setSelectedMessage(null)} className="modal-close-btn hover:bg-white/50"><X size={20} /></button>
-            </div>
-            <div className="modal-body">
+      <IonModal
+        isOpen={!!selectedMessage}
+        onDidDismiss={() => setSelectedMessage(null)}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">Dettagli Comunicazione</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setSelectedMessage(null)} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
+            {selectedMessage && (
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-start">
                         <h2 className="text-xl font-bold text-slate-800">{selectedMessage.title}</h2>
@@ -383,18 +391,20 @@ const CommunicationsView = ({ userProfile }) => {
                         </div>
                     )}
                 </div>
-            </div>
-          </div>
-        </div>
-        </Portal>
-      )}
+            )}
+        </IonContent>
+      </IonModal>
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
-            <div className="p-6 flex flex-col items-center text-center">
+      <IonModal
+        isOpen={isDeleteModalOpen}
+        onDidDismiss={cancelDeleteComm}
+        breakpoints={[0, 0.4]}
+        initialBreakpoint={0.4}
+        className="custom-modal"
+      >
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="flex flex-col items-center text-center h-full justify-center">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={32} />
               </div>
@@ -417,20 +427,28 @@ const CommunicationsView = ({ userProfile }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
-      {isCreateModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h3 className="modal-title">{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
-            </div>
-            <div className="modal-body">
+      <IonModal
+        isOpen={isCreateModalOpen}
+        onDidDismiss={() => setIsCreateModalOpen(false)}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="modal-body-content">
               <form onSubmit={handleCreateComm} className="form-space">
                 <div>
                   <label className="form-label">Titolo</label>
@@ -464,11 +482,9 @@ const CommunicationsView = ({ userProfile }) => {
                   <Button type="submit" className="form-submit-btn">Pubblica</Button>
                 </div>
               </form>
-            </div>
           </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
     </div>
   );
 };

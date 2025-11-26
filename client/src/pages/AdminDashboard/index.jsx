@@ -1,5 +1,4 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 import Card from '../../components/ui/Card';
@@ -8,9 +7,8 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import CustomSelect from '../../components/ui/CustomSelect';
 import { useAdminDashboard } from './AdminDashboardLogic';
+import { IonModal, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton } from '@ionic/react';
 import './AdminDashboard.css';
-
-const Portal = ({ children }) => createPortal(children, document.body);
 
 const AdminDashboard = ({ userProfile }) => {
   const {
@@ -277,9 +275,9 @@ const AdminDashboard = ({ userProfile }) => {
             <div 
                 key={user.id} 
                 onClick={() => openView(user)} 
-                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform overflow-hidden"
             >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between p-4 border-b border-slate-100 bg-amber-200">
                     <div className="flex items-center gap-3">
                         <Avatar src={user.photoUrl} name={user.name} size="md" />
                         <div>
@@ -290,14 +288,14 @@ const AdminDashboard = ({ userProfile }) => {
                     <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                         <button 
                             onClick={() => openEdit(user)} 
-                            className="p-2 text-slate-400 hover:text-blue-600 bg-slate-50 rounded-full"
+                            className="p-2 text-slate-400 hover:text-blue-600 bg-white/60 rounded-full"
                         >
                             <Edit2 size={16} />
                         </button>
                         {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
                             <button 
                                 onClick={() => handleDeleteUser(user)} 
-                                className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
+                                className="p-2 text-slate-400 hover:text-red-600 bg-white/60 rounded-full"
                             >
                                 <Trash2 size={16} />
                             </button>
@@ -305,7 +303,7 @@ const AdminDashboard = ({ userProfile }) => {
                     </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-2 gap-3 text-sm p-4">
                     <div className="bg-slate-50 p-2.5 rounded-lg">
                         <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
                         <Badge 
@@ -364,15 +362,27 @@ const AdminDashboard = ({ userProfile }) => {
       </button>
 
       {/* VIEW MODAL */}
-      {isViewing && selectedUser && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-content max-w-lg">
-             <div className="modal-header">
-                <h3 className="font-bold text-white">Scheda Volontario</h3>
-                <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
-             </div>
-             <div className="modal-body">
+      <IonModal
+        isOpen={isViewing && !!selectedUser}
+        onDidDismiss={() => setIsViewing(false)}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">Scheda Volontario</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setIsViewing(false)} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="modal-body-content">
+             {selectedUser && (
+                <>
                 <div className="modal-profile-header">
                    <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
                    <h2 className="modal-profile-name">{selectedUser.name}</h2>
@@ -451,22 +461,31 @@ const AdminDashboard = ({ userProfile }) => {
                         <Edit2 size={16} /> Modifica Dati
                     </Button>
                 </div>
-             </div>
+                </>
+             )}
           </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
-      {(isEditing || isCreating) && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-content max-w-2xl">
-             <div className="modal-header">
-                <h3 className="font-bold text-white">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
-                <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
-             </div>
-             
-             <div className="modal-body">
+      <IonModal
+        isOpen={isEditing || isCreating}
+        onDidDismiss={closeAll}
+        breakpoints={[0, 0.92]}
+        initialBreakpoint={0.92}
+        className="custom-modal"
+      >
+        <IonHeader>
+          <IonToolbar className="modal-toolbar">
+            <IonTitle className="font-bold text-white">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={closeAll} className="modal-close-btn">
+                <X size={20} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="modal-body-content">
                 <form onSubmit={handleSave} className="space-y-8">
                    
                    {/* DATI PERSONALI */}
@@ -567,13 +586,13 @@ const AdminDashboard = ({ userProfile }) => {
 
                      <div className="space-y-4">
                         {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
-                          <div key={category} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <h5 className="font-bold text-slate-700 text-xs uppercase mb-3 flex items-center gap-2">
+                          <div key={category} className={`p-4 rounded-xl border ${data.color}`}>
+                            <h5 className="font-bold text-xs uppercase mb-3 flex items-center gap-2 opacity-90">
                               {data.icon} {category}
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {data.items.map(item => (
-                                <label key={item} className="spec-checkbox-label">
+                                <label key={item} className="spec-checkbox-label hover:bg-white/60">
                                   <input 
                                     type="checkbox" 
                                     checked={formData.specializations?.includes(item)}
@@ -618,18 +637,20 @@ const AdminDashboard = ({ userProfile }) => {
                       <Button type="submit">Salva Modifiche</Button>
                    </div>
                 </form>
-             </div>
           </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
+      <IonModal
+        isOpen={isDeleteModalOpen}
+        onDidDismiss={cancelDeleteUser}
+        breakpoints={[0, 0.4]}
+        initialBreakpoint={0.4}
+        className="custom-modal"
+      >
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="flex flex-col items-center text-center h-full justify-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={24} />
               </div>
@@ -652,17 +673,19 @@ const AdminDashboard = ({ userProfile }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
       {/* Bulk Delete Confirmation Modal */}
-      {isBulkDeleteModalOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
+      <IonModal
+        isOpen={isBulkDeleteModalOpen}
+        onDidDismiss={cancelDeleteSelected}
+        breakpoints={[0, 0.4]}
+        initialBreakpoint={0.4}
+        className="custom-modal"
+      >
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="flex flex-col items-center text-center h-full justify-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={24} />
               </div>
@@ -685,23 +708,26 @@ const AdminDashboard = ({ userProfile }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
 
       {/* Notification Modal */}
-      {notification.isOpen && (
-        <Portal>
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 120}}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
+      <IonModal
+        isOpen={notification.isOpen}
+        onDidDismiss={closeNotification}
+        breakpoints={[0, 0.5]}
+        initialBreakpoint={0.5}
+        className="custom-modal"
+      >
+        <IonContent className="ion-padding" scrollY={true}>
+          <div className="flex flex-col items-center text-center h-full justify-center relative">
             <button 
                 onClick={closeNotification}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute top-0 right-0 text-slate-400 hover:text-slate-600 transition-colors"
             >
                 <X size={20} />
             </button>
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-col items-center text-center w-full">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
                   notification.type === 'success' ? 'bg-green-100 text-green-600' :
                   notification.type === 'error' ? 'bg-red-100 text-red-600' :
@@ -725,9 +751,8 @@ const AdminDashboard = ({ userProfile }) => {
               </button>
             </div>
           </div>
-        </div>
-        </Portal>
-      )}
+        </IonContent>
+      </IonModal>
     </div>
   );
 };
