@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { MessageSquare, ChevronDown, Trash2, PlusCircle, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
 import { hasAdminAccess } from '../../utils/constants';
 import Card from '../../components/ui/Card';
@@ -7,6 +8,8 @@ import CommunicationCard from '../../components/communications/CommunicationCard
 import CustomSelect from '../../components/ui/CustomSelect';
 import { useCommunicationsView } from './CommunicationsViewLogic';
 import './CommunicationsView.css';
+
+const Portal = ({ children }) => createPortal(children, document.body);
 
 const getTheme = (topic) => {
   switch(topic) {
@@ -331,6 +334,7 @@ const CommunicationsView = ({ userProfile }) => {
 
       {/* View Details Modal */}
       {selectedMessage && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in" onClick={() => setSelectedMessage(null)}>
           <div className="modal-container" onClick={e => e.stopPropagation()}>
             <div className={`modal-header ${getTheme(selectedMessage.topic).bg} border-b ${getTheme(selectedMessage.topic).border}`}>
@@ -382,10 +386,12 @@ const CommunicationsView = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
             <div className="p-6 flex flex-col items-center text-center">
@@ -413,9 +419,11 @@ const CommunicationsView = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {isCreateModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-container">
             <div className="modal-header">
@@ -459,6 +467,7 @@ const CommunicationsView = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </div>
   );

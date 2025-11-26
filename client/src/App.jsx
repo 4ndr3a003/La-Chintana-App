@@ -152,7 +152,7 @@ export default function App() {
                 // Nota: enableWebNotifications è definita fuori, ma per useEffect dobbiamo gestirla qui o spostarla
                 // Per semplicità, chiamiamo la logica qui o usiamo un ref, ma meglio definire la funzione fuori e usarla qui
                 // Tuttavia, per evitare loop, definisco la logica web qui dentro o la rendo accessibile
-                enableWebNotifications();
+                enableWebNotifications(true);
             }
         } else {
             // Native initialization
@@ -170,9 +170,12 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
 
-  const enableWebNotifications = async () => {
+  const enableWebNotifications = async (silent = false) => {
+        // Handle event object if passed directly from onClick
+        if (typeof silent === 'object') silent = false;
+
         try {
-          setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
+          if (!silent) setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
           const permission = await Notification.requestPermission();
           
           if (permission === 'granted') {
@@ -183,7 +186,7 @@ export default function App() {
             
             if (vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
                 console.warn("VAPID Key mancante.");
-                setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
+                if (!silent) setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
             } else {
                 // Registra esplicitamente il Service Worker per stabilità
                 let registration;
@@ -193,11 +196,11 @@ export default function App() {
                         console.log('Service Worker registration successful with scope: ', registration.scope);
                     } catch (err) {
                         console.error('Service Worker registration failed: ', err);
-                        setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
+                        if (!silent) setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
                     }
                 }
 
-                setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
+                if (!silent) setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
                 // Passa la registrazione a getToken
                 const currentToken = await getToken(messaging, { 
                     vapidKey, 
@@ -206,7 +209,7 @@ export default function App() {
 
                 if (currentToken) {
                   console.log('Web Push Token:', currentToken);
-                  setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
+                  if (!silent) setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
                   
                   const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
                   await updateDoc(profileRef, {
@@ -214,7 +217,7 @@ export default function App() {
                   });
                 } else {
                   console.log('No registration token available.');
-                  setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
+                  if (!silent) setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
                 }
             }
 
@@ -229,11 +232,11 @@ export default function App() {
 
           } else {
             console.log('Unable to get permission to notify.');
-            setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
+            if (!silent) setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
           }
         } catch (err) {
           console.error('An error occurred while retrieving token. ', err);
-          setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+          if (!silent) setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
         }
   };
 

@@ -182,6 +182,40 @@
     backdrop-filter: blur(4px);
 }
 
+@keyframes slideUpMobile {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        top: 80px;
+        padding: 0;
+        display: block;
+    }
+
+    .modal-container, .modal-content-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0 !important;
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+        animation: slideUpMobile 0.3s ease-out forwards;
+        border-top: 2px solid var(--color-pc-yellow);
+    }
+}
+
 .modal-content-wrapper {
     width: 100%;
     max-width: 32rem;
@@ -210,7 +244,7 @@
     position: fixed;
     bottom: 22rem;
     right: 1.5rem;
-    background-color: var(--color-pc-blue);
+    background-color: var(--color-pc-blue-700);
     color: var(--color-white);
     padding: 1rem;
     border-radius: 9999px;
@@ -229,7 +263,7 @@
 }
 
 .fab-btn:hover {
-    background-color: var(--color-pc-blue-700);
+    background-color: var(--color-pc-blue-800);
     transform: scale(1.1);
 }
 
@@ -251,18 +285,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-slate-50);
+    background-color: var(--color-pc-blue-700);
 }
 
 .modal-title {
     font-weight: 700;
-    color: var(--color-slate-800);
+    color: var(--color-white);
 }
 
 .modal-close-btn {
     padding: 0.25rem;
     border-radius: 9999px;
-    color: var(--color-slate-500);
+    color: var(--color-white);
 }
 
 .modal-close-btn:hover {
@@ -291,7 +325,7 @@
 .form-input {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-slate-50);
+    background-color: var(--color-pc-yellow-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -308,7 +342,7 @@
 .form-select {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-slate-50);
+    background-color: var(--color-pc-yellow-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -331,7 +365,7 @@
 .form-textarea {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-slate-50);
+    background-color: var(--color-pc-yellow-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;

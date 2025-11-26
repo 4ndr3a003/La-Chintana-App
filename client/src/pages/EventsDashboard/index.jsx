@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
 import { hasAdminAccess, EVENT_TYPES } from '../../utils/constants';
 import Card from '../../components/ui/Card';
@@ -8,6 +9,8 @@ import EventCard from '../../components/events/EventCard';
 import { useEventsDashboard } from './EventsDashboardLogic';
 import CustomSelect from '../../components/ui/CustomSelect';
 import './EventsDashboard.css';
+
+const Portal = ({ children }) => createPortal(children, document.body);
 
 const EventsDashboard = ({ userProfile }) => {
   const {
@@ -276,6 +279,7 @@ const EventsDashboard = ({ userProfile }) => {
       )}
 
       {selectedEvent && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-content-wrapper modal-wide">
             <button 
@@ -295,6 +299,7 @@ const EventsDashboard = ({ userProfile }) => {
             />
           </div>
         </div>
+        </Portal>
       )}
 
       {hasAdminAccess(userProfile) && (
@@ -307,6 +312,7 @@ const EventsDashboard = ({ userProfile }) => {
       )}
 
       {isDeleteModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center text-center">
@@ -334,9 +340,11 @@ const EventsDashboard = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {isCreateModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-container">
             <div className="modal-header">
@@ -382,6 +390,7 @@ const EventsDashboard = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </div>
   );

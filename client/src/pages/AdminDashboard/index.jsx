@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 import Card from '../../components/ui/Card';
@@ -8,6 +9,8 @@ import Button from '../../components/ui/Button';
 import CustomSelect from '../../components/ui/CustomSelect';
 import { useAdminDashboard } from './AdminDashboardLogic';
 import './AdminDashboard.css';
+
+const Portal = ({ children }) => createPortal(children, document.body);
 
 const AdminDashboard = ({ userProfile }) => {
   const {
@@ -362,10 +365,11 @@ const AdminDashboard = ({ userProfile }) => {
 
       {/* VIEW MODAL */}
       {isViewing && selectedUser && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-content max-w-lg">
              <div className="modal-header">
-                <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
+                <h3 className="font-bold text-white">Scheda Volontario</h3>
                 <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
              </div>
              <div className="modal-body">
@@ -450,13 +454,15 @@ const AdminDashboard = ({ userProfile }) => {
              </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {(isEditing || isCreating) && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-content max-w-2xl">
              <div className="modal-header">
-                <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
+                <h3 className="font-bold text-white">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
                 <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
              </div>
              
@@ -615,10 +621,12 @@ const AdminDashboard = ({ userProfile }) => {
              </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center text-center">
@@ -646,10 +654,12 @@ const AdminDashboard = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Bulk Delete Confirmation Modal */}
       {isBulkDeleteModalOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center text-center">
@@ -677,10 +687,12 @@ const AdminDashboard = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Notification Modal */}
       {notification.isOpen && (
+        <Portal>
         <div className="modal-overlay animate-in fade-in" style={{zIndex: 120}}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
             <button 
@@ -714,6 +726,7 @@ const AdminDashboard = ({ userProfile }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </div>
   );
