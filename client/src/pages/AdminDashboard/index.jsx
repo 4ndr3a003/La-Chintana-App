@@ -30,15 +30,10 @@ const AdminDashboard = ({ userProfile }) => {
     setIsViewing,
     isDeleteModalOpen,
     handleDeleteUser,
-    confirmDeleteUser,
-    cancelDeleteUser,
     selectedUserIds,
     toggleUserSelection,
     toggleAllUsers,
     handleDeleteSelected,
-    confirmDeleteSelected,
-    cancelDeleteSelected,
-    isBulkDeleteModalOpen,
     searchTerm,
     setSearchTerm,
     filterRole,
@@ -365,8 +360,6 @@ const AdminDashboard = ({ userProfile }) => {
       <IonModal
         isOpen={isViewing && !!selectedUser}
         onDidDismiss={() => setIsViewing(false)}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>
@@ -379,7 +372,7 @@ const AdminDashboard = ({ userProfile }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="ion-padding" scrollY={true}>
+        <IonContent className="ion-padding" scrollY={false}>
           <div className="modal-body-content">
              {selectedUser && (
                 <>
@@ -470,8 +463,6 @@ const AdminDashboard = ({ userProfile }) => {
       <IonModal
         isOpen={isEditing || isCreating}
         onDidDismiss={closeAll}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>
@@ -484,7 +475,7 @@ const AdminDashboard = ({ userProfile }) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="ion-padding" scrollY={true}>
+        <IonContent className="ion-padding" scrollY={isCreating}>
           <div className="modal-body-content">
                 <form onSubmit={handleSave} className="space-y-8">
                    
@@ -641,85 +632,13 @@ const AdminDashboard = ({ userProfile }) => {
         </IonContent>
       </IonModal>
 
-      {/* Delete Confirmation Modal */}
-      <IonModal
-        isOpen={isDeleteModalOpen}
-        onDidDismiss={cancelDeleteUser}
-        breakpoints={[0, 0.4]}
-        initialBreakpoint={0.4}
-        className="custom-modal"
-      >
-        <IonContent className="ion-padding" scrollY={true}>
-          <div className="flex flex-col items-center text-center h-full justify-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="text-amber-600" size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Volontario</h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Sei sicuro di voler eliminare questo volontario? Questa azione non può essere annullata.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button 
-                  onClick={cancelDeleteUser}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annulla
-                </button>
-                <button 
-                  onClick={confirmDeleteUser}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Elimina
-                </button>
-              </div>
-            </div>
-        </IonContent>
-      </IonModal>
-
-      {/* Bulk Delete Confirmation Modal */}
-      <IonModal
-        isOpen={isBulkDeleteModalOpen}
-        onDidDismiss={cancelDeleteSelected}
-        breakpoints={[0, 0.4]}
-        initialBreakpoint={0.4}
-        className="custom-modal"
-      >
-        <IonContent className="ion-padding" scrollY={true}>
-          <div className="flex flex-col items-center text-center h-full justify-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="text-amber-600" size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina {selectedUserIds.length} Volontari</h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Sei sicuro di voler eliminare i volontari selezionati? Questa azione non può essere annullata.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button 
-                  onClick={cancelDeleteSelected}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annulla
-                </button>
-                <button 
-                  onClick={confirmDeleteSelected}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Elimina Tutto
-                </button>
-              </div>
-            </div>
-        </IonContent>
-      </IonModal>
-
       {/* Notification Modal */}
       <IonModal
         isOpen={notification.isOpen}
         onDidDismiss={closeNotification}
-        breakpoints={[0, 0.5]}
-        initialBreakpoint={0.5}
-        className="custom-modal"
+        className="custom-modal auto-height"
       >
-        <IonContent className="ion-padding" scrollY={true}>
+        <IonContent className="ion-padding" scrollY={false}>
           <div className="flex flex-col items-center text-center h-full justify-center relative">
             <button 
                 onClick={closeNotification}

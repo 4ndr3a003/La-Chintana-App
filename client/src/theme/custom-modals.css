@@ -1,0 +1,46 @@
+.custom-modal {
+  --background: transparent;
+  --box-shadow: none;
+  --width: fit-content;
+  --height: fit-content;
+  --max-width: 90%;
+  --max-height: 90%;
+}
+
+.custom-modal::part(content) {
+  width: 500px;
+  max-width: 95vw;
+  height: 650px;
+  max-height: 85vh;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  overflow: hidden;
+}
+
+.custom-modal.auto-height::part(content) {
+  height: auto;
+}
+
+/* Stili per il modale di conferma eliminazione */
+.delete-confirmation-modal {
+  --background: transparent;
+  --box-shadow: none;
+}
+
+.delete-confirmation-modal::part(content) {
+  width: 420px;
+  max-width: 90vw;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-top: 6px solid #ef4444; /* red-500 */
+}
+
+.custom-modal ion-input,
+.custom-modal ion-textarea,
+.custom-modal ion-select {
+  --background: #ffffff;
+  --color: #000;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}

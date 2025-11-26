@@ -182,40 +182,6 @@
     backdrop-filter: blur(4px);
 }
 
-@keyframes slideUpMobile {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
-}
-
-@media (max-width: 768px) {
-    .modal-overlay {
-        top: 80px;
-        padding: 0;
-        display: block;
-    }
-
-    .modal-container, .modal-content-wrapper {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        max-height: none;
-        border-radius: 0 !important;
-        max-width: none;
-        margin: 0;
-        box-shadow: none;
-        animation: slideUpMobile 0.3s ease-out forwards;
-        border-top: 2px solid var(--color-pc-yellow);
-    }
-}
-
 .modal-content-wrapper {
     width: 100%;
     max-width: 32rem;

@@ -279,8 +279,6 @@ const EventsDashboard = ({ userProfile }) => {
       <IonModal
         isOpen={!!selectedEvent}
         onDidDismiss={() => setSelectedEvent(null)}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>
@@ -318,12 +316,11 @@ const EventsDashboard = ({ userProfile }) => {
       <IonModal
         isOpen={isDeleteModalOpen}
         onDidDismiss={cancelDeleteEvent}
-        breakpoints={[0, 0.4]}
-        initialBreakpoint={0.4}
-        className="custom-modal"
+        className="delete-confirmation-modal"
+        trigger="delete-event-modal-trigger"
       >
-        <IonContent className="ion-padding" scrollY={true}>
-          <div className="flex flex-col items-center text-center h-full justify-center">
+        <IonContent className="ion-padding">
+          <div className="flex flex-col items-center text-center justify-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={24} />
               </div>
@@ -352,8 +349,6 @@ const EventsDashboard = ({ userProfile }) => {
       <IonModal
         isOpen={isCreateModalOpen}
         onDidDismiss={() => setIsCreateModalOpen(false)}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>

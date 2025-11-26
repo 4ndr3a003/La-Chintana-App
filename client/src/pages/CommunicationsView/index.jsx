@@ -334,8 +334,6 @@ const CommunicationsView = ({ userProfile }) => {
       <IonModal
         isOpen={!!selectedMessage}
         onDidDismiss={() => setSelectedMessage(null)}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>
@@ -399,12 +397,11 @@ const CommunicationsView = ({ userProfile }) => {
       <IonModal
         isOpen={isDeleteModalOpen}
         onDidDismiss={cancelDeleteComm}
-        breakpoints={[0, 0.4]}
-        initialBreakpoint={0.4}
-        className="custom-modal"
+        className="delete-confirmation-modal"
+        trigger="delete-comm-modal-trigger"
       >
-        <IonContent className="ion-padding" scrollY={true}>
-          <div className="flex flex-col items-center text-center h-full justify-center">
+        <IonContent className="ion-padding">
+          <div className="flex flex-col items-center text-center justify-center">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={32} />
               </div>
@@ -433,8 +430,6 @@ const CommunicationsView = ({ userProfile }) => {
       <IonModal
         isOpen={isCreateModalOpen}
         onDidDismiss={() => setIsCreateModalOpen(false)}
-        breakpoints={[0, 0.92]}
-        initialBreakpoint={0.92}
         className="custom-modal"
       >
         <IonHeader>

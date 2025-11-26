@@ -13,6 +13,7 @@ import { Capacitor } from '@capacitor/core';
 import Header from './components/layout/Header';
 import MobileNav from './components/layout/MobileNav';
 import AppRoutes from './routes/AppRoutes';
+import './theme/custom-modals.css';
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
