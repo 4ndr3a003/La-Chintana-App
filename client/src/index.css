@@ -6,7 +6,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  
+
   /* Force light mode defaults for this app design */
   color-scheme: light;
   color: var(--color-slate-800);
@@ -18,11 +18,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent body scroll, let the app handle it */
+  overflow: hidden;
+  /* Prevent body scroll, let the app handle it */
 }
 
 body {
@@ -42,11 +44,13 @@ body {
 }
 
 .nav-button-active {
-  --background: rgba(0, 76, 151, 0.1) !important; /* Very light blue transparent */
+  --background: rgba(0, 76, 151, 0.1) !important;
+  /* Very light blue transparent */
   --background-hover: rgba(0, 76, 151, 0.15) !important;
   --background-activated: rgba(0, 76, 151, 0.2) !important;
   --color: var(--color-pc-blue) !important;
-  --box-shadow: none; /* Removed border for cleaner look */
+  --box-shadow: none;
+  /* Removed border for cleaner look */
 }
 
 .nav-button-inactive {
@@ -104,3 +108,27 @@ body {
   background-color: transparent !important;
 }
 
+
+/* Global Pulse Animation for Emergency/High Priority */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    transform: scale(1);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    transform: scale(1);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s infinite;
+  border-radius: 0.75rem;
+  /* Match rounded-xl */
+}

@@ -1,0 +1,11 @@
+/* Stili mobile per il modale di aggiunta comunicazione */
+@media (max-width: 767px) {
+    .modal-overlay {
+        z-index: 150;
+        align-items: center;
+    }
+
+    .modal-container {
+        max-height: calc(100vh - 12rem);
+    }
+}

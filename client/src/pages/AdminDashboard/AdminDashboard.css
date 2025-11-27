@@ -49,11 +49,10 @@
     inset: 0;
     background-color: rgba(15, 23, 42, 0.4);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     z-index: 100;
     padding: 1rem;
-    padding-top: 10vh;
     backdrop-filter: blur(4px);
     overflow-y: auto;
 }
@@ -445,9 +444,7 @@
 @media (max-width: 767px) {
     .edit-create-modal {
         z-index: 150;
-        align-items: flex-start;
-        padding-top: 4rem;
-        padding-bottom: 8rem;
+        align-items: center;
     }
 
     .edit-create-modal .modal-content {
