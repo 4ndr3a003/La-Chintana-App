@@ -1,3 +1,5 @@
+@import '../../components/ui/fab.css';
+
 .admin-dashboard-container {
     padding-bottom: 6rem;
 }
@@ -40,82 +42,66 @@
     gap: 1rem;
 }
 
-.fab-button {
-    position: fixed;
-    bottom: 8rem;
-    right: 1.5rem;
-    background-color: var(--color-pc-blue);
-    color: var(--color-white);
-    padding: 1rem;
-    border-radius: 9999px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-    z-index: 100;
-}
 
-@media (min-width: 768px) {
-    .fab-button {
-        bottom: 2.5rem;
-        right: 2.5rem;
-    }
-}
-
-.fab-button:hover {
-    background-color: var(--color-pc-blue-700);
-    transform: scale(1.1);
-}
 
 .modal-overlay {
     position: fixed;
     inset: 0;
     background-color: rgba(15, 23, 42, 0.4);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    z-index: 105;
+    z-index: 100;
     padding: 1rem;
+    padding-top: 10vh;
     backdrop-filter: blur(4px);
+    overflow-y: auto;
 }
 
 .modal-content {
-    background-color: var(--color-white);
+    background-color: var(--color-slate-50);
     border-radius: 1rem;
     width: 100%;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    max-height: 85vh;
+    max-height: 80vh;
     overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .modal-content {
+        max-height: 75vh;
+    }
 }
 
 .modal-header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--color-slate-100);
+    border-bottom: 1px solid var(--color-pc-blue-800);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-slate-50);
-    flex-shrink: 0;
+    background-color: var(--color-pc-blue-700);
+    color: white;
+}
+
+.modal-header h3 {
+    color: white;
+}
+
+.modal-header .modal-close-btn {
+    color: white;
+    opacity: 0.8;
+}
+
+.modal-header .modal-close-btn:hover {
+    background-color: var(--color-pc-blue-700);
+    opacity: 1;
 }
 
 .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-}
-
-@media (max-width: 640px) {
-    .modal-content {
-        max-height: 80vh;
-        margin: 0 1rem 3rem 1rem;
-    }
-    
-    .modal-body {
-        padding: 1rem;
-    }
 }
 
 .user-card-inner {
@@ -326,7 +312,7 @@
 .form-input {
     width: 100%;
     padding: 0.625rem;
-    background-color: #ffffff;
+    background-color: var(--color-white);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -430,3 +416,50 @@
     justify-content: flex-end;
     gap: 0.75rem;
 }
+
+/* Stile per lo sfondo giallo del nome del volontario su mobile */
+@media (max-width: 767px) {
+    .volunteer-card-mobile .flex.items-center.gap-3 > div {
+        background-color: #fffacd; /* Giallo chiaro */
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+}
+
+/* Stile per lo sfondo giallo dell'header della card del volontario su mobile */
+@media (max-width: 767px) {
+    .volunteer-card-mobile > .flex.items-start.justify-between {
+        background-color: #ffecb3; /* Giallo chiaro più scuro */
+        padding: 1rem;
+        margin: -1rem; /* Rimuove il padding del genitore */
+        border-radius: 0.75rem 0.75rem 0 0;
+        margin-bottom: 1rem !important; /* Forza il margine inferiore */
+    }
+    .volunteer-card-mobile .flex.items-start.justify-between .flex.items-center.gap-3 > div {
+        background-color: transparent;
+        padding: 0;
+    }
+}
+
+/* Stili per il modale di creazione/modifica volontario su mobile */
+@media (max-width: 767px) {
+    .edit-create-modal {
+        z-index: 150;
+        align-items: flex-start;
+        padding-top: 4rem;
+        padding-bottom: 8rem;
+    }
+
+    .edit-create-modal .modal-content {
+        max-height: calc(100vh - 12rem);
+    }
+}
+
+/* Stili per il modale di visualizzazione volontario su mobile */
+@media (max-width: 767px) {
+    .modal-overlay:has(.modal-profile-header) .modal-content {
+        max-height: 78vh;
+        margin-bottom: 35px;
+    }
+}
+

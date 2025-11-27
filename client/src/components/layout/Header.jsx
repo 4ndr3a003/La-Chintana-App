@@ -99,10 +99,7 @@ const Header = ({ userProfile }) => {
           <IonButtons slot="start">
             <IonButton onClick={() => navigate('/')} fill="clear" className="h-auto hover:opacity-80 transition-opacity">
               <div className="flex items-center gap-3.5">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-20 rounded-full"></div>
-                    <img src={logo} alt="Logo" className="h-12 w-auto relative z-10 drop-shadow-sm" />
-                </div>
+                <img src={logo} alt="Logo" className="h-12 w-auto drop-shadow-sm" />
                 <div className="leading-none text-left block">
                   <h1 className="text-lg font-black tracking-tighter text-white">LA CHINTANA</h1>
                   <p className="text-[10px] text-yellow-400 font-bold uppercase tracking-widest">Protezione Civile</p>

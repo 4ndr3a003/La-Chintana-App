@@ -9,9 +9,12 @@ export const useAdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
-
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  
   // Bulk Actions State
   const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
 
   // Notification State
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'info' });
@@ -216,16 +219,27 @@ export const useAdminDashboard = () => {
       setSelectedUser(null);
   }
 
-  const handleDeleteUser = async (user) => {
-    if (window.confirm(`Sei sicuro di voler eliminare il volontario ${user.name}? L'azione è irreversibile.`)) {
-      try {
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', user.id));
-        setNotification({ isOpen: true, title: 'Successo', message: "Volontario eliminato con successo.", type: 'success' });
-      } catch (error) {
-        console.error("Error deleting user:", error);
-        setNotification({ isOpen: true, title: 'Errore', message: "Errore durante l'eliminazione del volontario.", type: 'error' });
-      }
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userToDelete.id));
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+      setNotification({ isOpen: true, title: 'Successo', message: "Volontario eliminato con successo.", type: 'success' });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setNotification({ isOpen: true, title: 'Errore', message: "Errore durante l'eliminazione del volontario.", type: 'error' });
     }
+  };
+
+  const cancelDeleteUser = () => {
+    setIsDeleteModalOpen(false);
+    setUserToDelete(null);
   };
 
   // Bulk Actions Logic
@@ -251,21 +265,28 @@ export const useAdminDashboard = () => {
     }
   };
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = () => {
     if (selectedUserIds.length === 0) return;
-    if (window.confirm(`Sei sicuro di voler eliminare ${selectedUserIds.length} volontari? L'azione è irreversibile.`)) {
-      try {
-        const promises = selectedUserIds.map(id => 
-          deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', id))
-        );
-        await Promise.all(promises);
-        setSelectedUserIds([]);
-        setNotification({ isOpen: true, title: 'Successo', message: `${selectedUserIds.length} volontari eliminati con successo.`, type: 'success' });
-      } catch (error) {
-        console.error("Error deleting users:", error);
-        setNotification({ isOpen: true, title: 'Errore', message: "Errore durante l'eliminazione dei volontari.", type: 'error' });
-      }
+    setIsBulkDeleteModalOpen(true);
+  };
+
+  const confirmDeleteSelected = async () => {
+    try {
+      const promises = selectedUserIds.map(id => 
+        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', id))
+      );
+      await Promise.all(promises);
+      setIsBulkDeleteModalOpen(false);
+      setSelectedUserIds([]);
+      setNotification({ isOpen: true, title: 'Successo', message: `${selectedUserIds.length} volontari eliminati con successo.`, type: 'success' });
+    } catch (error) {
+      console.error("Error deleting users:", error);
+      setNotification({ isOpen: true, title: 'Errore', message: "Errore durante l'eliminazione dei volontari.", type: 'error' });
     }
+  };
+
+  const cancelDeleteSelected = () => {
+    setIsBulkDeleteModalOpen(false);
   };
 
   const handleExportCSV = () => {
@@ -564,11 +585,17 @@ export const useAdminDashboard = () => {
     setIsViewing,
     setIsEditing,
     setIsCreating,
+    isDeleteModalOpen,
     handleDeleteUser,
+    confirmDeleteUser,
+    cancelDeleteUser,
     selectedUserIds,
     toggleUserSelection,
     toggleAllUsers,
     handleDeleteSelected,
+    confirmDeleteSelected,
+    cancelDeleteSelected,
+    isBulkDeleteModalOpen,
     searchTerm,
     setSearchTerm,
     filterRole,

@@ -1,0 +1,26 @@
+.fab-btn {
+    position: fixed;
+    bottom: 6rem;
+    right: 1.5rem;
+    background-color: var(--color-pc-blue-700);
+    color: var(--color-white);
+    padding: 1rem;
+    border-radius: 9999px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    z-index: 50;
+}
+
+@media (min-width: 768px) {
+    .fab-btn {
+        bottom: 2.5rem;
+        right: 2.5rem;
+    }
+}
+
+.fab-btn:hover {
+    background-color: var(--color-pc-blue-700);
+    transform: scale(1.1);
+}

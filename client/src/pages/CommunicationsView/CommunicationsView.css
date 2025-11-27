@@ -1,3 +1,5 @@
+@import '../../components/ui/fab.css';
+
 .comm-container {
     position: relative;
     min-height: 80vh;
@@ -31,33 +33,7 @@
     font-weight: 500;
 }
 
-.fab-btn {
-    position: fixed;
-    bottom: 8rem;
-    right: 1.5rem;
-    background-color: var(--color-pc-blue-700);
-    color: var(--color-white);
-    padding: 1rem;
-    border-radius: 9999px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    box-shadow: 0 20px 25px -5px var(--color-pc-blue-300);
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-    z-index: 40;
-}
 
-@media (min-width: 768px) {
-    .fab-btn {
-        bottom: 2.5rem;
-        right: 2.5rem;
-    }
-}
-
-.fab-btn:hover {
-    background-color: var(--color-pc-blue-800);
-    transform: scale(1.1);
-}
 
 .modal-overlay {
     position: fixed;
@@ -72,7 +48,7 @@
 }
 
 .modal-container {
-    background-color: var(--color-white);
+    background-color: var(--color-slate-50);
     border-radius: 1rem;
     width: 100%;
     max-width: 32rem;
@@ -89,18 +65,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-pc-blue-700);
+    background-color: var(--color-slate-50);
 }
 
 .modal-title {
     font-weight: 700;
-    color: var(--color-white);
+    color: var(--color-slate-800);
 }
 
 .modal-close-btn {
     padding: 0.25rem;
     border-radius: 9999px;
-    color: var(--color-white);
+    color: var(--color-slate-500);
 }
 
 .modal-close-btn:hover {
@@ -129,7 +105,7 @@
 .form-input {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-white);
+    background-color: var(--color-slate-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -150,7 +126,7 @@
 .form-select {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-white);
+    background-color: var(--color-slate-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -168,7 +144,7 @@
 .form-textarea {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-white);
+    background-color: var(--color-slate-50);
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -189,4 +165,25 @@
 .form-submit-btn {
     width: 100%;
     justify-content: center;
+}
+
+/* Stili mobile per input bianchi */
+@media (max-width: 767px) {
+    .form-input, .form-textarea {
+        background-color: var(--color-white);
+    }
+}
+
+/* Stili mobile per il modale di aggiunta comunicazione */
+@media (max-width: 767px) {
+    .modal-overlay {
+        z-index: 150;
+        align-items: flex-start;
+        padding-top: 4rem;
+        padding-bottom: 8rem;
+    }
+
+    .modal-container {
+        max-height: calc(100vh - 12rem);
+    }
 }

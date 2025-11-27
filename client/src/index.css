@@ -104,21 +104,3 @@ body {
   background-color: transparent !important;
 }
 
-/* Ionic Modal Customization */
-.custom-modal {
-  --border-radius: 16px 16px 0 0;
-}
-
-.custom-modal::part(content) {
-  border-top: 2px solid var(--color-pc-yellow);
-}
-
-.modal-toolbar {
-  --background: var(--color-pc-blue-700);
-  --color: white;
-}
-
-.modal-close-btn {
-  color: white;
-}
-

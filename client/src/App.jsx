@@ -13,7 +13,6 @@ import { Capacitor } from '@capacitor/core';
 import Header from './components/layout/Header';
 import MobileNav from './components/layout/MobileNav';
 import AppRoutes from './routes/AppRoutes';
-import './theme/custom-modals.css';
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
@@ -149,11 +148,8 @@ export default function App() {
             if (Notification.permission === 'default' || Notification.permission === 'denied') {
                 setShowNotifButton(true);
             } else if (Notification.permission === 'granted') {
-                // Se già concesso, prova ad abilitare direttamente
-                // Nota: enableWebNotifications è definita fuori, ma per useEffect dobbiamo gestirla qui o spostarla
-                // Per semplicità, chiamiamo la logica qui o usiamo un ref, ma meglio definire la funzione fuori e usarla qui
-                // Tuttavia, per evitare loop, definisco la logica web qui dentro o la rendo accessibile
-                enableWebNotifications(true);
+                // Se già concesso, abilita in background senza mostrare toast di successo
+                setupWebPush(false);
             }
         } else {
             // Native initialization
@@ -171,74 +167,86 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
 
-  const enableWebNotifications = async (silent = false) => {
-        // Handle event object if passed directly from onClick
-        if (typeof silent === 'object') silent = false;
+  const setupWebPush = async (isInteractive = false) => {
+    try {
+      if (isInteractive) {
+        setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
+      }
 
-        try {
-          if (!silent) setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
-          const permission = await Notification.requestPermission();
-          
-          if (permission === 'granted') {
-            console.log('Notification permission granted.');
-            setShowNotifButton(false);
-            
-            const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
-            
-            if (vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
-                console.warn("VAPID Key mancante.");
-                if (!silent) setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
-            } else {
-                // Registra esplicitamente il Service Worker per stabilità
-                let registration;
-                if ('serviceWorker' in navigator) {
-                    try {
-                        registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                        console.log('Service Worker registration successful with scope: ', registration.scope);
-                    } catch (err) {
-                        console.error('Service Worker registration failed: ', err);
-                        if (!silent) setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
-                    }
-                }
+      const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
+      
+      if (vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
+          console.warn("VAPID Key mancante.");
+          setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
+          return;
+      }
 
-                if (!silent) setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
-                // Passa la registrazione a getToken
-                const currentToken = await getToken(messaging, { 
-                    vapidKey, 
-                    serviceWorkerRegistration: registration 
-                });
-
-                if (currentToken) {
-                  console.log('Web Push Token:', currentToken);
-                  if (!silent) setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
-                  
-                  const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-                  await updateDoc(profileRef, {
-                    fcmTokens: arrayUnion(currentToken)
-                  });
-                } else {
-                  console.log('No registration token available.');
-                  if (!silent) setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
-                }
-            }
-
-            onMessage(messaging, (payload) => {
-              console.log('Message received. ', payload);
-              setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
-              new Notification(payload.notification.title, {
-                body: payload.notification.body,
-                icon: '/logo_chintana.png'
-              });
-            });
-
-          } else {
-            console.log('Unable to get permission to notify.');
-            if (!silent) setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
+      let registration;
+      if ('serviceWorker' in navigator) {
+          try {
+              registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+              console.log('Service Worker registration successful with scope: ', registration.scope);
+          } catch (err) {
+              console.error('Service Worker registration failed: ', err);
+              setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
+              return;
           }
-        } catch (err) {
-          console.error('An error occurred while retrieving token. ', err);
-          if (!silent) setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+      }
+
+      const currentToken = await getToken(messaging, { 
+          vapidKey, 
+          serviceWorkerRegistration: registration 
+      });
+
+      if (currentToken) {
+        console.log('Web Push Token:', currentToken);
+        if (isInteractive) {
+          setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
         }
+        
+        const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+        await updateDoc(profileRef, {
+          fcmTokens: arrayUnion(currentToken)
+        });
+      } else {
+        console.log('No registration token available.');
+        if (isInteractive) {
+          setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
+        }
+      }
+
+      onMessage(messaging, (payload) => {
+        console.log('Message received. ', payload);
+        setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
+        new Notification(payload.notification.title, {
+          body: payload.notification.body,
+          icon: '/logo_chintana.png'
+        });
+      });
+
+    } catch (err) {
+      console.error('An error occurred while retrieving token. ', err);
+      setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+    }
+  };
+
+  const enableWebNotifications = async () => {
+    try {
+      setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        setShowNotifButton(false);
+        await setupWebPush(true); // Attivazione interattiva
+      } else {
+        console.log('Unable to get permission to notify.');
+        setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
+      }
+    } catch (err) {
+      console.error('An error occurred while requesting permissions. ', err);
+      setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+    }
   };
 
   const handleLogout = async () => {

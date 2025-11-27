@@ -7,7 +7,6 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import CustomSelect from '../../components/ui/CustomSelect';
 import { useAdminDashboard } from './AdminDashboardLogic';
-import { IonModal, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton } from '@ionic/react';
 import './AdminDashboard.css';
 
 const AdminDashboard = ({ userProfile }) => {
@@ -30,10 +29,15 @@ const AdminDashboard = ({ userProfile }) => {
     setIsViewing,
     isDeleteModalOpen,
     handleDeleteUser,
+    confirmDeleteUser,
+    cancelDeleteUser,
     selectedUserIds,
     toggleUserSelection,
     toggleAllUsers,
     handleDeleteSelected,
+    confirmDeleteSelected,
+    cancelDeleteSelected,
+    isBulkDeleteModalOpen,
     searchTerm,
     setSearchTerm,
     filterRole,
@@ -142,13 +146,12 @@ const AdminDashboard = ({ userProfile }) => {
                         placeholder="Filtra per Stato"
                     />
                 </div>
-                <button
+                <Button
                     onClick={openCreate}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0"
                 >
                     <PlusCircle size={18} />
                     Nuovo Volontario
-                </button>
+                </Button>
             </div>
         </div>
 
@@ -241,7 +244,7 @@ const AdminDashboard = ({ userProfile }) => {
                     <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <button 
                           onClick={() => openEdit(user)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                          className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] hover:bg-blue-50 rounded-full transition-colors"
                           title="Modifica Dati"
                       >
                           <Edit2 size={18} />
@@ -270,9 +273,9 @@ const AdminDashboard = ({ userProfile }) => {
             <div 
                 key={user.id} 
                 onClick={() => openView(user)} 
-                className="bg-white rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform overflow-hidden"
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform volunteer-card-mobile"
             >
-                <div className="flex items-start justify-between p-4 border-b border-slate-100 bg-amber-200">
+                <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                         <Avatar src={user.photoUrl} name={user.name} size="md" />
                         <div>
@@ -283,14 +286,14 @@ const AdminDashboard = ({ userProfile }) => {
                     <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                         <button 
                             onClick={() => openEdit(user)} 
-                            className="p-2 text-slate-400 hover:text-blue-600 bg-white/60 rounded-full"
+                            className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
                         >
                             <Edit2 size={16} />
                         </button>
                         {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
                             <button 
                                 onClick={() => handleDeleteUser(user)} 
-                                className="p-2 text-slate-400 hover:text-red-600 bg-white/60 rounded-full"
+                                className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
                             >
                                 <Trash2 size={16} />
                             </button>
@@ -298,7 +301,7 @@ const AdminDashboard = ({ userProfile }) => {
                     </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 text-sm p-4">
+                <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-slate-50 p-2.5 rounded-lg">
                         <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
                         <Badge 
@@ -351,31 +354,20 @@ const AdminDashboard = ({ userProfile }) => {
 
       <button 
         onClick={openCreate}
-        className="fab-button lg:hidden"
+        className="fab-btn lg:hidden"
       >
         <PlusCircle size={28} />
       </button>
 
       {/* VIEW MODAL */}
-      <IonModal
-        isOpen={isViewing && !!selectedUser}
-        onDidDismiss={() => setIsViewing(false)}
-        className="custom-modal"
-      >
-        <IonHeader>
-          <IonToolbar className="modal-toolbar">
-            <IonTitle className="font-bold text-white">Scheda Volontario</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={() => setIsViewing(false)} className="modal-close-btn">
-                <X size={20} />
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding" scrollY={false}>
-          <div className="modal-body-content">
-             {selectedUser && (
-                <>
+      {isViewing && selectedUser && (
+        <div className="modal-overlay animate-in fade-in">
+          <div className="modal-content max-w-2xl">
+             <div className="modal-header">
+                <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
+                <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
+             </div>
+             <div className="modal-body">
                 <div className="modal-profile-header">
                    <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
                    <h2 className="modal-profile-name">{selectedUser.name}</h2>
@@ -401,7 +393,11 @@ const AdminDashboard = ({ userProfile }) => {
                             <p className="info-label">Data di Nascita</p>
                             <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                         </div>
-                        <div className="info-card col-span-2">
+                        <div className="info-card">
+                            <p className="info-label">Codice Emercomnet</p>
+                            <p className="info-value">{selectedUser.emercomnetId || '-'}</p>
+                        </div>
+                        <div className="info-card">
                             <p className="info-label">Residenza</p>
                             <p className="info-value">{selectedUser.city || '-'}</p>
                         </div>
@@ -454,29 +450,20 @@ const AdminDashboard = ({ userProfile }) => {
                         <Edit2 size={16} /> Modifica Dati
                     </Button>
                 </div>
-                </>
-             )}
+             </div>
           </div>
-        </IonContent>
-      </IonModal>
+        </div>
+      )}
 
-      <IonModal
-        isOpen={isEditing || isCreating}
-        onDidDismiss={closeAll}
-        className="custom-modal"
-      >
-        <IonHeader>
-          <IonToolbar className="modal-toolbar">
-            <IonTitle className="font-bold text-white">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={closeAll} className="modal-close-btn">
-                <X size={20} />
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding" scrollY={isCreating}>
-          <div className="modal-body-content">
+      {(isEditing || isCreating) && (
+        <div className="modal-overlay animate-in fade-in edit-create-modal">
+          <div className="modal-content max-w-2xl">
+             <div className="modal-header">
+                <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
+                <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
+             </div>
+             
+             <div className="modal-body">
                 <form onSubmit={handleSave} className="space-y-8">
                    
                    {/* DATI PERSONALI */}
@@ -577,13 +564,13 @@ const AdminDashboard = ({ userProfile }) => {
 
                      <div className="space-y-4">
                         {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
-                          <div key={category} className={`p-4 rounded-xl border ${data.color}`}>
-                            <h5 className="font-bold text-xs uppercase mb-3 flex items-center gap-2 opacity-90">
+                          <div key={category} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <h5 className="font-bold text-slate-700 text-xs uppercase mb-3 flex items-center gap-2">
                               {data.icon} {category}
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {data.items.map(item => (
-                                <label key={item} className="spec-checkbox-label hover:bg-white/60">
+                                <label key={item} className="spec-checkbox-label">
                                   <input 
                                     type="checkbox" 
                                     checked={formData.specializations?.includes(item)}
@@ -628,25 +615,84 @@ const AdminDashboard = ({ userProfile }) => {
                       <Button type="submit">Salva Modifiche</Button>
                    </div>
                 </form>
+             </div>
           </div>
-        </IonContent>
-      </IonModal>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="text-amber-600" size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Volontario</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Sei sicuro di voler eliminare questo volontario? Questa azione non può essere annullata.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={cancelDeleteUser}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button 
+                  onClick={confirmDeleteUser}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Elimina
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {isBulkDeleteModalOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="text-amber-600" size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina {selectedUserIds.length} Volontari</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Sei sicuro di voler eliminare i volontari selezionati? Questa azione non può essere annullata.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button 
+                  onClick={cancelDeleteSelected}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button 
+                  onClick={confirmDeleteSelected}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Elimina Tutto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Notification Modal */}
-      <IonModal
-        isOpen={notification.isOpen}
-        onDidDismiss={closeNotification}
-        className="custom-modal auto-height"
-      >
-        <IonContent className="ion-padding" scrollY={false}>
-          <div className="flex flex-col items-center text-center h-full justify-center relative">
+      {notification.isOpen && (
+        <div className="modal-overlay animate-in fade-in" style={{zIndex: 120}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
             <button 
                 onClick={closeNotification}
-                className="absolute top-0 right-0 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
             >
                 <X size={20} />
             </button>
-            <div className="flex flex-col items-center text-center w-full">
+            <div className="flex flex-col items-center text-center">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
                   notification.type === 'success' ? 'bg-green-100 text-green-600' :
                   notification.type === 'error' ? 'bg-red-100 text-red-600' :
@@ -670,8 +716,8 @@ const AdminDashboard = ({ userProfile }) => {
               </button>
             </div>
           </div>
-        </IonContent>
-      </IonModal>
+        </div>
+      )}
     </div>
   );
 };
