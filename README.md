@@ -103,10 +103,29 @@ Per generare l'applicazione Android installabile (.apk):
     - In Android Studio, vai su **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
     - Al termine, clicca su "locate" nella notifica per trovare il file `.apk` (solitamente in `client/android/app/build/outputs/apk/debug/app-debug.apk`).
 
+## 🔄 Live Updates (Appflow)
+
+L'app è configurata per ricevere aggiornamenti "over-the-air" senza dover rilasciare una nuova versione sugli store.
+
+### Rilasciare un aggiornamento
+Per aggiornare il codice web (JS/CSS/HTML) sui dispositivi che hanno già l'app installata:
+
+1.  **Build Web**:
+    ```bash
+    npm run build
+    ```
+2.  **Deploy su Appflow**:
+    ```bash
+    ionic deploy build --app-id="ff632d26" --channel-name="Production"
+    ```
+    *Nota: Richiede login a Ionic Appflow.*
+
+Gli utenti riceveranno l'aggiornamento automaticamente al successivo riavvio dell'app.
+
 ## Credenziali di Test
 
 **Presidente**
-- email: presidente@mail.it
+- email: mantelli.alessandro@gmail.com
 - password: 1234
 
 **Volontario**

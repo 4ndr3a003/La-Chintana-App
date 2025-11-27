@@ -4,7 +4,17 @@
   "webDir": "client/dist",
   "plugins": {
     "PushNotifications": {
-      "presentationOptions": ["badge", "sound", "alert"]
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    },
+    "LiveUpdates": {
+      "appId": "ff632d26",
+      "channel": "Production",
+      "autoUpdateMethod": "auto",
+      "maxVersions": 2
     }
   }
 }

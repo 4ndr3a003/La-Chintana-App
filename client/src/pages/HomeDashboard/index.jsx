@@ -14,18 +14,18 @@ const HomeDashboard = ({ userProfile }) => {
     <div className="home-dashboard-container">
       {/* Header - Yellow Banner */}
       <header className="mb-8 pt-4 px-4 md:px-0">
-        <div className="bg-[var(--color-pc-yellow)] rounded-3xl p-6 md:p-8 flex items-center gap-6 shadow-sm">
+        <div className="bg-[var(--color-pc-blue)] rounded-3xl p-6 md:p-8 flex items-center gap-6 shadow-sm">
           <div className="hidden md:block">
             <Avatar src={userProfile.photoUrl} name={userProfile.name} size="lg" className="border-4 border-white/30" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-white/30 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="bg-white/30 text-white text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1">Ciao, {userProfile.name}</h1>
-            <p className="text-slate-800 font-medium opacity-80">Benvenuto nel portale operativo della Protezione Civile.</p>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-1">Ciao, {userProfile.name}</h1>
+            <p className="text-blue-50 font-medium opacity-90">Benvenuto nel portale operativo della Protezione Civile.</p>
           </div>
         </div>
       </header>
