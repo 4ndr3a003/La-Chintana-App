@@ -1,45 +1,96 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, storage, appId } from '../../services/firebase';
+import { db, storage, appId, auth } from '../../services/firebase';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useUserProfileView = (userProfile) => {
   const [uploading, setUploading] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [crop, setCrop] = useState({ unit: '%', width: 50, aspect: 1 });
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const imgRef = useRef(null);
 
-  const handlePhotoUpload = async (e) => {
+
+  const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      console.log("Starting upload to Firebase Storage...");
-      const storageRef = ref(storage, `avatars/${userProfile.id}_${Date.now()}`);
-
-      console.log("Uploading bytes...");
-      await uploadBytes(storageRef, file);
-      console.log("Upload complete. Getting download URL...");
-
-      const url = await getDownloadURL(storageRef);
-      console.log("Download URL obtained:", url);
-
-      const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-      await updateDoc(userRef, { photoUrl: url });
-      console.log("Firestore updated.");
-
-    } catch (error) {
-      console.error("Error uploading photo:", error);
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
-      if (error.customData) {
-        console.error("Custom data:", error.customData);
-      }
-      alert(`Errore caricamento foto: ${error.message}`);
-    } finally {
-      setUploading(false);
+    if (file) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => setImageSrc(reader.result.toString() || ''));
+      reader.readAsDataURL(file);
+      setIsModalOpen(true);
     }
   };
 
+  const uploadCroppedImage = async () => {
+    if (!completedCrop || !imgRef.current) {
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      console.error("User not authenticated for photo upload.");
+      alert("Devi essere autenticato per caricare una foto.");
+      return;
+    }
+
+    setUploading(true);
+    setIsModalOpen(false);
+
+    try {
+      const canvas = document.createElement('canvas');
+      const image = imgRef.current;
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+      canvas.width = completedCrop.width * scaleX;
+      canvas.height = completedCrop.height * scaleY;
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(
+        image,
+        completedCrop.x * scaleX,
+        completedCrop.y * scaleY,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          console.error('Canvas is empty');
+          setUploading(false);
+          return;
+        }
+
+        try {
+          const storageRef = ref(storage, `avatars/${currentUser.uid}/${currentUser.uid}_${Date.now()}`);
+          await uploadBytes(storageRef, blob);
+          const url = await getDownloadURL(storageRef);
+
+          const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+          await updateDoc(userRef, { photoUrl: url });
+        } catch (error) {
+          console.error("Error during blob upload/doc update:", error);
+          alert(`Errore caricamento foto: ${error.message}`);
+        } finally {
+          setUploading(false);
+          setImageSrc(null);
+        }
+      }, 'image/jpeg');
+
+    } catch (error) {
+      console.error("Error creating cropped image:", error);
+      alert(`Errore durante il ritaglio dell'immagine: ${error.message}`);
+      setUploading(false);
+      setIsModalOpen(false);
+      setImageSrc(null);
+    }
+  };
+  
   // Raggruppa le specializzazioni dell'utente
   const groupedSpecs = Object.entries(SPECIALIZATIONS_DATA).reduce((acc, [category, data]) => {
     const userSpecsByCategory = data.items.filter(item => userProfile.specializations?.includes(item));
@@ -98,6 +149,15 @@ export const useUserProfileView = (userProfile) => {
     handlePhotoUpload,
     groupedSpecs,
     otherSpecs,
-    status
+    status,
+    imageSrc,
+    crop,
+    setCrop,
+    completedCrop,
+    setCompletedCrop,
+    isModalOpen,
+    setIsModalOpen,
+    imgRef,
+    uploadCroppedImage
   };
 };

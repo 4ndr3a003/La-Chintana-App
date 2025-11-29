@@ -6,7 +6,7 @@ const db = admin.firestore();
 const messaging = admin.messaging();
 
 // Helper function to send notifications
-async function sendNotificationToAll(appId, title, body) {
+async function sendNotificationToAll(appId, title, body, options = {}) {
   try {
     // 1. Get all profiles to find tokens
     // Path: artifacts/{appId}/public/data/profiles
@@ -39,6 +39,22 @@ async function sendNotificationToAll(appId, title, body) {
       },
       tokens: uniqueTokens,
     };
+
+    if (options.isUrgent) {
+      message.android = {
+        notification: {
+          color: "#FF0000", // Rosso per le notifiche urgenti
+        },
+      };
+      // Per iOS, si potrebbero aggiungere personalizzazioni come suoni specifici
+      message.apns = {
+        payload: {
+          aps: {
+            sound: "default",
+          },
+        },
+      };
+    }
 
     const response = await messaging.sendEachForMulticast(message);
     console.log(response.successCount + ' messages were sent successfully');
@@ -83,7 +99,14 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
   const data = snap.data();
   const appId = context.params.appId;
 
-  const title = `Nuova Comunicazione: ${data.title}`;
+  let title = `Nuova Comunicazione: ${data.title}`;
+  const options = {};
+
+  if (data.level === 'URGENTE') {
+    title = `⚠️ ${title}`;
+    options.isUrgent = true;
+  }
+  
   // Truncate body if too long
   let bodyContent = data.content || '';
   if (bodyContent.length > 100) {
@@ -91,5 +114,42 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
   }
   const body = bodyContent;
 
-  await sendNotificationToAll(appId, title, body);
+  await sendNotificationToAll(appId, title, body, options);
 });
+
+// Sync user role to custom claims
+exports.syncUserRole = functions.firestore
+  .document("artifacts/{appId}/public/data/profiles/{userId}")
+  .onWrite(async (change, context) => {
+    const userData = change.after.exists ? change.after.data() : null;
+    const oldUserData = change.before.exists ? change.before.data() : null;
+
+    if (!userData) {
+      // User profile was deleted, do nothing for claims
+      return null;
+    }
+    
+    // Role or email changed?
+    const role = userData.role || 'Volontario';
+    const oldRole = oldUserData ? oldUserData.role || 'Volontario' : null;
+    
+    if (role === oldRole) {
+      // Role hasn't changed, no need to update claims
+      return null;
+    }
+
+    try {
+      // Find the user by email
+      const user = await admin.auth().getUserByEmail(userData.email);
+
+      // Set custom claims
+      await admin.auth().setCustomUserClaims(user.uid, { role: role });
+      
+      console.log(`Custom claim for role '${role}' set for user ${user.uid}`);
+      return null;
+
+    } catch (error) {
+      console.error("Error syncing user role:", error);
+      return null;
+    }
+  });

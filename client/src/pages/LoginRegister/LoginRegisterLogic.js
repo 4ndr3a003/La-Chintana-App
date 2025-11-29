@@ -25,6 +25,9 @@ export const useLoginRegister = (onLoginSuccess) => {
       const snapshot = await getDocs(q);
       
       if (!snapshot.empty) {
+        // Force refresh of the token to get custom claims
+        await auth.currentUser.getIdToken(true);
+        
         const userDoc = snapshot.docs[0];
         onLoginSuccess(userDoc.id);
       } else {

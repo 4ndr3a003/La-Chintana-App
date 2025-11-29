@@ -20,7 +20,7 @@ const HomeDashboard = ({ userProfile }) => {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-white/30 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
               </span>
             </div>

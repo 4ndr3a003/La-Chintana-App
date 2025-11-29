@@ -1,4 +1,5 @@
-import React from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { Camera, LogOut } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
@@ -12,7 +13,15 @@ const UserProfileView = ({ userProfile, onLogout }) => {
     handlePhotoUpload,
     groupedSpecs,
     otherSpecs,
-    status
+    status,
+    imageSrc,
+    crop,
+    setCrop,
+    setCompletedCrop,
+    isModalOpen,
+    setIsModalOpen,
+    imgRef,
+    uploadCroppedImage
   } = useUserProfileView(userProfile);
 
   // Helper to format dates
@@ -24,6 +33,31 @@ const UserProfileView = ({ userProfile, onLogout }) => {
   return (
     <div className="min-h-screen bg-[var(--color-slate-50)] p-4 md:p-8 font-sans">
       <h1 className="text-3xl font-extrabold text-[var(--color-slate-900)] mb-8">Profilo Volontario</h1>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4">
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4 text-slate-800">Ritaglia Immagine</h3>
+            <div className="max-h-[60vh] overflow-y-auto">
+              <ReactCrop
+                crop={crop}
+                onChange={c => setCrop(c)}
+                onComplete={c => setCompletedCrop(c)}
+                aspect={1}
+                circularCrop
+              >
+                <img ref={imgRef} src={imageSrc} style={{ maxHeight: '70vh' }} />
+              </ReactCrop>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setIsModalOpen(false)} className="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition-colors">Annulla</button>
+              <button onClick={uploadCroppedImage} className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors" disabled={uploading}>
+                {uploading ? 'Caricamento...' : 'Salva'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Top Card: Profile Header */}
       <div className="bg-white rounded-3xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)] relative">

@@ -1,78 +1,99 @@
 import React from 'react';
-import { Trash2, AlertCircle, Pencil } from 'lucide-react';
+import { Trash2, AlertCircle, Pencil, Briefcase, BookOpen, Users, Megaphone, Info } from 'lucide-react';
 import { hasAdminAccess } from '../../utils/constants';
 import Avatar from '../ui/Avatar';
 
 const CommunicationCard = ({ message, userProfile, onDelete, onEdit, onClick }) => {
   const dateObj = new Date(message.date);
-  const isAdmin = hasAdminAccess(userProfile);
+  const isAdmin = hasAdminAccess(userProfile?.uid);
 
-  const getTheme = (topic) => {
+  const getTheme = (topic, importance) => {
+    let theme = {};
     switch(topic) {
       case 'Urgente':
-        return {
+        theme = {
           headerBg: 'bg-red-100',
           headerText: 'text-red-900',
           borderColor: 'border-red-200',
           badge: 'bg-white/80 text-red-800 border-red-200',
+          icon: <AlertCircle size={18} className="text-red-400" />
         };
+        break;
       case 'Servizio':
-        return {
+        theme = {
           headerBg: 'bg-amber-100',
           headerText: 'text-amber-900',
           borderColor: 'border-amber-200',
           badge: 'bg-white/80 text-amber-800 border-amber-200',
+          icon: <Briefcase size={18} className="text-amber-400" />
         };
+        break;
       case 'Formazione':
-        return {
+        theme = {
           headerBg: 'bg-emerald-100',
           headerText: 'text-emerald-900',
           borderColor: 'border-emerald-200',
           badge: 'bg-white/80 text-emerald-800 border-emerald-200',
+          icon: <BookOpen size={18} className="text-emerald-400" />
         };
+        break;
       case 'Direttivo':
-        return {
+        theme = {
           headerBg: 'bg-purple-100',
           headerText: 'text-purple-900',
           borderColor: 'border-purple-200',
           badge: 'bg-white/80 text-purple-800 border-purple-200',
+          icon: <Users size={18} className="text-purple-400" />
         };
+        break;
       case 'Generale':
-        return {
+        theme = {
           headerBg: 'bg-slate-100',
           headerText: 'text-slate-900',
           borderColor: 'border-slate-200',
           badge: 'bg-white/80 text-slate-800 border-slate-200',
+          icon: <Megaphone size={18} className="text-slate-400" />
         };
+        break;
       default: // Altro
-        return {
+        theme = {
           headerBg: 'bg-blue-100',
           headerText: 'text-blue-900',
           borderColor: 'border-blue-200',
           badge: 'bg-white/80 text-blue-800 border-blue-200',
+          icon: <Info size={18} className="text-blue-400" />
         };
     }
+    if (importance === 'Alta') {
+      return {
+        ...theme,
+        card: 'border-2 shadow-lg shadow-red-500/20',
+        headerBg: 'bg-red-500',
+        headerText: 'text-white',
+        badge: 'bg-white/90 text-red-800 border-red-200 font-bold',
+        icon: <AlertCircle size={18} className="text-white" />
+      };
+    }
+    return theme;
   };
 
-  const theme = getTheme(message.topic);
+  const theme = getTheme(message.topic, message.importance);
 
   return (
     <div 
       onClick={onClick}
-      className={`bg-white ${theme.borderColor} rounded-xl shadow-sm border overflow-hidden flex flex-col hover:shadow-md transition-all duration-300 cursor-pointer group`}
+      className={`bg-white rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-all duration-300 cursor-pointer group ${theme.borderColor} ${theme.card || 'border'}`}
     >
       {/* Header Colorato */}
       <div className={`${theme.headerBg} px-4 py-3 border-b ${theme.borderColor} flex justify-between items-start gap-3`}>
-        <h3 className={`text-lg font-bold ${theme.headerText} leading-tight`}>{message.title}</h3>
+        <div className="flex items-center gap-3">
+          {theme.icon}
+          <h3 className={`text-lg font-bold ${theme.headerText} leading-tight`}>{message.title}</h3>
+        </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
             <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap`}>
                 {message.topic}
             </span>
-            {message.importance === 'Alta' && (
-                <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-red-100 text-red-700 border border-red-200">
-                    <AlertCircle size={10} /> Importante
-                </span>
-            )}
         </div>
       </div>
 

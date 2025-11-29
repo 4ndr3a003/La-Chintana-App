@@ -17,58 +17,41 @@ export const useHomeDashboard = () => {
     const loadedSources = new Set();
     const checkLoading = (source) => {
       loadedSources.add(source);
-      if (loadedSources.size >= 3) { // 3 listeners: event, emergency, comms
+      if (loadedSources.size >= 2) { // 2 listeners: events, comms
         setLoading(false);
       }
     };
 
-    // 1. Next Single Event (General)
-    const qNextEvent = query(
+    // 1. Unified query for future events
+    const qEvents = query(
       collection(db, 'artifacts', appId, 'public', 'data', 'events'),
       where('date', '>=', now),
-      orderBy('date', 'asc'),
-      limit(1)
+      orderBy('date', 'asc')
     );
 
-    // 2. Next Emergency
-    const qNextEmergency = query(
-      collection(db, 'artifacts', appId, 'public', 'data', 'events'),
-      where('date', '>=', now),
-      where('type', '==', 'Emergenza'),
-      orderBy('date', 'asc'),
-      limit(1)
-    );
+    const unsubEvents = onSnapshot(qEvents, (snap) => {
+      const allFutureEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // 3. Recent Communications (Ordered by Importance then Date)
+      // Find the very next event (the first in the sorted list)
+      const firstEvent = allFutureEvents.length > 0 ? allFutureEvents[0] : null;
+      setNextEvent(firstEvent);
+
+      // Find the next emergency event
+      const firstEmergency = allFutureEvents.find(event => event.type === 'Emergenza') || null;
+      setNextEmergency(firstEmergency);
+      
+      checkLoading('events');
+    }, (error) => {
+      console.error("Error fetching future events:", error);
+      checkLoading('events');
+    });
+
+    // 2. Recent Communications (Ordered by Importance then Date)
     const qComms = query(
       collection(db, 'artifacts', appId, 'public', 'data', 'communications'),
       orderBy('date', 'desc'),
       limit(10)
     );
-
-    const unsubNextEvent = onSnapshot(qNextEvent, (snap) => {
-      if (!snap.empty) {
-        setNextEvent({ id: snap.docs[0].id, ...snap.docs[0].data() });
-      } else {
-        setNextEvent(null);
-      }
-      checkLoading('event');
-    }, (error) => {
-      console.error("Error fetching next event:", error);
-      checkLoading('event');
-    });
-
-    const unsubNextEmergency = onSnapshot(qNextEmergency, (snap) => {
-      if (!snap.empty) {
-        setNextEmergency({ id: snap.docs[0].id, ...snap.docs[0].data() });
-      } else {
-        setNextEmergency(null);
-      }
-      checkLoading('emergency');
-    }, (error) => {
-      console.error("Error fetching next emergency:", error);
-      checkLoading('emergency');
-    });
 
     const unsubComms = onSnapshot(qComms, (snap) => {
       const comms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -90,8 +73,7 @@ export const useHomeDashboard = () => {
     });
 
     return () => {
-      unsubNextEvent();
-      unsubNextEmergency();
+      unsubEvents();
       unsubComms();
     };
   }, []);

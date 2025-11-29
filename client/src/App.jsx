@@ -83,7 +83,7 @@ export default function App() {
 
   // Push Notifications Initialization
   useEffect(() => {
-    if (!userProfile) return;
+    if (!authUser || !userProfile) return;
 
     const initNativeNotifications = async () => {
         try {
@@ -216,12 +216,14 @@ export default function App() {
       }
 
       onMessage(messaging, (payload) => {
-        console.log('Message received. ', payload);
-        setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
-        new Notification(payload.notification.title, {
-          body: payload.notification.body,
-          icon: '/logo_chintana.png'
-        });
+        if (document.visibilityState === 'visible') {
+          console.log('Message received. ', payload);
+          setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
+          new Notification(payload.notification.title, {
+            body: payload.notification.body,
+            icon: '/logo_chintana.png'
+          });
+        }
       });
 
     } catch (err) {
