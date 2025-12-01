@@ -86,75 +86,75 @@ export default function App() {
     if (!authUser || !userProfile) return;
 
     const initNativeNotifications = async () => {
-        try {
-          // 1. Register listeners FIRST
-          await PushNotifications.addListener('registration', async token => {
-            console.log('Push registration success, token: ' + token.value);
-            try {
-              const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-              await updateDoc(profileRef, {
-                fcmTokens: arrayUnion(token.value)
-              });
-            } catch (err) {
-              console.error('Error saving FCM token:', err);
-            }
-          });
-
-          await PushNotifications.addListener('registrationError', err => {
-            console.error('Push registration error: ', err.error);
-            // alert('Push registration error: ' + JSON.stringify(err)); // Debug only
-          });
-
-          await PushNotifications.addListener('pushNotificationReceived', notification => {
-            console.log('Push received: ', notification);
-          });
-
-          await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-            console.log('Push action performed: ', notification);
-          });
-
-          // 2. Request permissions
-          let permStatus = await PushNotifications.checkPermissions();
-
-          if (permStatus.receive === 'prompt') {
-            permStatus = await PushNotifications.requestPermissions();
+      try {
+        // 1. Register listeners FIRST
+        await PushNotifications.addListener('registration', async token => {
+          console.log('Push registration success, token: ' + token.value);
+          try {
+            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+            await updateDoc(profileRef, {
+              fcmTokens: arrayUnion(token.value)
+            });
+          } catch (err) {
+            console.error('Error saving FCM token:', err);
           }
+        });
 
-          if (permStatus.receive !== 'granted') {
-            console.log('User denied permissions!');
-            return;
-          }
+        await PushNotifications.addListener('registrationError', err => {
+          console.error('Push registration error: ', err.error);
+          // alert('Push registration error: ' + JSON.stringify(err)); // Debug only
+        });
 
-          // 3. Register with FCM
-          await PushNotifications.register();
+        await PushNotifications.addListener('pushNotificationReceived', notification => {
+          console.log('Push received: ', notification);
+        });
 
-          // 4. Create Notification Channel (Required for Android O+)
-          await PushNotifications.createChannel({
-              id: 'default',
-              name: 'Notifiche Generali',
-              description: 'Notifiche generali dell\'app',
-              importance: 5,
-              visibility: 1,
-              vibration: true,
-          });
+        await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+          console.log('Push action performed: ', notification);
+        });
 
-        } catch (e) {
-          console.error('Error initializing push notifications', e);
+        // 2. Request permissions
+        let permStatus = await PushNotifications.checkPermissions();
+
+        if (permStatus.receive === 'prompt') {
+          permStatus = await PushNotifications.requestPermissions();
         }
+
+        if (permStatus.receive !== 'granted') {
+          console.log('User denied permissions!');
+          return;
+        }
+
+        // 3. Register with FCM
+        await PushNotifications.register();
+
+        // 4. Create Notification Channel (Required for Android O+)
+        await PushNotifications.createChannel({
+          id: 'default',
+          name: 'Notifiche Generali',
+          description: 'Notifiche generali dell\'app',
+          importance: 5,
+          visibility: 1,
+          vibration: true,
+        });
+
+      } catch (e) {
+        console.error('Error initializing push notifications', e);
+      }
     };
 
     const checkPermissionStatus = async () => {
-        if (!Capacitor.isNativePlatform()) {
-            if (Notification.permission === 'default' || Notification.permission === 'denied') {
-                setShowNotifButton(true);
-            } else if (Notification.permission === 'granted') {
-                // Se già concesso, abilita in background senza mostrare toast di successo
-                setupWebPush(false);
-            }
-        } else {
-            // Native initialization
-            initNativeNotifications();
+      if (!Capacitor.isNativePlatform()) {
+        if (Notification.permission === 'default' || Notification.permission === 'denied') {
+          setShowNotifButton(true);
+        } else if (Notification.permission === 'granted') {
+          // Se già concesso, abilita in background senza mostrare toast di successo
+          setupWebPush(false);
         }
+      } else {
+        // Native initialization
+        initNativeNotifications();
+      }
     };
 
     checkPermissionStatus();
@@ -167,35 +167,63 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
 
+  // Foreground Message Listener (Web only)
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) return;
+
+    const unsubscribe = onMessage(messaging, (payload) => {
+      if (document.visibilityState === 'visible') {
+        console.log('Message received. ', payload);
+        setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
+
+        // Check if we have permission to show system notification
+        if (Notification.permission === 'granted') {
+          new Notification(payload.notification.title, {
+            body: payload.notification.body,
+            icon: '/logo_chintana.png'
+          });
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const setupWebPush = async (isInteractive = false) => {
     try {
       if (isInteractive) {
         setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
       }
 
-      const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk"; 
-      
-      if (vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
-          console.warn("VAPID Key mancante.");
-          setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
-          return;
+      const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk";
+
+      if (!vapidKey || vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
+        console.warn("VAPID Key mancante o non valida.");
+        setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
+        return;
       }
 
       let registration;
       if ('serviceWorker' in navigator) {
-          try {
-              registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-              console.log('Service Worker registration successful with scope: ', registration.scope);
-          } catch (err) {
-              console.error('Service Worker registration failed: ', err);
-              setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
-              return;
-          }
+        try {
+          registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+          console.log('Service Worker registration successful with scope: ', registration.scope);
+        } catch (err) {
+          console.error('Service Worker registration failed: ', err);
+          setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
+          return;
+        }
+      } else {
+        console.warn('Service Worker non supportato in questo browser.');
+        setToastInfo({ isOpen: true, message: 'Notifiche non supportate da questo browser.' });
+        return;
       }
 
-      const currentToken = await getToken(messaging, { 
-          vapidKey, 
-          serviceWorkerRegistration: registration 
+      const currentToken = await getToken(messaging, {
+        vapidKey,
+        serviceWorkerRegistration: registration
       });
 
       if (currentToken) {
@@ -203,7 +231,7 @@ export default function App() {
         if (isInteractive) {
           setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
         }
-        
+
         const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
         await updateDoc(profileRef, {
           fcmTokens: arrayUnion(currentToken)
@@ -211,24 +239,24 @@ export default function App() {
       } else {
         console.log('No registration token available.');
         if (isInteractive) {
-          setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche.' });
+          setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche. Verifica i permessi.' });
         }
       }
 
-      onMessage(messaging, (payload) => {
-        if (document.visibilityState === 'visible') {
-          console.log('Message received. ', payload);
-          setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
-          new Notification(payload.notification.title, {
-            body: payload.notification.body,
-            icon: '/logo_chintana.png'
-          });
-        }
-      });
+
 
     } catch (err) {
       console.error('An error occurred while retrieving token. ', err);
-      setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+      // More specific error messages
+      let msg = `Errore notifiche: ${err.message}`;
+      if (err.code === 'messaging/permission-blocked') {
+        msg = 'Permesso notifiche bloccato. Abilitalo nelle impostazioni del browser.';
+      } else if (err.code === 'messaging/unsupported-browser') {
+        msg = 'Browser non supportato per le notifiche.';
+      } else if (err.message.includes('Missing required')) {
+        msg = 'Configurazione notifiche incompleta (manifest o VAPID).';
+      }
+      setToastInfo({ isOpen: true, message: msg });
     }
   };
 
@@ -236,7 +264,7 @@ export default function App() {
     try {
       setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
       const permission = await Notification.requestPermission();
-      
+
       if (permission === 'granted') {
         console.log('Notification permission granted.');
         setShowNotifButton(false);
@@ -293,24 +321,24 @@ export default function App() {
             />
             {/* Spacer for bottom nav on mobile */}
             {userProfile && location.pathname !== '/login' && (
-               <div className="h-24 xl:hidden"></div>
+              <div className="h-24 xl:hidden"></div>
             )}
           </div>
         </div>
 
         {/* Notification Permission Button (Floating) */}
         {showNotifButton && !loading && userProfile && (
-            <div className="fixed bottom-24 right-4 z-50">
-                <IonButton 
-                    shape="round" 
-                    color="warning" 
-                    onClick={enableWebNotifications}
-                    className="shadow-lg"
-                >
-                    <IonIcon slot="start" icon={notificationsOutline} />
-                    Attiva Notifiche
-                </IonButton>
-            </div>
+          <div className="fixed bottom-24 right-4 z-50">
+            <IonButton
+              shape="round"
+              color="warning"
+              onClick={enableWebNotifications}
+              className="shadow-lg"
+            >
+              <IonIcon slot="start" icon={notificationsOutline} />
+              Attiva Notifiche
+            </IonButton>
+          </div>
         )}
 
         {/* MOBILE BOTTOM NAV */}

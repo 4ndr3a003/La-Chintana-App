@@ -8,7 +8,7 @@ import Avatar from '../../components/ui/Avatar';
 import './HomeDashboard.css';
 
 const HomeDashboard = ({ userProfile }) => {
-  const { nextEvent, nextEmergency, recentComms, monthEvents, currentMonth, changeMonth, loading } = useHomeDashboard();
+  const { nextEvent, nextEmergency, recentComms, monthEvents, currentMonth, changeMonth, loading } = useHomeDashboard(userProfile);
 
   return (
     <div className="home-dashboard-container">

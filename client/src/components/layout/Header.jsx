@@ -35,8 +35,11 @@ const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref
 const Header = ({ userProfile }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isActive = (path) => location.pathname === path;
-  
+  const isActive = (path) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
+
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navContainerRef = useRef(null);
   const navRefs = useRef({});
@@ -56,39 +59,39 @@ const Header = ({ userProfile }) => {
 
   useEffect(() => {
     const updatePill = () => {
-        const activeItem = navItems.find(item => item.path === location.pathname);
-        if (activeItem && navRefs.current[activeItem.path] && navContainerRef.current) {
-          const element = navRefs.current[activeItem.path];
-          const container = navContainerRef.current;
-          
-          const eleRect = element.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
-          
-          setPillStyle({
-            left: eleRect.left - containerRect.left,
-            width: eleRect.width,
-            opacity: 1
-          });
-        } else {
-           setPillStyle(prev => ({ ...prev, opacity: 0 }));
-        }
+      const activeItem = navItems.find(item => isActive(item.path));
+      if (activeItem && navRefs.current[activeItem.path] && navContainerRef.current) {
+        const element = navRefs.current[activeItem.path];
+        const container = navContainerRef.current;
+
+        const eleRect = element.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        setPillStyle({
+          left: eleRect.left - containerRect.left,
+          width: eleRect.width,
+          opacity: 1
+        });
+      } else {
+        setPillStyle(prev => ({ ...prev, opacity: 0 }));
+      }
     };
 
     const timer = setTimeout(updatePill, 50);
     window.addEventListener('resize', updatePill);
-    
+
     return () => {
-        clearTimeout(timer);
-        window.removeEventListener('resize', updatePill);
+      clearTimeout(timer);
+      window.removeEventListener('resize', updatePill);
     };
   }, [location.pathname, navItems]);
 
   return (
     <IonHeader className="ion-no-border pt-0 px-0 pb-0 md:pt-4 md:px-4 md:pb-2" style={{ '--background': 'transparent' }}>
-      <IonToolbar 
-        className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10" 
-        style={{ 
-          '--background': 'var(--color-pc-blue-700)', 
+      <IonToolbar
+        className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10"
+        style={{
+          '--background': 'var(--color-pc-blue-700)',
           '--min-height': '80px',
           '--padding-start': '16px',
           '--padding-end': '16px'
@@ -110,64 +113,63 @@ const Header = ({ userProfile }) => {
 
           {/* Navigation Buttons - Desktop Only */}
           <IonButtons slot="primary" className="!hidden xl:!block">
-             <div 
-                ref={navContainerRef}
-                className="flex relative items-center bg-blue-900/40 p-1.5 rounded-full border border-blue-500/30 shadow-inner"
-             >
-                {/* The Pill */}
-                <div
-                    className="absolute bg-yellow-500 rounded-[20px] shadow-sm transition-all duration-300 ease-in-out"
-                    style={{
-                    left: pillStyle.left,
-                    width: pillStyle.width,
-                    height: '40px',
-                    opacity: pillStyle.opacity,
-                    top: '6px' 
-                    }}
-                />
-                
-                {navItems.map((item) => (
-                    <NavButton
-                    key={item.path}
-                    to={item.path}
-                    active={isActive(item.path)}
-                    icon={item.icon}
-                    onClick={() => navigate(item.path)}
-                    ref={el => navRefs.current[item.path] = el}
-                    >
-                    {item.label}
-                    </NavButton>
-                ))}
-             </div>
+            <div
+              ref={navContainerRef}
+              className="flex relative items-center bg-blue-900/40 p-1.5 rounded-full border border-blue-500/30 shadow-inner"
+            >
+              {/* The Pill */}
+              <div
+                className="absolute bg-yellow-500 rounded-[20px] shadow-sm transition-all duration-300 ease-in-out"
+                style={{
+                  left: pillStyle.left,
+                  width: pillStyle.width,
+                  height: '40px',
+                  opacity: pillStyle.opacity,
+                  top: '6px'
+                }}
+              />
+
+              {navItems.map((item) => (
+                <NavButton
+                  key={item.path}
+                  to={item.path}
+                  active={isActive(item.path)}
+                  icon={item.icon}
+                  onClick={() => navigate(item.path)}
+                  ref={el => navRefs.current[item.path] = el}
+                >
+                  {item.label}
+                </NavButton>
+              ))}
+            </div>
           </IonButtons>
 
           {/* User Profile Section */}
           <IonButtons slot="end">
             <div className="flex items-center gap-3 pl-4">
-                <div className="h-8 w-px bg-blue-500/50 hidden lg:block"></div>
-                <IonButton
+              <div className="h-8 w-px bg-blue-500/50 hidden lg:block"></div>
+              <IonButton
                 onClick={() => navigate('/profile')}
                 shape="round"
                 fill="clear"
-                className={`group transition-all duration-300 ease-in-out ${isActive('/profile') ? 'scale-105' : 'hover:scale-105'}`}
-                style={{ 
-                    height: 'auto', 
-                    '--padding-start': '12px', 
-                    '--padding-end': '12px',
-                    '--border-radius': '20px',
-                    '--background': isActive('/profile') ? 'var(--color-pc-yellow-200)' : 'transparent',
-                    '--background-hover': isActive('/profile') ? 'var(--color-pc-yellow-100)' : 'rgba(255, 255, 255, 0.1)',
-                    '--box-shadow': 'none',
+                className={`group transition-all duration-300 ease-in-out ${isActive('/profile') ? 'scale-105 profile-button-active' : 'hover:scale-105 profile-button'}`}
+                style={{
+                  height: 'auto',
+                  '--padding-start': '12px',
+                  '--padding-end': '12px',
+                  '--border-radius': '20px',
+                  '--background': isActive('/profile') && window.innerWidth >= 1024 ? 'var(--color-pc-yellow)' : 'transparent',
+                  '--background-hover': isActive('/profile') && window.innerWidth >= 1024 ? 'var(--color-pc-yellow-400)' : 'rgba(255, 255, 255, 0.1)'
                 }}
-                >
+              >
                 <div className="flex items-center gap-3 py-1.5 px-1">
-                    <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-2px] transition-transform duration-300">
-                    <div className={`text-sm font-bold transition-colors duration-300 ${isActive('/profile') ? 'text-blue-900' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
+                  <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-2px] transition-transform duration-300">
+                    <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') ? 'text-blue-900' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
                     <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') ? 'text-blue-800' : 'text-blue-200'}`}>{ROLE_LABELS[userProfile.role]}</div>
-                    </div>
-                    <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
+                  </div>
+                  <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
                 </div>
-                </IonButton>
+              </IonButton>
             </div>
           </IonButtons>
         </div>

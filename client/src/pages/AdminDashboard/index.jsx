@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
-import { ROLES, ROLE_LABELS, BOARD_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
+import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
@@ -89,88 +89,94 @@ const AdminDashboard = ({ userProfile }) => {
     color: 'bg-purple-500'
   }));
 
+  const volunteerRoleOptions = Object.values(VOLUNTEER_ROLES).map(r => ({
+    value: r,
+    label: r,
+    color: 'bg-amber-500'
+  }));
+
   return (
     <div className="admin-dashboard-container">
       <div className="dashboard-header">
-         <h3 className="dashboard-title">
-            <Users className="text-blue-600" size={28} /> Gestione Volontari
-         </h3>
-         <span className="user-count-badge">{filteredUsers.length} Volontari</span>
+        <h3 className="dashboard-title">
+          <Users className="text-blue-600" size={28} /> Gestione Volontari
+        </h3>
+        <span className="user-count-badge">{filteredUsers.length} Volontari</span>
       </div>
 
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex gap-3">
-            <div className="relative flex-grow">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                    type="text" 
-                    placeholder="Cerca volontario..." 
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Cerca volontario..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-            {/* Mobile Filter Toggle Button */}
-            <button
-                onClick={toggleFilters}
-                className={`lg:hidden flex items-center justify-center px-4 rounded-xl border transition-colors ${isFiltersOpen ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200'}`}
-            >
-                <SlidersHorizontal size={20} />
-            </button>
-            
-            {/* Desktop Filters */}
-            <div className="hidden lg:flex gap-4 items-center">
-                {selectedUserIds.length > 0 && userProfile?.role === ROLES.PRESIDENT && (
-                    <button
-                        onClick={handleDeleteSelected}
-                        className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors shadow-sm shrink-0 animate-in fade-in"
-                    >
-                        <Trash2 size={18} />
-                        Elimina ({selectedUserIds.length})
-                    </button>
-                )}
-                <div className="w-48">
-                    <CustomSelect 
-                        options={filterRoleOptions}
-                        value={filterRole}
-                        onChange={setFilterRole}
-                        placeholder="Filtra per Ruolo"
-                    />
-                </div>
-                <div className="w-48">
-                    <CustomSelect 
-                        options={filterStatusOptions}
-                        value={filterStatus}
-                        onChange={setFilterStatus}
-                        placeholder="Filtra per Stato"
-                    />
-                </div>
-                <Button
-                    onClick={openCreate}
-                >
-                    <PlusCircle size={18} />
-                    Nuovo Volontario
-                </Button>
+          {/* Mobile Filter Toggle Button */}
+          <button
+            onClick={toggleFilters}
+            className={`lg:hidden flex items-center justify-center px-4 rounded-xl border transition-colors ${isFiltersOpen ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200'}`}
+          >
+            <SlidersHorizontal size={20} />
+          </button>
+
+          {/* Desktop Filters */}
+          <div className="hidden lg:flex gap-4 items-center">
+            {selectedUserIds.length > 0 && userProfile?.role === ROLES.PRESIDENT && (
+              <button
+                onClick={handleDeleteSelected}
+                className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors shadow-sm shrink-0 animate-in fade-in"
+              >
+                <Trash2 size={18} />
+                Elimina ({selectedUserIds.length})
+              </button>
+            )}
+            <div className="w-48">
+              <CustomSelect
+                options={filterRoleOptions}
+                value={filterRole}
+                onChange={setFilterRole}
+                placeholder="Filtra per Ruolo"
+              />
             </div>
+            <div className="w-48">
+              <CustomSelect
+                options={filterStatusOptions}
+                value={filterStatus}
+                onChange={setFilterStatus}
+                placeholder="Filtra per Stato"
+              />
+            </div>
+            <Button
+              onClick={openCreate}
+            >
+              <PlusCircle size={18} />
+              Nuovo Volontario
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Filters Content */}
         {isFiltersOpen && (
-            <div className="lg:hidden flex flex-col gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2">
-                <CustomSelect 
-                    options={filterRoleOptions}
-                    value={filterRole}
-                    onChange={setFilterRole}
-                    placeholder="Filtra per Ruolo"
-                />
-                <CustomSelect 
-                    options={filterStatusOptions}
-                    value={filterStatus}
-                    onChange={setFilterStatus}
-                    placeholder="Filtra per Stato"
-                />
-            </div>
+          <div className="lg:hidden flex flex-col gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2">
+            <CustomSelect
+              options={filterRoleOptions}
+              value={filterRole}
+              onChange={setFilterRole}
+              placeholder="Filtra per Ruolo"
+            />
+            <CustomSelect
+              options={filterStatusOptions}
+              value={filterStatus}
+              onChange={setFilterStatus}
+              placeholder="Filtra per Stato"
+            />
+          </div>
         )}
       </div>
 
@@ -181,12 +187,12 @@ const AdminDashboard = ({ userProfile }) => {
             <thead>
               <tr className="border-b border-slate-200" style={{ backgroundColor: 'var(--color-pc-yellow)' }}>
                 <th className="p-4 w-10">
-                    <input 
-                        type="checkbox" 
-                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        checked={filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.filter(u => u.role !== ROLES.PRESIDENT).length}
-                        onChange={toggleAllUsers}
-                    />
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    checked={filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.filter(u => u.role !== ROLES.PRESIDENT).length}
+                    onChange={toggleAllUsers}
+                  />
                 </th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Volontario</th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Codice Emercomnet</th>
@@ -197,19 +203,19 @@ const AdminDashboard = ({ userProfile }) => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredUsers.map(user => (
-                <tr 
-                  key={user.id} 
+                <tr
+                  key={user.id}
                   onClick={() => openView(user)}
                   className="hover:bg-slate-50 transition-colors cursor-pointer group"
                 >
                   <td className="p-4" onClick={e => e.stopPropagation()}>
                     {user.role !== ROLES.PRESIDENT && (
-                        <input 
-                            type="checkbox" 
-                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                            checked={selectedUserIds.includes(user.id)}
-                            onChange={() => toggleUserSelection(user.id)}
-                        />
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        checked={selectedUserIds.includes(user.id)}
+                        onChange={() => toggleUserSelection(user.id)}
+                      />
                     )}
                   </td>
                   <td className="p-4">
@@ -227,10 +233,11 @@ const AdminDashboard = ({ userProfile }) => {
                     </span>
                   </td>
                   <td className="p-4">
-                     <Badge 
-                       text={ROLE_LABELS[user.role]} 
-                       color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'} 
-                     />
+                    <Badge
+                      text={ROLE_LABELS[user.role]}
+                      color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
+                    />
+                    {user.volunteerRole && <div className="mt-1"><Badge text={user.volunteerRole} color="amber" size="sm" /></div>}
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
@@ -242,21 +249,21 @@ const AdminDashboard = ({ userProfile }) => {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      <button 
-                          onClick={() => openEdit(user)}
-                          className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] hover:bg-blue-50 rounded-full transition-colors"
-                          title="Modifica Dati"
+                      <button
+                        onClick={() => openEdit(user)}
+                        className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] hover:bg-blue-50 rounded-full transition-colors"
+                        title="Modifica Dati"
                       >
-                          <Edit2 size={18} />
+                        <Edit2 size={18} />
                       </button>
                       {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
-                          <button 
-                              onClick={() => handleDeleteUser(user)}
-                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                              title="Elimina Volontario"
-                          >
-                              <Trash2 size={18} />
-                          </button>
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                          title="Elimina Volontario"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       )}
                     </div>
                   </td>
@@ -270,61 +277,61 @@ const AdminDashboard = ({ userProfile }) => {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-3 pb-20">
         {filteredUsers.map(user => (
-            <div 
-                key={user.id} 
-                onClick={() => openView(user)} 
-                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform volunteer-card-mobile"
-            >
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <Avatar src={user.photoUrl} name={user.name} size="md" />
-                        <div>
-                            <h4 className="font-bold text-slate-800">{formatName(user.name)}</h4>
-                            <p className="text-xs text-slate-500">{user.email}</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
-                        <button 
-                            onClick={() => openEdit(user)} 
-                            className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
-                        >
-                            <Edit2 size={16} />
-                        </button>
-                        {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
-                            <button 
-                                onClick={() => handleDeleteUser(user)} 
-                                className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        )}
-                    </div>
+          <div
+            key={user.id}
+            onClick={() => openView(user)}
+            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:scale-[0.99] transition-transform volunteer-card-mobile"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Avatar src={user.photoUrl} name={user.name} size="md" />
+                <div>
+                  <h4 className="font-bold text-slate-800">{formatName(user.name)}</h4>
+                  <p className="text-xs text-slate-500">{user.email}</p>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="bg-slate-50 p-2.5 rounded-lg">
-                        <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
-                        <Badge 
-                            text={ROLE_LABELS[user.role]} 
-                            color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'} 
-                            size="sm"
-                        />
-                    </div>
-                    <div className="bg-slate-50 p-2.5 rounded-lg">
-                        <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
-                        <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${user.status?.trim().toLowerCase() === 'non operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                            <span className={`font-bold text-xs ${user.status?.trim().toLowerCase() === 'non operativo' ? 'text-red-700' : 'text-green-700'}`}>
-                                {user.status || 'Operativo'}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="col-span-2 bg-slate-50 p-2.5 rounded-lg flex justify-between items-center">
-                        <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Codice Emercomnet</span>
-                        <span className="font-mono text-slate-700 font-bold">{user.emercomnetId || '-'}</span>
-                    </div>
-                </div>
+              </div>
+              <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => openEdit(user)}
+                  className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
+                >
+                  <Edit2 size={16} />
+                </button>
+                {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
+                  <button
+                    onClick={() => handleDeleteUser(user)}
+                    className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="bg-slate-50 p-2.5 rounded-lg">
+                <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
+                <Badge
+                  text={ROLE_LABELS[user.role]}
+                  color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
+                  size="sm"
+                />
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-lg">
+                <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${user.status?.trim().toLowerCase() === 'non operativo' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                  <span className={`font-bold text-xs ${user.status?.trim().toLowerCase() === 'non operativo' ? 'text-red-700' : 'text-green-700'}`}>
+                    {user.status || 'Operativo'}
+                  </span>
+                </div>
+              </div>
+              <div className="col-span-2 bg-slate-50 p-2.5 rounded-lg flex justify-between items-center">
+                <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Codice Emercomnet</span>
+                <span className="font-mono text-slate-700 font-bold">{user.emercomnetId || '-'}</span>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -338,21 +345,21 @@ const AdminDashboard = ({ userProfile }) => {
           id="csv-upload"
         />
         <label htmlFor="csv-upload">
-            <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
-                <Upload size={18} />
-                Importa CSV
-            </div>
+          <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+            <Upload size={18} />
+            Importa CSV
+          </div>
         </label>
         <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
+          onClick={handleExportCSV}
+          className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
         >
-            <Download size={18} />
-            Esporta CSV
+          <Download size={18} />
+          Esporta CSV
         </button>
       </div>
 
-      <button 
+      <button
         onClick={openCreate}
         className="fab-btn lg:hidden"
       >
@@ -363,94 +370,95 @@ const AdminDashboard = ({ userProfile }) => {
       {isViewing && selectedUser && (
         <div className="modal-overlay animate-in fade-in">
           <div className="modal-content max-w-2xl">
-             <div className="modal-header">
-                <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
-                <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
-             </div>
-             <div className="modal-body">
-                <div className="modal-profile-header">
-                   <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
-                   <h2 className="modal-profile-name">{selectedUser.name}</h2>
-                   <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
-                   {selectedUser.boardRole && <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />}
-                </div>
-                
-                <div className="space-y-6">
-                    <div className="info-grid">
-                        <div className="info-card">
-                            <p className="info-label">Email</p>
-                            <p className="info-value break-all">{selectedUser.email}</p>
-                        </div>
-                        <div className="info-card">
-                            <p className="info-label">Telefono</p>
-                            <p className="info-value">{selectedUser.phone || '-'}</p>
-                        </div>
-                        <div className="info-card">
-                            <p className="info-label">Codice Fiscale</p>
-                            <p className="info-value uppercase">{selectedUser.cf || '-'}</p>
-                        </div>
-                        <div className="info-card">
-                            <p className="info-label">Data di Nascita</p>
-                            <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
-                        </div>
-                        <div className="info-card">
-                            <p className="info-label">Codice Emercomnet</p>
-                            <p className="info-value">{selectedUser.emercomnetId || '-'}</p>
-                        </div>
-                        <div className="info-card">
-                            <p className="info-label">Residenza</p>
-                            <p className="info-value">{selectedUser.city || '-'}</p>
-                        </div>
-                    </div>
+            <div className="modal-header">
+              <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
+              <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
+            </div>
+            <div className="modal-body">
+              <div className="modal-profile-header">
+                <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
+                <h2 className="modal-profile-name">{selectedUser.name}</h2>
+                <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
+                {selectedUser.boardRole && <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />}
+                {selectedUser.volunteerRole && <Badge text={selectedUser.volunteerRole} color="amber" className="mt-1" />}
+              </div>
 
-                    <div>
-                        <h4 className="specs-section-title">
-                           <Shield size={14} /> Abilitazioni ({selectedUser.specializations?.length || 0})
-                        </h4>
-                        <div className="space-y-3">
-                            {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => {
-                                const userSpecs = data.items.filter(i => selectedUser.specializations?.includes(i));
-                                if (userSpecs.length === 0) return null;
-                                return (
-                                    <div key={category} className="spec-category-card">
-                                        <h5 className={`spec-category-title ${data.color.split(' ')[1]}`}>
-                                            {data.icon} {category}
-                                        </h5>
-                                        <div className="spec-tags-wrapper">
-                                            {userSpecs.map(item => (
-                                                <span key={item} className={`spec-tag ${data.color}`}>
-                                                    {item}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            {selectedUser.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).length > 0 && (
-                                <div className="spec-category-card">
-                                    <h5 className="text-[10px] font-bold uppercase mb-2 text-slate-400">Altro</h5>
-                                    <div className="spec-tags-wrapper">
-                                        {selectedUser.specializations.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
-                                            <span key={s} className="custom-spec-tag">
-                                                {s}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {(!selectedUser.specializations || selectedUser.specializations.length === 0) && (
-                                <span className="text-sm text-slate-400 italic">Nessuna abilitazione</span>
-                            )}
+              <div className="space-y-6">
+                <div className="info-grid">
+                  <div className="info-card">
+                    <p className="info-label">Email</p>
+                    <p className="info-value break-all">{selectedUser.email}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label">Telefono</p>
+                    <p className="info-value">{selectedUser.phone || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label">Codice Fiscale</p>
+                    <p className="info-value uppercase">{selectedUser.cf || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label">Data di Nascita</p>
+                    <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label">Codice Emercomnet</p>
+                    <p className="info-value">{selectedUser.emercomnetId || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label">Residenza</p>
+                    <p className="info-value">{selectedUser.city || '-'}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="specs-section-title">
+                    <Shield size={14} /> Abilitazioni ({selectedUser.specializations?.length || 0})
+                  </h4>
+                  <div className="space-y-3">
+                    {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => {
+                      const userSpecs = data.items.filter(i => selectedUser.specializations?.includes(i));
+                      if (userSpecs.length === 0) return null;
+                      return (
+                        <div key={category} className="spec-category-card">
+                          <h5 className={`spec-category-title ${data.color.split(' ')[1]}`}>
+                            {data.icon} {category}
+                          </h5>
+                          <div className="spec-tags-wrapper">
+                            {userSpecs.map(item => (
+                              <span key={item} className={`spec-tag ${data.color}`}>
+                                {item}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                    </div>
+                      );
+                    })}
+                    {selectedUser.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).length > 0 && (
+                      <div className="spec-category-card">
+                        <h5 className="text-[10px] font-bold uppercase mb-2 text-slate-400">Altro</h5>
+                        <div className="spec-tags-wrapper">
+                          {selectedUser.specializations.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
+                            <span key={s} className="custom-spec-tag">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {(!selectedUser.specializations || selectedUser.specializations.length === 0) && (
+                      <span className="text-sm text-slate-400 italic">Nessuna abilitazione</span>
+                    )}
+                  </div>
                 </div>
-                
-                <div className="modal-footer">
-                    <Button onClick={() => { setIsViewing(false); openEdit(selectedUser); }} variant="outline" size="sm">
-                        <Edit2 size={16} /> Modifica Dati
-                    </Button>
-                </div>
-             </div>
+              </div>
+
+              <div className="modal-footer">
+                <Button onClick={() => { setIsViewing(false); openEdit(selectedUser); }} variant="outline" size="sm">
+                  <Edit2 size={16} /> Modifica Dati
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -458,171 +466,182 @@ const AdminDashboard = ({ userProfile }) => {
       {(isEditing || isCreating) && (
         <div className="modal-overlay animate-in fade-in edit-create-modal">
           <div className="modal-content max-w-2xl">
-             <div className="modal-header">
-                <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
-                <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
-             </div>
-             
-             <div className="modal-body">
-                <form onSubmit={handleSave} className="space-y-8">
-                   
-                   {/* DATI PERSONALI */}
-                   <section>
-                     <h4 className="form-section-title">
-                       <User size={16} className="text-blue-500"/> Dati Personali
-                     </h4>
-                     <div className="form-grid">
-                        <div>
-                          <label className="info-label">Nome</label>
-                          <input type="text" required className="form-input" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Cognome</label>
-                          <input type="text" required className="form-input" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Data di Nascita</label>
-                          <input type="date" className="form-input" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Luogo di Nascita</label>
-                          <input type="text" className="form-input" value={formData.birthPlace} onChange={e => setFormData({...formData, birthPlace: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Codice Fiscale</label>
-                          <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({...formData, cf: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Codice Identificativo Emercomnet</label>
-                          <input type="text" className="form-input" value={formData.emercomnetId} onChange={e => setFormData({...formData, emercomnetId: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Città di Residenza</label>
-                          <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Telefono</label>
-                          <input type="tel" className="form-input" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="info-label">Email</label>
-                          <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                        </div>
-                        {(isCreating || (isEditing && userProfile?.role === ROLES.PRESIDENT)) && (
-                          <div className="md:col-span-2">
-                            <label className="info-label">
-                                {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
+            <div className="modal-header">
+              <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
+              <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
+            </div>
+
+            <div className="modal-body">
+              <form onSubmit={handleSave} className="space-y-8">
+
+                {/* DATI PERSONALI */}
+                <section>
+                  <h4 className="form-section-title">
+                    <User size={16} className="text-blue-500" /> Dati Personali
+                  </h4>
+                  <div className="form-grid">
+                    <div>
+                      <label className="info-label">Nome</label>
+                      <input type="text" required className="form-input" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Cognome</label>
+                      <input type="text" required className="form-input" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Data di Nascita</label>
+                      <input type="date" className="form-input" value={formData.birthDate} onChange={e => setFormData({ ...formData, birthDate: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Luogo di Nascita</label>
+                      <input type="text" className="form-input" value={formData.birthPlace} onChange={e => setFormData({ ...formData, birthPlace: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Codice Fiscale</label>
+                      <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({ ...formData, cf: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Codice Identificativo Emercomnet</label>
+                      <input type="text" className="form-input" value={formData.emercomnetId} onChange={e => setFormData({ ...formData, emercomnetId: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Città di Residenza</label>
+                      <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Telefono</label>
+                      <input type="tel" className="form-input" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Email</label>
+                      <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                    </div>
+                    {(isCreating || (isEditing && userProfile?.role === ROLES.PRESIDENT)) && (
+                      <div className="md:col-span-2">
+                        <label className="info-label">
+                          {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
+                        </label>
+                        <input
+                          type="text"
+                          required={isCreating}
+                          className="form-input"
+                          value={formData.password || ''}
+                          onChange={e => setFormData({ ...formData, password: e.target.value })}
+                          placeholder={isEditing ? "Inserisci nuova password..." : ""}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* RUOLO & ABILITAZIONI */}
+                <section>
+                  <h4 className="form-section-title">
+                    <Shield size={16} className="text-purple-500" /> Ruolo & Abilitazioni
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label className="info-label">Stato Operativo</label>
+                      <CustomSelect
+                        value={formData.status}
+                        onChange={val => setFormData({ ...formData, status: val })}
+                        options={statusOptions}
+                      />
+                    </div>
+                    <div>
+                      <label className="info-label">Ruolo Organizzativo</label>
+                      <CustomSelect
+                        value={formData.role}
+                        onChange={val => setFormData({ ...formData, role: val })}
+                        options={roleOptions}
+                      />
+                    </div>
+                    {formData.role === ROLES.BOARD && (
+                      <div>
+                        <label className="info-label">Incarico Direttivo</label>
+                        <CustomSelect
+                          value={formData.boardRole || ''}
+                          onChange={val => setFormData({ ...formData, boardRole: val })}
+                          options={boardRoleOptions}
+                          placeholder="Seleziona..."
+                        />
+                      </div>
+                    )}
+                    {formData.role === ROLES.VOLUNTEER && (
+                      <div>
+                        <label className="info-label">Ruolo Volontario (Opzionale)</label>
+                        <CustomSelect
+                          value={formData.volunteerRole || ''}
+                          onChange={val => setFormData({ ...formData, volunteerRole: val })}
+                          options={volunteerRoleOptions}
+                          placeholder="Seleziona..."
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
+                      <div key={category} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <h5 className="font-bold text-slate-700 text-xs uppercase mb-3 flex items-center gap-2">
+                          {data.icon} {category}
+                        </h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {data.items.map(item => (
+                            <label key={item} className="spec-checkbox-label">
+                              <input
+                                type="checkbox"
+                                checked={formData.specializations?.includes(item)}
+                                onChange={() => toggleSpec(item)}
+                                className="spec-checkbox-input"
+                              />
+                              <span className="spec-checkbox-text">{item}</span>
                             </label>
-                            <input 
-                                type="text" 
-                                required={isCreating} 
-                                className="form-input" 
-                                value={formData.password || ''} 
-                                onChange={e => setFormData({...formData, password: e.target.value})} 
-                                placeholder={isEditing ? "Inserisci nuova password..." : ""}
-                            />
-                          </div>
-                        )}
-                     </div>
-                   </section>
-
-                   {/* RUOLO & ABILITAZIONI */}
-                   <section>
-                     <h4 className="form-section-title">
-                       <Shield size={16} className="text-purple-500"/> Ruolo & Abilitazioni
-                     </h4>
-                     
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                       <div>
-                          <label className="info-label">Stato Operativo</label>
-                          <CustomSelect 
-                            value={formData.status}
-                            onChange={val => setFormData({...formData, status: val})}
-                            options={statusOptions}
-                          />
-                       </div>
-                       <div>
-                          <label className="info-label">Ruolo Organizzativo</label>
-                          <CustomSelect 
-                            value={formData.role}
-                            onChange={val => setFormData({...formData, role: val})}
-                            options={roleOptions}
-                          />
-                       </div>
-                       {formData.role === ROLES.BOARD && (
-                         <div>
-                            <label className="info-label">Incarico Direttivo</label>
-                            <CustomSelect 
-                              value={formData.boardRole || ''}
-                              onChange={val => setFormData({...formData, boardRole: val})}
-                              options={boardRoleOptions}
-                              placeholder="Seleziona..."
-                            />
-                         </div>
-                       )}
-                     </div>
-
-                     <div className="space-y-4">
-                        {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
-                          <div key={category} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <h5 className="font-bold text-slate-700 text-xs uppercase mb-3 flex items-center gap-2">
-                              {data.icon} {category}
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {data.items.map(item => (
-                                <label key={item} className="spec-checkbox-label">
-                                  <input 
-                                    type="checkbox" 
-                                    checked={formData.specializations?.includes(item)}
-                                    onChange={() => toggleSpec(item)}
-                                    className="spec-checkbox-input"
-                                  />
-                                  <span className="spec-checkbox-text">{item}</span>
-                                </label>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                        
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                           <h5 className="font-bold text-slate-700 text-xs uppercase mb-3">Altre Abilitazioni</h5>
-                           <div className="flex gap-2">
-                             <input 
-                               type="text" 
-                               placeholder="Aggiungi..." 
-                               className="custom-spec-input"
-                               value={customSpec}
-                               onChange={e => setCustomSpec(e.target.value)}
-                             />
-                             <button type="button" onClick={addCustomSpec} className="custom-spec-add-btn">
-                               +
-                             </button>
-                           </div>
-                           <div className="flex flex-wrap gap-2 mt-3">
-                             {formData.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
-                               <span key={s} className="custom-spec-tag-edit">
-                                 {s}
-                                 <button type="button" onClick={() => toggleSpec(s)} className="custom-spec-remove-btn"><X size={12}/></button>
-                               </span>
-                             ))}
-                           </div>
+                          ))}
                         </div>
-                     </div>
-                   </section>
+                      </div>
+                    ))}
 
-                   <div className="form-footer">
-                      <Button type="button" variant="ghost" onClick={closeAll}>Annulla</Button>
-                      <Button type="submit">Salva Modifiche</Button>
-                   </div>
-                </form>
-             </div>
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                      <h5 className="font-bold text-slate-700 text-xs uppercase mb-3">Altre Abilitazioni</h5>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Aggiungi..."
+                          className="custom-spec-input"
+                          value={customSpec}
+                          onChange={e => setCustomSpec(e.target.value)}
+                        />
+                        <button type="button" onClick={addCustomSpec} className="custom-spec-add-btn">
+                          +
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {formData.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
+                          <span key={s} className="custom-spec-tag-edit">
+                            {s}
+                            <button type="button" onClick={() => toggleSpec(s)} className="custom-spec-remove-btn"><X size={12} /></button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <div className="form-footer">
+                  <Button type="button" variant="ghost" onClick={closeAll}>Annulla</Button>
+                  <Button type="submit">Salva Modifiche</Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
@@ -633,13 +652,13 @@ const AdminDashboard = ({ userProfile }) => {
                 Sei sicuro di voler eliminare questo volontario? Questa azione non può essere annullata.
               </p>
               <div className="flex gap-3 w-full">
-                <button 
+                <button
                   onClick={cancelDeleteUser}
                   className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
                 >
                   Annulla
                 </button>
-                <button 
+                <button
                   onClick={confirmDeleteUser}
                   className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
                 >
@@ -653,7 +672,7 @@ const AdminDashboard = ({ userProfile }) => {
 
       {/* Bulk Delete Confirmation Modal */}
       {isBulkDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 110}}>
+        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
@@ -664,13 +683,13 @@ const AdminDashboard = ({ userProfile }) => {
                 Sei sicuro di voler eliminare i volontari selezionati? Questa azione non può essere annullata.
               </p>
               <div className="flex gap-3 w-full">
-                <button 
+                <button
                   onClick={cancelDeleteSelected}
                   className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
                 >
                   Annulla
                 </button>
-                <button 
+                <button
                   onClick={confirmDeleteSelected}
                   className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
                 >
@@ -684,21 +703,20 @@ const AdminDashboard = ({ userProfile }) => {
 
       {/* Notification Modal */}
       {notification.isOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{zIndex: 120}}>
+        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 120 }}>
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
-            <button 
-                onClick={closeNotification}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+            <button
+              onClick={closeNotification}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
             >
-                <X size={20} />
+              <X size={20} />
             </button>
             <div className="flex flex-col items-center text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-                  notification.type === 'success' ? 'bg-green-100 text-green-600' :
-                  notification.type === 'error' ? 'bg-red-100 text-red-600' :
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${notification.type === 'success' ? 'bg-green-100 text-green-600' :
+                notification.type === 'error' ? 'bg-red-100 text-red-600' :
                   notification.type === 'warning' ? 'bg-amber-100 text-amber-600' :
-                  'bg-blue-100 text-blue-600'
-              }`}>
+                    'bg-blue-100 text-blue-600'
+                }`}>
                 {notification.type === 'success' && <CheckCircle size={24} />}
                 {notification.type === 'error' && <XCircle size={24} />}
                 {notification.type === 'warning' && <AlertTriangle size={24} />}
@@ -708,7 +726,7 @@ const AdminDashboard = ({ userProfile }) => {
               <div className="text-sm text-slate-600 mb-6 whitespace-pre-wrap text-left w-full bg-slate-50 p-3 rounded-lg border border-slate-100 max-h-60 overflow-y-auto font-mono">
                 {notification.message}
               </div>
-              <button 
+              <button
                 onClick={closeNotification}
                 className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors"
               >

@@ -132,3 +132,24 @@ body {
   border-radius: 0.75rem;
   /* Match rounded-xl */
 }
+
+/* Profile Button Styles */
+.profile-button {
+  --background: transparent;
+  --background-hover: rgba(255, 255, 255, 0.1);
+  --box-shadow: none;
+}
+
+.profile-button-active {
+  --background: transparent;
+  /* Default (Mobile): Transparent */
+  --background-hover: rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 1024px) {
+  .profile-button-active {
+    --background: var(--color-pc-yellow);
+    /* Desktop: Official Yellow */
+    --background-hover: var(--color-pc-yellow-400);
+  }
+}

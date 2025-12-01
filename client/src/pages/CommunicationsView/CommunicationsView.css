@@ -61,11 +61,12 @@
 
 .modal-header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--color-slate-100);
+    border-bottom: 1px solid var(--color-pc-yellow-600);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-slate-50);
+    background-color: var(--color-pc-yellow);
+    color: var(--color-slate-800);
 }
 
 .modal-title {
@@ -76,11 +77,13 @@
 .modal-close-btn {
     padding: 0.25rem;
     border-radius: 9999px;
-    color: var(--color-slate-500);
+    color: var(--color-slate-800);
+    opacity: 0.8;
 }
 
 .modal-close-btn:hover {
-    background-color: var(--color-slate-200);
+    background-color: var(--color-pc-yellow-600);
+    opacity: 1;
 }
 
 .modal-body {
@@ -88,7 +91,7 @@
     overflow-y: auto;
 }
 
-.form-space > * + * {
+.form-space>*+* {
     margin-top: 1.25rem;
 }
 
@@ -105,7 +108,7 @@
 .form-input {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-slate-50);
+    background-color: #ffffff !important;
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -126,7 +129,7 @@
 .form-select {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-slate-50);
+    background-color: #ffffff !important;
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -144,7 +147,7 @@
 .form-textarea {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--color-white);
+    background-color: #ffffff !important;
     border: 1px solid var(--color-slate-200);
     border-radius: 0.75rem;
     font-size: 0.875rem;
@@ -169,8 +172,10 @@
 
 /* Stili mobile per input bianchi */
 @media (max-width: 767px) {
-    .form-input, .form-textarea {
-        background-color: var(--color-white);
+
+    .form-input,
+    .form-textarea {
+        background-color: #ffffff !important;
     }
 }
 
@@ -181,6 +186,7 @@
     }
 
     .modal-container {
-        max-height: calc(100vh - 12rem);
+        max-height: 78vh;
+        margin-bottom: 35px;
     }
 }

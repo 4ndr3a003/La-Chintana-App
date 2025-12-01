@@ -4,7 +4,7 @@
     padding-bottom: 6rem;
 }
 
-.admin-dashboard-container > * + * {
+.admin-dashboard-container>*+* {
     margin-top: 1.5rem;
 }
 
@@ -76,25 +76,25 @@
 
 .modal-header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--color-pc-blue-800);
+    border-bottom: 1px solid var(--color-pc-yellow-600);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-pc-blue-700);
-    color: white;
+    background-color: var(--color-pc-yellow);
+    color: var(--color-slate-800);
 }
 
 .modal-header h3 {
-    color: white;
+    color: var(--color-slate-800);
 }
 
 .modal-header .modal-close-btn {
-    color: white;
+    color: var(--color-slate-800);
     opacity: 0.8;
 }
 
 .modal-header .modal-close-btn:hover {
-    background-color: var(--color-pc-blue-700);
+    background-color: var(--color-pc-yellow-600);
     opacity: 1;
 }
 
@@ -231,7 +231,8 @@
 }
 
 .spec-category-card {
-    background-color: rgba(248, 250, 252, 0.5); /* slate-50/50 */
+    background-color: rgba(248, 250, 252, 0.5);
+    /* slate-50/50 */
     border-radius: 0.75rem;
     padding: 0.75rem;
     border: 1px solid var(--color-slate-100);
@@ -418,8 +419,9 @@
 
 /* Stile per lo sfondo giallo del nome del volontario su mobile */
 @media (max-width: 767px) {
-    .volunteer-card-mobile .flex.items-center.gap-3 > div {
-        background-color: #fffacd; /* Giallo chiaro */
+    .volunteer-card-mobile .flex.items-center.gap-3>div {
+        background-color: #fffacd;
+        /* Giallo chiaro */
         padding: 0.5rem;
         border-radius: 0.5rem;
     }
@@ -427,14 +429,18 @@
 
 /* Stile per lo sfondo giallo dell'header della card del volontario su mobile */
 @media (max-width: 767px) {
-    .volunteer-card-mobile > .flex.items-start.justify-between {
-        background-color: #ffecb3; /* Giallo chiaro più scuro */
+    .volunteer-card-mobile>.flex.items-start.justify-between {
+        background-color: #ffecb3;
+        /* Giallo chiaro più scuro */
         padding: 1rem;
-        margin: -1rem; /* Rimuove il padding del genitore */
+        margin: -1rem;
+        /* Rimuove il padding del genitore */
         border-radius: 0.75rem 0.75rem 0 0;
-        margin-bottom: 1rem !important; /* Forza il margine inferiore */
+        margin-bottom: 1rem !important;
+        /* Forza il margine inferiore */
     }
-    .volunteer-card-mobile .flex.items-start.justify-between .flex.items-center.gap-3 > div {
+
+    .volunteer-card-mobile .flex.items-start.justify-between .flex.items-center.gap-3>div {
         background-color: transparent;
         padding: 0;
     }
@@ -448,7 +454,8 @@
     }
 
     .edit-create-modal .modal-content {
-        max-height: calc(100vh - 12rem);
+        max-height: 78vh;
+        margin-bottom: 35px;
     }
 }
 
@@ -459,4 +466,3 @@
         margin-bottom: 35px;
     }
 }
-

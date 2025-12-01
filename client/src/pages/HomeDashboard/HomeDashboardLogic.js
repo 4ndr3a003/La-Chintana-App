@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { query, collection, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
 
-export const useHomeDashboard = () => {
+export const useHomeDashboard = (userProfile) => {
   const [nextEvent, setNextEvent] = useState(null);
   const [nextEmergency, setNextEmergency] = useState(null);
   const [recentComms, setRecentComms] = useState([]);
@@ -39,7 +39,7 @@ export const useHomeDashboard = () => {
       // Find the next emergency event
       const firstEmergency = allFutureEvents.find(event => event.type === 'Emergenza') || null;
       setNextEmergency(firstEmergency);
-      
+
       checkLoading('events');
     }, (error) => {
       console.error("Error fetching future events:", error);
@@ -56,9 +56,16 @@ export const useHomeDashboard = () => {
     const unsubComms = onSnapshot(qComms, (snap) => {
       const comms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+      // Filter out 'Direttivo' topic for non-board members
+      const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
+      const visibleComms = comms.filter(c => {
+        if (c.topic === 'Direttivo' && !isBoardOrPresident) return false;
+        return true;
+      });
+
       // Filter logic: 1 Urgent + 2 Others
-      const urgentComm = comms.find(c => c.importance === 'Alta' || c.topic === 'Urgente');
-      const otherComms = comms.filter(c => c.id !== urgentComm?.id).slice(0, 2);
+      const urgentComm = visibleComms.find(c => c.importance === 'Alta' || c.topic === 'Urgente');
+      const otherComms = visibleComms.filter(c => c.id !== urgentComm?.id).slice(0, 2);
 
       const finalComms = [];
       if (urgentComm) finalComms.push(urgentComm);
@@ -76,7 +83,7 @@ export const useHomeDashboard = () => {
       unsubEvents();
       unsubComms();
     };
-  }, []);
+  }, [userProfile]);
 
   // 4. Month Events for Calendar (Dynamic based on currentMonth)
   useEffect(() => {

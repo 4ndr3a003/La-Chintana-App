@@ -41,7 +41,10 @@ const EventsDashboard = ({ userProfile }) => {
     openEditModal,
     isEditing,
     isFiltersOpen,
-    toggleFilters
+    toggleFilters,
+    addShift,
+    removeShift,
+    updateShift
   } = useEventsDashboard(userProfile);
 
   const location = useLocation();
@@ -388,6 +391,70 @@ const EventsDashboard = ({ userProfile }) => {
                 <div>
                   <label className="form-label">Descrizione</label>
                   <textarea className="form-textarea" rows="3" value={newEvent.description} onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}></textarea>
+                </div>
+
+                {/* Gestione Turni */}
+                <div className="border-t border-slate-100 pt-4 mt-2">
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="form-label mb-0">Turni (Opzionale)</label>
+                    <button
+                      type="button"
+                      onClick={addShift}
+                      className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      + Aggiungi Turno
+                    </button>
+                  </div>
+
+                  {newEvent.shifts && newEvent.shifts.length > 0 ? (
+                    <div className="space-y-3">
+                      {newEvent.shifts.map((shift, index) => (
+                        <div key={shift.id || index} className="bg-slate-50 p-3 rounded-xl border border-slate-200 relative">
+                          <button
+                            type="button"
+                            onClick={() => removeShift(index)}
+                            className="absolute top-2 right-2 text-slate-400 hover:text-red-500"
+                          >
+                            <X size={16} />
+                          </button>
+                          <div className="grid grid-cols-3 gap-3 pr-6">
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-500 uppercase">Inizio</label>
+                              <input
+                                type="time"
+                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                value={shift.startTime}
+                                onChange={e => updateShift(index, 'startTime', e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-500 uppercase">Fine</label>
+                              <input
+                                type="time"
+                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                value={shift.endTime}
+                                onChange={e => updateShift(index, 'endTime', e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-500 uppercase">Max Pers.</label>
+                              <input
+                                type="number"
+                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                value={shift.maxParticipants}
+                                onChange={e => updateShift(index, 'maxParticipants', e.target.value)}
+                                placeholder="∞"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">Nessun turno definito. L'evento sarà a partecipazione unica.</p>
+                  )}
                 </div>
                 <div className="form-submit-wrapper">
                   <Button type="submit" className="form-submit-btn">{isEditing ? 'Salva Modifiche' : 'Pubblica Evento'}</Button>

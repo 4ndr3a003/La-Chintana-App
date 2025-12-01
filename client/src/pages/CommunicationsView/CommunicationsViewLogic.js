@@ -15,7 +15,8 @@ export const useCommunicationsView = (userProfile) => {
     title: '',
     content: '',
     importance: 'Normale',
-    topic: 'Generale'
+    topic: 'Generale',
+    expirationDate: ''
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -38,9 +39,46 @@ export const useCommunicationsView = (userProfile) => {
   const filteredMessages = messages.filter(msg => {
     const matchesTopic = filterTopic === 'Tutti' || msg.topic === filterTopic;
     const matchesImportance = filterImportance === 'Tutte' || msg.importance === filterImportance;
-    const matchesSearch = msg.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          msg.content.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesTopic && matchesImportance && matchesSearch;
+    const matchesSearch = msg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.content.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Check expiration
+    let isExpired = false;
+    if (msg.expirationDate) {
+      const expDate = new Date(msg.expirationDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Compare with start of today
+      // If expiration date is strictly before today, it's expired. 
+      // Example: Expires 2023-10-01. Today is 2023-10-02. Expired.
+      // Example: Expires 2023-10-02. Today is 2023-10-02. Not expired (expires at end of day).
+      if (expDate < today) {
+        isExpired = true;
+      }
+    }
+
+    // Check visibility for 'Direttivo' topic
+    const isDirettivoContent = msg.topic === 'Direttivo';
+
+    // Check for ANY board member or president
+    const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
+
+    if (isDirettivoContent && !isBoardOrPresident) {
+      return false;
+    }
+
+    return matchesTopic && matchesImportance && matchesSearch && !isExpired;
+  }).sort((a, b) => {
+    // Sort by Importance first: Alta > Normale > Bassa
+    const importanceValue = { 'Alta': 3, 'Normale': 2, 'Bassa': 1 };
+    const valA = importanceValue[a.importance] || 2;
+    const valB = importanceValue[b.importance] || 2;
+
+    if (valA !== valB) {
+      return valB - valA; // Descending importance
+    }
+
+    // Then by Date (already sorted by query, but good to be explicit if we re-sort)
+    return new Date(b.date) - new Date(a.date);
   });
 
   const toggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
@@ -64,7 +102,7 @@ export const useCommunicationsView = (userProfile) => {
 
         // Notification is now handled by Cloud Functions
       }
-      setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale' });
+      setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '' });
       setIsCreateModalOpen(false);
       setIsEditing(false);
       setCurrentCommId(null);
@@ -77,7 +115,7 @@ export const useCommunicationsView = (userProfile) => {
   const openCreateModal = () => {
     setIsEditing(false);
     setCurrentCommId(null);
-    setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale' });
+    setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '' });
     setIsCreateModalOpen(true);
   };
 
@@ -88,7 +126,8 @@ export const useCommunicationsView = (userProfile) => {
       title: comm.title,
       content: comm.content,
       importance: comm.importance,
-      topic: comm.topic
+      topic: comm.topic,
+      expirationDate: comm.expirationDate || ''
     });
     setIsCreateModalOpen(true);
   };

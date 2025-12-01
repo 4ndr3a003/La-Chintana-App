@@ -1,10 +1,10 @@
 import React from 'react';
-import { 
-  Shield, 
-  Radio, 
-  HeartPulse, 
-  HardHat, 
-  Truck 
+import {
+  Shield,
+  Radio,
+  HeartPulse,
+  HardHat,
+  Truck
 } from 'lucide-react';
 
 export const ROLES = {
@@ -34,7 +34,8 @@ export const EVENT_TYPES = {
   'Esercitazione': { color: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Esercitazione' },
   'Riunione': { color: 'bg-slate-200 text-slate-700 border-slate-300', label: 'Riunione' },
   'Emergenza': { color: 'bg-red-50 text-red-700 border-red-200', label: 'Emergenza' },
-  'Formazione': { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Formazione' }
+  'Formazione': { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Formazione' },
+  'Direttivo': { color: 'bg-purple-50 text-purple-700 border-purple-200', label: 'Direttivo' }
 };
 
 export const SPECIALIZATIONS_DATA = {
@@ -83,10 +84,23 @@ export const SPECIALIZATIONS_DATA = {
     ],
     icon: <Truck size={18} className="text-slate-600" />,
     color: "bg-slate-100 text-slate-700 border-slate-200"
+  },
+  "Patenti di Guida": {
+    items: [
+      "Patente B", "Patente BE",
+      "Patente C", "Patente CE",
+      "Patente D", "Patente DE"
+    ],
+    icon: <Truck size={18} className="text-slate-600" />,
+    color: "bg-slate-100 text-slate-700 border-slate-200"
   }
+};
+
+export const VOLUNTEER_ROLES = {
+  K9: 'Unità Cinofila'
 };
 
 export const hasAdminAccess = (user) => {
   if (!user) return false;
-  return user.role === ROLES.PRESIDENT || (user.role === ROLES.BOARD && user.boardRole === BOARD_ROLES.VP);
+  return user.role === ROLES.PRESIDENT || user.role === ROLES.BOARD;
 };
