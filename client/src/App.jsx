@@ -81,28 +81,29 @@ export default function App() {
     return () => unsubscribeProfile();
   }, [authUser, activeProfileId, navigate, location.pathname]);
 
-  // Push Notifications Initialization
+  const [fcmToken, setFcmToken] = useState(null);
+
+  // Native Push Notifications Initialization - Runs ONCE
   useEffect(() => {
-    if (!authUser || !userProfile) return;
+    if (!Capacitor.isNativePlatform()) {
+      if (Notification.permission === 'default' || Notification.permission === 'denied') {
+        setShowNotifButton(true);
+      } else if (Notification.permission === 'granted') {
+        setupWebPush(false);
+      }
+      return;
+    }
 
     const initNativeNotifications = async () => {
       try {
         // 1. Register listeners FIRST
-        await PushNotifications.addListener('registration', async token => {
+        await PushNotifications.addListener('registration', token => {
           console.log('Push registration success, token: ' + token.value);
-          try {
-            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-            await updateDoc(profileRef, {
-              fcmTokens: arrayUnion(token.value)
-            });
-          } catch (err) {
-            console.error('Error saving FCM token:', err);
-          }
+          setFcmToken(token.value);
         });
 
         await PushNotifications.addListener('registrationError', err => {
           console.error('Push registration error: ', err.error);
-          // alert('Push registration error: ' + JSON.stringify(err)); // Debug only
         });
 
         await PushNotifications.addListener('pushNotificationReceived', notification => {
@@ -143,21 +144,7 @@ export default function App() {
       }
     };
 
-    const checkPermissionStatus = async () => {
-      if (!Capacitor.isNativePlatform()) {
-        if (Notification.permission === 'default' || Notification.permission === 'denied') {
-          setShowNotifButton(true);
-        } else if (Notification.permission === 'granted') {
-          // Se già concesso, abilita in background senza mostrare toast di successo
-          setupWebPush(false);
-        }
-      } else {
-        // Native initialization
-        initNativeNotifications();
-      }
-    };
-
-    checkPermissionStatus();
+    initNativeNotifications();
 
     return () => {
       if (Capacitor.isNativePlatform()) {
@@ -165,7 +152,31 @@ export default function App() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile]);
+  }, []);
+
+  // Sync Native FCM Token to Firestore
+  useEffect(() => {
+    if (!authUser || !userProfile || !fcmToken) return;
+
+    // Avoid unnecessary writes if token is already present
+    if (userProfile.fcmTokens && userProfile.fcmTokens.includes(fcmToken)) {
+      return;
+    }
+
+    const saveToken = async () => {
+      try {
+        const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+        await updateDoc(profileRef, {
+          fcmTokens: arrayUnion(fcmToken)
+        });
+        console.log('FCM Token saved to profile');
+      } catch (err) {
+        console.error('Error saving FCM token:', err);
+      }
+    };
+
+    saveToken();
+  }, [authUser, userProfile, fcmToken]);
 
   // Foreground Message Listener (Web only)
   useEffect(() => {
@@ -231,11 +242,7 @@ export default function App() {
         if (isInteractive) {
           setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
         }
-
-        const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-        await updateDoc(profileRef, {
-          fcmTokens: arrayUnion(currentToken)
-        });
+        setFcmToken(currentToken);
       } else {
         console.log('No registration token available.');
         if (isInteractive) {

@@ -90,7 +90,7 @@ export const useUserProfileView = (userProfile) => {
       setImageSrc(null);
     }
   };
-  
+
   // Raggruppa le specializzazioni dell'utente
   const groupedSpecs = Object.entries(SPECIALIZATIONS_DATA).reduce((acc, [category, data]) => {
     const userSpecsByCategory = data.items.filter(item => userProfile.specializations?.includes(item));
@@ -111,34 +111,34 @@ export const useUserProfileView = (userProfile) => {
     // Se nel DB è "Operativo", verifichiamo comunque le regole per sicurezza (opzionale, ma richiesto dall'utente)
     // L'utente ha detto: "fai in modo che anche nella sezione del prfilo il dato venga recuperato dal db"
     // E anche: "voglio che cambi in 'Non operativo' quando non e presente il corso delle 12 ore o quando si ha piu di 75 anni"
-    
+
     // Quindi:
     // 1. Se il DB dice "Non Operativo", è "Non Operativo".
     // 2. Se il DB dice "Operativo", controlliamo se dovrebbe essere "Non Operativo" secondo le regole.
-    
+
     const dbStatus = userProfile.status || 'Operativo';
-    
+
     if (dbStatus.toLowerCase() === 'non operativo') {
-        return 'Non Operativo';
+      return 'Non Operativo';
     }
 
     // Regole di validazione extra (se nel DB è Operativo ma non dovrebbe esserlo)
-    if (!userProfile.birthDate) return 'Non Operativo'; 
-    
+    if (!userProfile.birthDate) return 'Non Operativo';
+
     const birthDate = new Date(userProfile.birthDate);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+      age--;
     }
 
     const has12HoursCourse = userProfile.specializations?.includes('Corso 12 ore');
 
     if (age > 75 || !has12HoursCourse) {
-        return 'Non Operativo';
+      return 'Non Operativo';
     }
-    
+
     return 'Operativo';
   };
 
@@ -158,6 +158,18 @@ export const useUserProfileView = (userProfile) => {
     isModalOpen,
     setIsModalOpen,
     imgRef,
-    uploadCroppedImage
+    uploadCroppedImage,
+    resetNotifications: async () => {
+      if (!confirm('Vuoi davvero resettare le notifiche? Questo rimuoverà tutti i dispositivi collegati e dovrai riaprire l\'app su ciascuno di essi.')) return;
+      try {
+        const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+        await updateDoc(userRef, { fcmTokens: [] });
+        alert('Notifiche resettate. L\'app verrà ricaricata per registrare questo dispositivo.');
+        window.location.reload();
+      } catch (error) {
+        console.error("Error resetting notifications:", error);
+        alert("Errore durante il reset delle notifiche.");
+      }
+    }
   };
 };

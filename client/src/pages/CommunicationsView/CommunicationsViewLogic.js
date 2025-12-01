@@ -83,13 +83,17 @@ export const useCommunicationsView = (userProfile) => {
 
   const toggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleCreateComm = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       if (isEditing && currentCommId) {
         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'communications', currentCommId), {
           ...newComm,
-          date: new Date().toISOString() // Update date on edit? Or keep original? Usually update date is better or add updatedAt. Let's update date for now to bump it up.
+          date: new Date().toISOString()
         });
       } else {
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'communications'), {
@@ -109,6 +113,8 @@ export const useCommunicationsView = (userProfile) => {
     } catch (error) {
       console.error("Error creating/updating communication:", error);
       alert("Errore durante il salvataggio della comunicazione");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -204,6 +210,7 @@ export const useCommunicationsView = (userProfile) => {
     cancelDeleteComm,
     openCreateModal,
     openEditModal,
-    isEditing
+    isEditing,
+    isSubmitting
   };
 };

@@ -94,7 +94,8 @@ const CommunicationsView = ({ userProfile }) => {
     cancelDeleteComm,
     openCreateModal,
     openEditModal,
-    isEditing
+    isEditing,
+    isSubmitting
   } = useCommunicationsView(userProfile);
 
   const topicOptions = ['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Altro'].map(topic => ({
@@ -463,7 +464,9 @@ const CommunicationsView = ({ userProfile }) => {
                   <textarea className="form-textarea" rows="5" value={newComm.content} onChange={e => setNewComm({ ...newComm, content: e.target.value })} required></textarea>
                 </div>
                 <div className="form-submit-wrapper">
-                  <Button type="submit" className="form-submit-btn">Pubblica</Button>
+                  <Button type="submit" className="form-submit-btn" disabled={isSubmitting}>
+                    {isSubmitting ? 'Pubblicazione...' : 'Pubblica'}
+                  </Button>
                 </div>
               </form>
             </div>
