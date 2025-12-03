@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageSquare, ChevronDown, Trash2, PlusCircle, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
-import { hasAdminAccess } from '../../utils/constants';
+import { hasAdminAccess, canManageContent } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CommunicationCard from '../../components/communications/CommunicationCard';
@@ -216,7 +216,7 @@ const CommunicationsView = ({ userProfile }) => {
               </div>
             </div>
 
-            {hasAdminAccess(userProfile) && (
+            {canManageContent(userProfile) && (
               <button
                 onClick={openCreateModal}
                 className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
@@ -313,15 +313,15 @@ const CommunicationsView = ({ userProfile }) => {
               key={msg.id}
               message={msg}
               userProfile={userProfile}
-              onDelete={handleDeleteComm}
-              onEdit={openEditModal}
+              onDelete={canManageContent(userProfile) ? handleDeleteComm : undefined}
+              onEdit={canManageContent(userProfile) ? openEditModal : undefined}
               onClick={() => setSelectedMessage(msg)}
             />
           ))
         )}
       </div>
 
-      {hasAdminAccess(userProfile) && (
+      {canManageContent(userProfile) && (
         <button
           onClick={openCreateModal}
           className="fab-btn lg:hidden"
@@ -365,7 +365,7 @@ const CommunicationsView = ({ userProfile }) => {
                   <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">{selectedMessage.content}</p>
                 </div>
 
-                {hasAdminAccess(userProfile) && (
+                {canManageContent(userProfile) && (
                   <div className="flex justify-end pt-2">
                     <Button
                       variant="danger"

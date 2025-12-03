@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useHomeDashboard } from './HomeDashboardLogic';
+import { hasAdminAccess } from '../../utils/constants';
 import EventCard from '../../components/ui/EventCard';
 import CommunicationItem from '../../components/ui/CommunicationItem';
 import AvailabilityWidget from '../../components/ui/AvailabilityWidget';
@@ -27,6 +28,18 @@ const HomeDashboard = ({ userProfile }) => {
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1">Ciao, {userProfile.name}</h1>
             <p className="text-slate-800 font-medium opacity-80">Benvenuto nel portale operativo della Protezione Civile.</p>
           </div>
+
+          {/* Direttivo Dashboard Button */}
+          {hasAdminAccess(userProfile) && (
+            <div className="ml-auto hidden md:block">
+              <Link
+                to="/direttivo"
+                className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 shadow-lg"
+              >
+                Dashboard Direttivo
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 

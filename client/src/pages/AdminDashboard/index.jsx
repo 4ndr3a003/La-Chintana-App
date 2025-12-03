@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
-import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
+import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
@@ -127,7 +127,7 @@ const AdminDashboard = ({ userProfile }) => {
 
           {/* Desktop Filters */}
           <div className="hidden lg:flex gap-4 items-center">
-            {selectedUserIds.length > 0 && userProfile?.role === ROLES.PRESIDENT && (
+            {selectedUserIds.length > 0 && canManageVolunteers(userProfile) && (
               <button
                 onClick={handleDeleteSelected}
                 className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors shadow-sm shrink-0 animate-in fade-in"
@@ -152,12 +152,14 @@ const AdminDashboard = ({ userProfile }) => {
                 placeholder="Filtra per Stato"
               />
             </div>
-            <Button
-              onClick={openCreate}
-            >
-              <PlusCircle size={18} />
-              Nuovo Volontario
-            </Button>
+            {canManageVolunteers(userProfile) && (
+              <Button
+                onClick={openCreate}
+              >
+                <PlusCircle size={18} />
+                Nuovo Volontario
+              </Button>
+            )}
           </div>
         </div>
 
@@ -192,6 +194,7 @@ const AdminDashboard = ({ userProfile }) => {
                     className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     checked={filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.filter(u => u.role !== ROLES.PRESIDENT).length}
                     onChange={toggleAllUsers}
+                    disabled={!canManageVolunteers(userProfile)}
                   />
                 </th>
                 <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Volontario</th>
@@ -209,7 +212,7 @@ const AdminDashboard = ({ userProfile }) => {
                   className="hover:bg-slate-50 transition-colors cursor-pointer group"
                 >
                   <td className="p-4" onClick={e => e.stopPropagation()}>
-                    {user.role !== ROLES.PRESIDENT && (
+                    {user.role !== ROLES.PRESIDENT && canManageVolunteers(userProfile) && (
                       <input
                         type="checkbox"
                         className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
@@ -249,14 +252,16 @@ const AdminDashboard = ({ userProfile }) => {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => openEdit(user)}
-                        className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] hover:bg-blue-50 rounded-full transition-colors"
-                        title="Modifica Dati"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
+                      {canManageVolunteers(userProfile) && (
+                        <button
+                          onClick={() => openEdit(user)}
+                          className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] hover:bg-blue-50 rounded-full transition-colors"
+                          title="Modifica Dati"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                      )}
+                      {canManageVolunteers(userProfile) && user.role !== ROLES.PRESIDENT && (
                         <button
                           onClick={() => handleDeleteUser(user)}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
@@ -291,13 +296,15 @@ const AdminDashboard = ({ userProfile }) => {
                 </div>
               </div>
               <div className="flex gap-1" onClick={e => e.stopPropagation()}>
-                <button
-                  onClick={() => openEdit(user)}
-                  className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
-                >
-                  <Edit2 size={16} />
-                </button>
-                {userProfile?.role === ROLES.PRESIDENT && user.role !== ROLES.PRESIDENT && (
+                {canManageVolunteers(userProfile) && (
+                  <button
+                    onClick={() => openEdit(user)}
+                    className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                )}
+                {canManageVolunteers(userProfile) && user.role !== ROLES.PRESIDENT && (
                   <button
                     onClick={() => handleDeleteUser(user)}
                     className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-full"
@@ -345,10 +352,12 @@ const AdminDashboard = ({ userProfile }) => {
           id="csv-upload"
         />
         <label htmlFor="csv-upload">
-          <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
-            <Upload size={18} />
-            Importa CSV
-          </div>
+          {canManageVolunteers(userProfile) && (
+            <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+              <Upload size={18} />
+              Importa CSV
+            </div>
+          )}
         </label>
         <button
           onClick={handleExportCSV}
@@ -359,12 +368,14 @@ const AdminDashboard = ({ userProfile }) => {
         </button>
       </div>
 
-      <button
-        onClick={openCreate}
-        className="fab-btn lg:hidden"
-      >
-        <PlusCircle size={28} />
-      </button>
+      {canManageVolunteers(userProfile) && (
+        <button
+          onClick={openCreate}
+          className="fab-btn lg:hidden"
+        >
+          <PlusCircle size={28} />
+        </button>
+      )}
 
       {/* VIEW MODAL */}
       {isViewing && selectedUser && (
@@ -454,9 +465,11 @@ const AdminDashboard = ({ userProfile }) => {
               </div>
 
               <div className="modal-footer">
-                <Button onClick={() => { setIsViewing(false); openEdit(selectedUser); }} variant="outline" size="sm">
-                  <Edit2 size={16} /> Modifica Dati
-                </Button>
+                {canManageVolunteers(userProfile) && (
+                  <Button onClick={() => { setIsViewing(false); openEdit(selectedUser); }} variant="outline" size="sm">
+                    <Edit2 size={16} /> Modifica Dati
+                  </Button>
+                )}
               </div>
             </div>
           </div>

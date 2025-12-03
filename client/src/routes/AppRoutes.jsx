@@ -9,6 +9,8 @@ import EventsDashboard from '../pages/EventsDashboard';
 import CommunicationsView from '../pages/CommunicationsView';
 import UserProfileView from '../pages/UserProfileView';
 import AdminDashboard from '../pages/AdminDashboard';
+import DirettivoDashboard from '../pages/DirettivoDashboard';
+import { hasAdminAccess } from '../utils/constants';
 
 const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
     return (
@@ -48,6 +50,16 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
             <Route path="/admin" element={
                 <ProtectedRoute userProfile={userProfile}>
                     <AdminDashboard userProfile={userProfile} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/direttivo" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    {hasAdminAccess(userProfile) ? (
+                        <DirettivoDashboard userProfile={userProfile} />
+                    ) : (
+                        <Navigate to="/" replace />
+                    )}
                 </ProtectedRoute>
             } />
 

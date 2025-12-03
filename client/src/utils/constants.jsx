@@ -104,3 +104,19 @@ export const hasAdminAccess = (user) => {
   if (!user) return false;
   return user.role === ROLES.PRESIDENT || user.role === ROLES.BOARD;
 };
+
+export const canManageVolunteers = (user) => {
+  if (!user) return false;
+  // President and Vice President can manage volunteers
+  if (user.role === ROLES.PRESIDENT) return true;
+  if (user.role === ROLES.BOARD && user.boardRole === BOARD_ROLES.VP) return true;
+  return false;
+};
+
+export const canManageContent = (user) => {
+  if (!user) return false;
+  // President, Vice President, and Secretary can manage content (Events, Communications)
+  if (user.role === ROLES.PRESIDENT) return true;
+  if (user.role === ROLES.BOARD && (user.boardRole === BOARD_ROLES.VP || user.boardRole === BOARD_ROLES.SECRETARY)) return true;
+  return false;
+};

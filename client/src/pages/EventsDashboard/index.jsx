@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
-import { hasAdminAccess, EVENT_TYPES } from '../../utils/constants';
+import { hasAdminAccess, EVENT_TYPES, canManageContent } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CalendarGrid from '../../components/events/CalendarGrid';
@@ -125,7 +125,7 @@ const EventsDashboard = ({ userProfile }) => {
                 onChange={(e) => setSearchDate(e.target.value)}
               />
             </div>
-            {hasAdminAccess(userProfile) && (
+            {canManageContent(userProfile) && (
               <button
                 onClick={openCreateModal}
                 className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
@@ -260,8 +260,8 @@ const EventsDashboard = ({ userProfile }) => {
                   allProfiles={allProfiles}
                   onToggleParticipation={toggleParticipation}
                   onClick={() => setSelectedEvent(event)}
-                  onDelete={handleDeleteEvent}
-                  onEdit={openEditModal}
+                  onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                  onEdit={canManageContent(userProfile) ? openEditModal : undefined}
                 />
               ))}
             </div>
@@ -284,8 +284,8 @@ const EventsDashboard = ({ userProfile }) => {
                 allProfiles={allProfiles}
                 onToggleParticipation={toggleParticipation}
                 onClick={() => setSelectedEvent(event)}
-                onDelete={handleDeleteEvent}
-                onEdit={openEditModal}
+                onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                onEdit={canManageContent(userProfile) ? openEditModal : undefined}
               />
             ))}
           </div>
@@ -307,14 +307,14 @@ const EventsDashboard = ({ userProfile }) => {
               allProfiles={allProfiles}
               onToggleParticipation={toggleParticipation}
               showParticipants={true}
-              onDelete={handleDeleteEvent}
-              onEdit={openEditModal}
+              onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+              onEdit={canManageContent(userProfile) ? openEditModal : undefined}
             />
           </div>
         </div>
       )}
 
-      {hasAdminAccess(userProfile) && (
+      {canManageContent(userProfile) && (
         <button
           onClick={openCreateModal}
           className="fab-btn lg:hidden"

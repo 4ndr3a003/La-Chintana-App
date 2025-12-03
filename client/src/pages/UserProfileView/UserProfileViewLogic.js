@@ -159,17 +159,6 @@ export const useUserProfileView = (userProfile) => {
     setIsModalOpen,
     imgRef,
     uploadCroppedImage,
-    resetNotifications: async () => {
-      if (!confirm('Vuoi davvero resettare le notifiche? Questo rimuoverà tutti i dispositivi collegati e dovrai riaprire l\'app su ciascuno di essi.')) return;
-      try {
-        const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
-        await updateDoc(userRef, { fcmTokens: [] });
-        alert('Notifiche resettate. L\'app verrà ricaricata per registrare questo dispositivo.');
-        window.location.reload();
-      } catch (error) {
-        console.error("Error resetting notifications:", error);
-        alert("Errore durante il reset delle notifiche.");
-      }
-    }
+
   };
 };

@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut, BellOff } from 'lucide-react';
+import { Camera, LogOut } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -22,7 +22,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
     setIsModalOpen,
     imgRef,
     uploadCroppedImage,
-    resetNotifications
+
   } = useUserProfileView(userProfile);
 
   // Helper to format dates
@@ -186,9 +186,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <button onClick={resetNotifications} className="w-full py-4 rounded-3xl bg-amber-100 text-amber-700 font-bold flex items-center justify-center gap-2 hover:bg-amber-200 transition-all shadow-sm">
-          <BellOff size={20} /> Reset Notifiche (Fix Doppie)
-        </button>
+
         <button onClick={onLogout} className="w-full py-4 rounded-3xl bg-[var(--color-pc-red-100)] text-[var(--color-pc-red-700)] font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-pc-red-200)] transition-all shadow-sm">
           <LogOut size={20} /> Esci dal Profilo
         </button>
