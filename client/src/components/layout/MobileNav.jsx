@@ -61,7 +61,7 @@ const MobileNav = ({ userProfile }) => {
             style={{ '--background': 'transparent' }}
           >
             <Users size={24} className={isActive('/admin') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
-            <IonLabel className={isActive('/admin') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Gestione</IonLabel>
+            <IonLabel className={isActive('/admin') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Volontari</IonLabel>
           </IonTabButton>
         )}
       </IonTabBar>

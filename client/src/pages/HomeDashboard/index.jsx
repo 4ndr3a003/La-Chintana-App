@@ -32,7 +32,7 @@ const HomeDashboard = ({ userProfile }) => {
 
           {/* Direttivo Dashboard Button */}
           {hasAdminAccess(userProfile) && (
-            <div className="ml-auto hidden md:block">
+            <div className="ml-auto">
               <Link
                 to="/direttivo"
                 className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-105 flex items-center justify-center"

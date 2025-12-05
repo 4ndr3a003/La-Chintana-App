@@ -52,7 +52,7 @@ const Header = ({ userProfile }) => {
     ];
 
     if (hasAdminAccess(userProfile)) {
-      items.push({ path: '/admin', label: 'Gestione', icon: <Users /> });
+      items.push({ path: '/admin', label: 'Volontari', icon: <Users /> });
     }
     return items;
   }, [userProfile]);

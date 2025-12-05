@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut } from 'lucide-react';
+import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -104,19 +104,19 @@ const UserProfileView = ({ userProfile, onLogout }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-4">
             <div>
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Data di Nascita</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Calendar size={14} /> Data di Nascita</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{formatDate(userProfile.birthDate)}</p>
             </div>
             <div>
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Codice Fiscale</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><CreditCard size={14} /> Codice Fiscale</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg uppercase">{userProfile.cf || '-'}</p>
             </div>
             <div>
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Luogo di Nascita</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><MapPin size={14} /> Luogo di Nascita</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.birthPlace || '-'}</p>
             </div>
             <div>
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Residenza</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Home size={14} /> Residenza</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.city || '-'}</p>
             </div>
           </div>
@@ -129,11 +129,11 @@ const UserProfileView = ({ userProfile, onLogout }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-4">
             <div className="md:col-span-2">
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Email</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Mail size={14} /> Email</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg break-all">{userProfile.email}</p>
             </div>
             <div>
-              <p className="text-sm text-[var(--color-slate-400)] mb-1">Telefono</p>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Phone size={14} /> Telefono</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.phone || '-'}</p>
             </div>
           </div>

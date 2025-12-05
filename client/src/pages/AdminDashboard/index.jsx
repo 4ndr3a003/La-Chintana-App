@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
@@ -75,7 +75,8 @@ const AdminDashboard = ({ userProfile }) => {
 
   const filterRoleOptions = [
     { value: 'Tutti', label: 'Tutti i Ruoli' },
-    ...roleOptions
+    ...roleOptions,
+    { value: VOLUNTEER_ROLES.K9, label: 'Unità Cinofila', color: 'bg-amber-500' }
   ];
 
   const filterStatusOptions = [
@@ -239,11 +240,17 @@ const AdminDashboard = ({ userProfile }) => {
                     </span>
                   </td>
                   <td className="p-4">
-                    <Badge
-                      text={ROLE_LABELS[user.role]}
-                      color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
-                    />
-                    {user.volunteerRole && <div className="mt-1"><Badge text={user.volunteerRole} color="amber" size="sm" /></div>}
+                    {user.volunteerRole ? (
+                      <Badge text={user.volunteerRole} color="amber" size="sm" />
+                    ) : user.boardRole ? (
+                      <Badge text={user.boardRole} color="purple" size="sm" />
+                    ) : (
+                      <Badge
+                        text={ROLE_LABELS[user.role]}
+                        color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
+                        size="sm"
+                      />
+                    )}
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
@@ -321,11 +328,17 @@ const AdminDashboard = ({ userProfile }) => {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="bg-slate-50 p-2.5 rounded-lg">
                 <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
-                <Badge
-                  text={ROLE_LABELS[user.role]}
-                  color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
-                  size="sm"
-                />
+                {user.volunteerRole ? (
+                  <Badge text={user.volunteerRole} color="amber" size="sm" />
+                ) : user.boardRole ? (
+                  <Badge text={user.boardRole} color="purple" size="sm" />
+                ) : (
+                  <Badge
+                    text={ROLE_LABELS[user.role]}
+                    color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
+                    size="sm"
+                  />
+                )}
               </div>
               <div className="bg-slate-50 p-2.5 rounded-lg">
                 <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
@@ -392,35 +405,39 @@ const AdminDashboard = ({ userProfile }) => {
               <div className="modal-profile-header">
                 <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
                 <h2 className="modal-profile-name">{selectedUser.name}</h2>
-                <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
-                {selectedUser.boardRole && <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />}
-                {selectedUser.volunteerRole && <Badge text={selectedUser.volunteerRole} color="amber" className="mt-1" />}
+                {selectedUser.volunteerRole ? (
+                  <Badge text={selectedUser.volunteerRole} color="amber" className="mt-1" />
+                ) : selectedUser.boardRole ? (
+                  <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />
+                ) : (
+                  <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
+                )}
               </div>
 
               <div className="space-y-6">
                 <div className="info-grid">
                   <div className="info-card">
-                    <p className="info-label">Email</p>
+                    <p className="info-label"><Mail size={14} /> Email</p>
                     <p className="info-value break-all">{selectedUser.email}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label">Telefono</p>
+                    <p className="info-label"><Phone size={14} /> Telefono</p>
                     <p className="info-value">{selectedUser.phone || '-'}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label">Codice Fiscale</p>
+                    <p className="info-label"><CreditCard size={14} /> Codice Fiscale</p>
                     <p className="info-value uppercase">{selectedUser.cf || '-'}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label">Data di Nascita</p>
+                    <p className="info-label"><Calendar size={14} /> Data di Nascita</p>
                     <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label">Codice Emercomnet</p>
+                    <p className="info-label"><Hash size={14} /> Codice Emercomnet</p>
                     <p className="info-value">{selectedUser.emercomnetId || '-'}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label">Residenza</p>
+                    <p className="info-label"><Home size={14} /> Residenza</p>
                     <p className="info-value">{selectedUser.city || '-'}</p>
                   </div>
                 </div>
@@ -479,6 +496,7 @@ const AdminDashboard = ({ userProfile }) => {
         </div>
       )}
 
+      {/* Edit/Create Modal */}
       {(isEditing || isCreating) && (
         <div className="modal-overlay animate-in fade-in edit-create-modal">
           <div className="modal-content max-w-2xl">
@@ -497,45 +515,45 @@ const AdminDashboard = ({ userProfile }) => {
                   </h4>
                   <div className="form-grid">
                     <div>
-                      <label className="info-label">Nome</label>
+                      <label className="info-label"><User size={14} /> Nome</label>
                       <input type="text" required className="form-input" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Cognome</label>
+                      <label className="info-label"><User size={14} /> Cognome</label>
                       <input type="text" required className="form-input" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Data di Nascita</label>
+                      <label className="info-label"><Calendar size={14} /> Data di Nascita</label>
                       <input type="date" className="form-input" value={formData.birthDate} onChange={e => setFormData({ ...formData, birthDate: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Luogo di Nascita</label>
+                      <label className="info-label"><MapPin size={14} /> Luogo di Nascita</label>
                       <input type="text" className="form-input" value={formData.birthPlace} onChange={e => setFormData({ ...formData, birthPlace: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Codice Fiscale</label>
+                      <label className="info-label"><CreditCard size={14} /> Codice Fiscale</label>
                       <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({ ...formData, cf: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Codice Identificativo Emercomnet</label>
+                      <label className="info-label"><Hash size={14} /> Codice Identificativo Emercomnet</label>
                       <input type="text" className="form-input" value={formData.emercomnetId} onChange={e => setFormData({ ...formData, emercomnetId: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Città di Residenza</label>
+                      <label className="info-label"><Home size={14} /> Città di Residenza</label>
                       <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Telefono</label>
+                      <label className="info-label"><Phone size={14} /> Telefono</label>
                       <input type="tel" className="form-input" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label">Email</label>
+                      <label className="info-label"><Mail size={14} /> Email</label>
                       <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                     </div>
                     {(isCreating || (isEditing && userProfile?.role === ROLES.PRESIDENT)) && (
                       <div className="md:col-span-2">
                         <label className="info-label">
-                          {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
+                          <Lock size={14} /> {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
                         </label>
                         <input
                           type="text"
@@ -597,57 +615,85 @@ const AdminDashboard = ({ userProfile }) => {
                     )}
                   </div>
 
-                  <div className="space-y-4">
-                    {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
-                      <div key={category} className={`${data.color} p-4 rounded-xl border bg-opacity-50`}>
-                        <h5 className={`font-bold text-xs uppercase mb-3 flex items-center gap-2 opacity-80`}>
-                          {data.icon} {category}
-                        </h5>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {data.items.map(item => (
-                            <label key={item} className="spec-checkbox-label">
-                              <input
-                                type="checkbox"
-                                checked={formData.specializations?.includes(item)}
-                                onChange={() => toggleSpec(item)}
-                                className="spec-checkbox-input"
-                              />
-                              <span className="spec-checkbox-text">{item}</span>
-                            </label>
-                          ))}
+                  <div>
+                    <h4 className="specs-section-title mb-3">
+                      <Award size={14} /> Abilitazioni
+                    </h4>
+                    <div className="space-y-4">
+                      {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
+                        <div key={category} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <h5 className={`flex items-center gap-2 font-bold text-xs uppercase mb-3 ${data.color.split(' ')[1]}`}>
+                            {data.icon} {category}
+                          </h5>
+                          <div className="flex flex-wrap gap-2">
+                            {data.items.map(item => (
+                              <button
+                                key={item}
+                                type="button"
+                                onClick={() => toggleSpec(item)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${formData.specializations.includes(item)
+                                  ? `${data.color} border-transparent shadow-sm`
+                                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                  }`}
+                              >
+                                {item}
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
 
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                      <h5 className="font-bold text-slate-700 text-xs uppercase mb-3">Altre Abilitazioni</h5>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Aggiungi..."
-                          className="custom-spec-input"
-                          value={customSpec}
-                          onChange={e => setCustomSpec(e.target.value)}
-                        />
-                        <button type="button" onClick={addCustomSpec} className="custom-spec-add-btn">
-                          +
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {formData.specializations?.filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s)).map(s => (
-                          <span key={s} className="custom-spec-tag-edit">
-                            {s}
-                            <button type="button" onClick={() => toggleSpec(s)} className="custom-spec-remove-btn"><X size={12} /></button>
-                          </span>
-                        ))}
+                      {/* Custom Specializations */}
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <h5 className="flex items-center gap-2 font-bold text-xs uppercase mb-3 text-slate-500">
+                          <PlusCircle size={14} /> Altre Abilitazioni
+                        </h5>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {formData.specializations
+                            .filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s))
+                            .map(s => (
+                              <div key={s} className="flex items-center gap-1 bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm">
+                                {s}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSpec(s)}
+                                  className="hover:text-red-300 transition-colors"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customSpec}
+                            onChange={e => setCustomSpec(e.target.value)}
+                            placeholder="Nuova abilitazione..."
+                            className="flex-grow px-3 py-2 rounded-lg text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addCustomSpec())}
+                          />
+                          <button
+                            type="button"
+                            onClick={addCustomSpec}
+                            disabled={!customSpec.trim()}
+                            className="bg-slate-800 text-white px-3 py-2 rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <PlusCircle size={18} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </section>
 
-                <div className="form-footer">
-                  <Button type="button" variant="ghost" onClick={closeAll}>Annulla</Button>
-                  <Button type="submit">Salva Modifiche</Button>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                  <Button type="button" variant="outline" onClick={closeAll}>
+                    Annulla
+                  </Button>
+                  <Button type="submit">
+                    {isCreating ? 'Crea Volontario' : 'Salva Modifiche'}
+                  </Button>
                 </div>
               </form>
             </div>
@@ -655,99 +701,57 @@ const AdminDashboard = ({ userProfile }) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="text-amber-600" size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Volontario</h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Sei sicuro di voler eliminare questo volontario? Questa azione non può essere annullata.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={cancelDeleteUser}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annulla
-                </button>
-                <button
-                  onClick={confirmDeleteUser}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Elimina
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Bulk Delete Confirmation Modal */}
       {isBulkDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="text-amber-600" size={24} />
+        <div className="modal-overlay animate-in fade-in z-50">
+          <div className="modal-content max-w-md">
+            <div className="modal-header border-b-0 pb-0">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
+                <AlertTriangle className="text-red-600" size={24} />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina {selectedUserIds.length} Volontari</h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Sei sicuro di voler eliminare i volontari selezionati? Questa azione non può essere annullata.
+              <h3 className="text-xl font-bold text-center text-slate-800">Elimina Volontari</h3>
+            </div>
+            <div className="modal-body text-center">
+              <p className="text-slate-600 mb-6">
+                Stai per eliminare <span className="font-bold text-slate-800">{selectedUserIds.length}</span> volontari selezionati.
+                Questa azione è irreversibile. Sei sicuro di voler procedere?
               </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={cancelDeleteSelected}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
+              <div className="flex justify-center gap-3">
+                <Button variant="outline" onClick={cancelDeleteSelected}>
                   Annulla
-                </button>
-                <button
-                  onClick={confirmDeleteSelected}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Elimina Tutto
-                </button>
+                </Button>
+                <Button onClick={confirmDeleteSelected} className="bg-red-600 hover:bg-red-700 text-white border-transparent">
+                  Elimina Definitivamente
+                </Button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Notification Modal */}
-      {notification.isOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 120 }}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4 relative">
-            <button
-              onClick={closeNotification}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              <X size={20} />
-            </button>
-            <div className="flex flex-col items-center text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${notification.type === 'success' ? 'bg-green-100 text-green-600' :
-                notification.type === 'error' ? 'bg-red-100 text-red-600' :
-                  notification.type === 'warning' ? 'bg-amber-100 text-amber-600' :
-                    'bg-blue-100 text-blue-600'
-                }`}>
-                {notification.type === 'success' && <CheckCircle size={24} />}
-                {notification.type === 'error' && <XCircle size={24} />}
-                {notification.type === 'warning' && <AlertTriangle size={24} />}
-                {notification.type === 'info' && <Info size={24} />}
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay animate-in fade-in z-50">
+          <div className="modal-content max-w-md">
+            <div className="modal-header border-b-0 pb-0">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
+                <AlertTriangle className="text-red-600" size={24} />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">{notification.title}</h3>
-              <div className="text-sm text-slate-600 mb-6 whitespace-pre-wrap text-left w-full bg-slate-50 p-3 rounded-lg border border-slate-100 max-h-60 overflow-y-auto font-mono">
-                {notification.message}
+              <h3 className="text-xl font-bold text-center text-slate-800">Elimina Volontario</h3>
+            </div>
+            <div className="modal-body text-center">
+              <p className="text-slate-600 mb-6">
+                Stai per eliminare il profilo di <span className="font-bold text-slate-800">{selectedUser?.name}</span>.
+                Questa azione è irreversibile. Sei sicuro di voler procedere?
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button variant="outline" onClick={cancelDeleteUser}>
+                  Annulla
+                </Button>
+                <Button onClick={confirmDeleteUser} className="bg-red-600 hover:bg-red-700 text-white border-transparent">
+                  Elimina Definitivamente
+                </Button>
               </div>
-              <button
-                onClick={closeNotification}
-                className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 transition-colors"
-              >
-                Chiudi
-              </button>
             </div>
           </div>
         </div>

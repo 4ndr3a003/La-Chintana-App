@@ -152,10 +152,10 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                     <div className="flex -space-x-2 overflow-hidden pl-1">
                       {event.participants?.slice(0, 5).map(uid => {
                         const p = allProfiles[uid];
-                        return p ? <Avatar key={uid} src={p.photoUrl} name={p.name} size="xs" className="ring-2 ring-white" /> : null;
+                        return p ? <Avatar key={uid} src={p.photoUrl} name={p.name} size="xs" className="ring-2 ring-transparent bg-transparent" /> : null;
                       })}
                       {(event.participants?.length || 0) > 5 && (
-                        <div className="w-6 h-6 rounded-full bg-white ring-2 ring-white flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-100">+{event.participants.length - 5}</div>
+                        <div className="w-6 h-6 rounded-full bg-transparent ring-2 ring-transparent flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-100">+{event.participants.length - 5}</div>
                       )}
                       {(!event.participants || event.participants.length === 0) && (
                         <span className="text-[10px] text-slate-400 italic">Nessuno</span>

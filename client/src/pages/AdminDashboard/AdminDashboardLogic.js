@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { ROLES } from '../../utils/constants';
+import { ROLES, VOLUNTEER_ROLES } from '../../utils/constants';
 
 export const useAdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -58,7 +58,8 @@ export const useAdminDashboard = () => {
     const matchesSearch = (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.emercomnetId?.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesRole = filterRole === 'Tutti' || user.role === filterRole;
+    const matchesRole = filterRole === 'Tutti' ||
+      (filterRole === VOLUNTEER_ROLES.K9 ? user.volunteerRole === VOLUNTEER_ROLES.K9 : user.role === filterRole);
     const matchesStatus = filterStatus === 'Tutti' || user.status === filterStatus;
 
     return matchesSearch && matchesRole && matchesStatus;
