@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { IonApp, IonToast, IonButton, IonIcon } from '@ionic/react';
+import { IonApp, IonButton, IonIcon } from '@ionic/react';
 import { notificationsOutline } from 'ionicons/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
@@ -13,17 +13,39 @@ import { Capacitor } from '@capacitor/core';
 import Header from './components/layout/Header';
 import MobileNav from './components/layout/MobileNav';
 import AppRoutes from './routes/AppRoutes';
+import NotificationToast from './components/ui/NotificationToast';
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('pc_profile_id'));
   const [loading, setLoading] = useState(true);
-  const [toastInfo, setToastInfo] = useState({ isOpen: false, message: '' });
+
+  // Custom Toast State
+  const [toastInfo, setToastInfo] = useState({
+    isOpen: false,
+    message: '',
+    title: '',
+    type: 'info' // info, success, warning, error
+  });
+
   const [showNotifButton, setShowNotifButton] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const showToast = (message, title = '', type = 'info') => {
+    setToastInfo({
+      isOpen: true,
+      message,
+      title,
+      type
+    });
+  };
+
+  const hideToast = () => {
+    setToastInfo(prev => ({ ...prev, isOpen: false }));
+  };
 
   // Auth Initialization
   useEffect(() => {
@@ -108,6 +130,9 @@ export default function App() {
 
         await PushNotifications.addListener('pushNotificationReceived', notification => {
           console.log('Push received: ', notification);
+          // Native apps handle foreground notifications automatically or via plugins, 
+          // but if we want to show our custom toast in foreground on native too:
+          showToast(notification.body, notification.title, 'info');
         });
 
         await PushNotifications.addListener('pushNotificationActionPerformed', notification => {
@@ -185,15 +210,15 @@ export default function App() {
     const unsubscribe = onMessage(messaging, (payload) => {
       if (document.visibilityState === 'visible') {
         console.log('Message received. ', payload);
-        setToastInfo({ isOpen: true, message: `Nuova notifica: ${payload.notification.title}` });
 
-        // Check if we have permission to show system notification
-        if (Notification.permission === 'granted') {
-          new Notification(payload.notification.title, {
-            body: payload.notification.body,
-            icon: '/logo_chintana.png'
-          });
-        }
+        // Show custom in-app notification instead of native browser notification
+        showToast(
+          payload.notification.body,
+          payload.notification.title,
+          'info' // You could map this from payload data if you send a 'type' field
+        );
+
+        // REMOVED: Native Notification generation to avoid double/ugly notifications
       }
     });
 
@@ -205,14 +230,14 @@ export default function App() {
   const setupWebPush = async (isInteractive = false) => {
     try {
       if (isInteractive) {
-        setToastInfo({ isOpen: true, message: 'Recupero token notifiche...' });
+        showToast('Recupero token notifiche...', '', 'info');
       }
 
       const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk";
 
       if (!vapidKey || vapidKey === "REPLACE_WITH_YOUR_VAPID_KEY") {
         console.warn("VAPID Key mancante o non valida.");
-        setToastInfo({ isOpen: true, message: 'Errore configurazione VAPID Key' });
+        showToast('Errore configurazione VAPID Key', 'Errore', 'error');
         return;
       }
 
@@ -223,12 +248,12 @@ export default function App() {
           console.log('Service Worker registration successful with scope: ', registration.scope);
         } catch (err) {
           console.error('Service Worker registration failed: ', err);
-          setToastInfo({ isOpen: true, message: 'Errore Service Worker: ' + err.message });
+          showToast('Errore Service Worker: ' + err.message, 'Errore', 'error');
           return;
         }
       } else {
         console.warn('Service Worker non supportato in questo browser.');
-        setToastInfo({ isOpen: true, message: 'Notifiche non supportate da questo browser.' });
+        showToast('Notifiche non supportate da questo browser.', 'Attenzione', 'warning');
         return;
       }
 
@@ -240,17 +265,15 @@ export default function App() {
       if (currentToken) {
         console.log('Web Push Token:', currentToken);
         if (isInteractive) {
-          setToastInfo({ isOpen: true, message: 'Notifiche attivate correttamente!' });
+          showToast('Notifiche attivate correttamente!', 'Successo', 'success');
         }
         setFcmToken(currentToken);
       } else {
         console.log('No registration token available.');
         if (isInteractive) {
-          setToastInfo({ isOpen: true, message: 'Impossibile ottenere il token notifiche. Verifica i permessi.' });
+          showToast('Impossibile ottenere il token notifiche. Verifica i permessi.', 'Avviso', 'warning');
         }
       }
-
-
 
     } catch (err) {
       console.error('An error occurred while retrieving token. ', err);
@@ -263,13 +286,13 @@ export default function App() {
       } else if (err.message.includes('Missing required')) {
         msg = 'Configurazione notifiche incompleta (manifest o VAPID).';
       }
-      setToastInfo({ isOpen: true, message: msg });
+      showToast(msg, 'Errore', 'error');
     }
   };
 
   const enableWebNotifications = async () => {
     try {
-      setToastInfo({ isOpen: true, message: 'Richiesta permessi notifiche...' });
+      showToast('Richiesta permessi notifiche...', '', 'info');
       const permission = await Notification.requestPermission();
 
       if (permission === 'granted') {
@@ -278,11 +301,11 @@ export default function App() {
         await setupWebPush(true); // Attivazione interattiva
       } else {
         console.log('Unable to get permission to notify.');
-        setToastInfo({ isOpen: true, message: 'Permesso notifiche negato.' });
+        showToast('Permesso notifiche negato.', 'Attenzione', 'warning');
       }
     } catch (err) {
       console.error('An error occurred while requesting permissions. ', err);
-      setToastInfo({ isOpen: true, message: `Errore notifiche: ${err.message}` });
+      showToast(`Errore notifiche: ${err.message}`, 'Errore', 'error');
     }
   };
 
@@ -355,13 +378,14 @@ export default function App() {
           </div>
         )}
 
-        <IonToast
+        {/* Custom Notification Toast */}
+        <NotificationToast
           isOpen={toastInfo.isOpen}
-          onDidDismiss={() => setToastInfo({ ...toastInfo, isOpen: false })}
+          onClose={hideToast}
           message={toastInfo.message}
-          duration={3000}
-          position="top"
-          color="dark"
+          title={toastInfo.title}
+          type={toastInfo.type}
+          duration={5000}
         />
       </div>
     </IonApp>
