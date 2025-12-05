@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Gauge } from 'lucide-react';
 import { useHomeDashboard } from './HomeDashboardLogic';
 import { hasAdminAccess } from '../../utils/constants';
 import EventCard from '../../components/ui/EventCard';
@@ -34,9 +35,10 @@ const HomeDashboard = ({ userProfile }) => {
             <div className="ml-auto hidden md:block">
               <Link
                 to="/direttivo"
-                className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-105 flex items-center justify-center"
+                title="Dashboard Direttivo"
               >
-                Dashboard Direttivo
+                <Gauge strokeWidth={1.5} size={32} />
               </Link>
             </div>
           )}

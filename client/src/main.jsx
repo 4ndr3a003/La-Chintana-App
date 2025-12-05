@@ -23,6 +23,9 @@ import './variables.css';
 import './index.css'
 import App from './App.jsx'
 
+import { disableZoom } from './utils/disableZoom';
+
+disableZoom();
 setupIonicReact();
 
 createRoot(document.getElementById('root')).render(

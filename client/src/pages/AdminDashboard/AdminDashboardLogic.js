@@ -75,6 +75,8 @@ export const useAdminDashboard = () => {
       specializations: user.specializations || [],
       emercomnetId: user.emercomnetId || '',
       status: user.status || 'Operativo',
+      boardRole: user.boardRole || '',
+      volunteerRole: user.volunteerRole || '',
       password: '' // Reset password field for editing
     });
     setSelectedUser(user);
@@ -95,7 +97,9 @@ export const useAdminDashboard = () => {
       emercomnetId: '',
       status: 'Operativo',
       role: ROLES.VOLUNTEER,
+      role: ROLES.VOLUNTEER,
       boardRole: '',
+      volunteerRole: '',
       specializations: [],
       joinedAt: new Date().toISOString(),
       photoUrl: ''
@@ -153,7 +157,9 @@ export const useAdminDashboard = () => {
       name: fullName,
       email: formData.email,
       role: formData.role,
+      role: formData.role,
       boardRole: formData.boardRole || null,
+      volunteerRole: formData.volunteerRole || null,
       specializations: formData.specializations,
       phone: formData.phone || '',
       cf: formData.cf || '',

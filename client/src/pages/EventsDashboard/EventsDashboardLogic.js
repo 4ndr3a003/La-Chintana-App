@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { EVENT_VISIBILITY } from '../../utils/constants';
 import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useEventsDashboard = (userProfile) => {
@@ -20,7 +21,7 @@ export const useEventsDashboard = (userProfile) => {
   const [currentEventId, setCurrentEventId] = useState(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
-    title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: []
+    title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [], visibility: EVENT_VISIBILITY.ALL
   });
 
   useEffect(() => {
@@ -115,7 +116,7 @@ export const useEventsDashboard = (userProfile) => {
   const openCreateModal = () => {
     setIsEditing(false);
     setCurrentEventId(null);
-    setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [] });
+    setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [], visibility: EVENT_VISIBILITY.ALL });
     setIsCreateModalOpen(true);
   };
 
@@ -137,7 +138,8 @@ export const useEventsDashboard = (userProfile) => {
       location: event.location,
       type: event.type,
       description: event.description || '',
-      shifts: event.shifts || []
+      shifts: event.shifts || [],
+      visibility: event.visibility || EVENT_VISIBILITY.ALL
     });
     setIsCreateModalOpen(true);
   };
@@ -185,7 +187,7 @@ export const useEventsDashboard = (userProfile) => {
         });
       }
 
-      setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [] });
+      setNewEvent({ title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [], visibility: EVENT_VISIBILITY.ALL });
       setIsCreateModalOpen(false);
       setIsEditing(false);
       setCurrentEventId(null);
@@ -232,6 +234,18 @@ export const useEventsDashboard = (userProfile) => {
 
     if (isDirettivoEvent && !isBoardOrPresident) {
       return false;
+    }
+
+    // New Visibility Logic
+    const visibility = event.visibility || EVENT_VISIBILITY.ALL;
+
+    if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
+      if (!isBoardOrPresident) return false;
+    }
+
+    if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+      const isK9 = userProfile?.volunteerRole === 'Unità Cinofila';
+      if (!isK9 && !isBoardOrPresident) return false;
     }
 
     return true;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, ChevronDown, Trash2, PlusCircle, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
+import { MessageSquare, ChevronDown, Trash2, PlusCircle, MessageSquarePlus, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
 import { hasAdminAccess, canManageContent } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -221,7 +221,7 @@ const CommunicationsView = ({ userProfile }) => {
                 onClick={openCreateModal}
                 className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
               >
-                <PlusCircle size={18} />
+                <MessageSquarePlus size={18} />
                 Nuova
               </button>
             )}
@@ -326,7 +326,7 @@ const CommunicationsView = ({ userProfile }) => {
           onClick={openCreateModal}
           className="fab-btn lg:hidden"
         >
-          <PlusCircle size={28} />
+          <MessageSquarePlus size={28} />
         </button>
       )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Users, House } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import Avatar from '../ui/Avatar';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
@@ -46,7 +46,7 @@ const Header = ({ userProfile }) => {
 
   const navItems = useMemo(() => {
     const items = [
-      { path: '/', label: 'Home', icon: <LayoutDashboard /> },
+      { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
       { path: '/events', label: 'Bacheca', icon: <Calendar /> },
       { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
     ];

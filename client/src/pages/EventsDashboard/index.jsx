@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Calendar, List, ChevronDown, PlusCircle, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
-import { hasAdminAccess, EVENT_TYPES, canManageContent } from '../../utils/constants';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Calendar, List, ChevronDown, PlusCircle, CalendarPlus, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
+import { hasAdminAccess, EVENT_TYPES, canManageContent, EVENT_VISIBILITY } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CalendarGrid from '../../components/events/CalendarGrid';
@@ -48,18 +48,18 @@ const EventsDashboard = ({ userProfile }) => {
   } = useEventsDashboard(userProfile);
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.state?.selectedEventId && filteredEvents.length > 0) {
       const eventToSelect = filteredEvents.find(e => e.id === location.state.selectedEventId);
       if (eventToSelect) {
         setSelectedEvent(eventToSelect);
-        // Optional: Clear state to prevent reopening on refresh, 
-        // but might be tricky with React Router history manipulation without navigation
-        // For now, we leave it as is, it's acceptable behavior.
+        // Clear the state so it doesn't reopen on re-renders
+        navigate(location.pathname, { replace: true, state: {} });
       }
     }
-  }, [location.state, filteredEvents, setSelectedEvent]);
+  }, [location.state, filteredEvents, setSelectedEvent, navigate, location.pathname]);
 
   const eventTypeOptions = Object.entries(EVENT_TYPES).map(([type, data]) => {
     let colorClass = '';
@@ -77,6 +77,11 @@ const EventsDashboard = ({ userProfile }) => {
       color: colorClass
     };
   });
+
+  const visibilityOptions = Object.values(EVENT_VISIBILITY).map(v => ({
+    value: v,
+    label: v
+  }));
 
   return (
     <div className="events-container">
@@ -130,7 +135,7 @@ const EventsDashboard = ({ userProfile }) => {
                 onClick={openCreateModal}
                 className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
               >
-                <PlusCircle size={18} />
+                <CalendarPlus size={18} />
                 Nuovo Evento
               </button>
             )}
@@ -319,7 +324,7 @@ const EventsDashboard = ({ userProfile }) => {
           onClick={openCreateModal}
           className="fab-btn lg:hidden"
         >
-          <PlusCircle size={28} />
+          <CalendarPlus size={28} />
         </button>
       )}
 
@@ -366,13 +371,23 @@ const EventsDashboard = ({ userProfile }) => {
                   <label className="form-label">Titolo Evento</label>
                   <input type="text" className="form-input" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} required />
                 </div>
-                <div>
-                  <label className="form-label">Tipologia</label>
-                  <CustomSelect
-                    value={newEvent.type}
-                    onChange={val => setNewEvent({ ...newEvent, type: val })}
-                    options={eventTypeOptions}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">Tipologia</label>
+                    <CustomSelect
+                      value={newEvent.type}
+                      onChange={val => setNewEvent({ ...newEvent, type: val })}
+                      options={eventTypeOptions}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Visibilità</label>
+                    <CustomSelect
+                      value={newEvent.visibility}
+                      onChange={val => setNewEvent({ ...newEvent, visibility: val })}
+                      options={visibilityOptions}
+                    />
+                  </div>
                 </div>
                 <div className="form-grid">
                   <div>

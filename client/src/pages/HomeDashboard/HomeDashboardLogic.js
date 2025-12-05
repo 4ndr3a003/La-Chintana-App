@@ -59,6 +59,16 @@ export const useHomeDashboard = (userProfile) => {
       // Filter out 'Direttivo' topic for non-board members
       const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
       const visibleComms = comms.filter(c => {
+        // Check expiration
+        if (c.expirationDate) {
+          const expDate = new Date(c.expirationDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (expDate < today) {
+            return false;
+          }
+        }
+
         if (c.topic === 'Direttivo' && !isBoardOrPresident) return false;
         return true;
       });

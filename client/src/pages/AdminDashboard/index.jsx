@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
@@ -89,15 +89,18 @@ const AdminDashboard = ({ userProfile }) => {
     color: 'bg-purple-500'
   }));
 
-  const volunteerRoleOptions = Object.values(VOLUNTEER_ROLES).map(r => ({
-    value: r,
-    label: r,
-    color: 'bg-amber-500'
-  }));
+  const volunteerRoleOptions = [
+    { value: '', label: 'Nessun Ruolo', color: 'bg-slate-200 text-slate-600' },
+    ...Object.values(VOLUNTEER_ROLES).map(r => ({
+      value: r,
+      label: r,
+      color: 'bg-amber-500'
+    }))
+  ];
 
   return (
     <div className="admin-dashboard-container">
-      <div className="dashboard-header">
+      <div className="admin-dashboard-header">
         <h3 className="dashboard-title">
           <Users className="text-blue-600" size={28} /> Gestione Volontari
         </h3>
@@ -156,7 +159,7 @@ const AdminDashboard = ({ userProfile }) => {
               <Button
                 onClick={openCreate}
               >
-                <PlusCircle size={18} />
+                <UserRoundPlus size={18} />
                 Nuovo Volontario
               </Button>
             )}
@@ -373,7 +376,7 @@ const AdminDashboard = ({ userProfile }) => {
           onClick={openCreate}
           className="fab-btn lg:hidden"
         >
-          <PlusCircle size={28} />
+          <UserRoundPlus size={28} />
         </button>
       )}
 
@@ -581,9 +584,9 @@ const AdminDashboard = ({ userProfile }) => {
                         />
                       </div>
                     )}
-                    {formData.role === ROLES.VOLUNTEER && (
+                    {(formData.role === ROLES.VOLUNTEER || formData.role === ROLES.BOARD) && (
                       <div>
-                        <label className="info-label">Ruolo Volontario (Opzionale)</label>
+                        <label className="info-label">Ruolo Volontario / Specializzazione</label>
                         <CustomSelect
                           value={formData.volunteerRole || ''}
                           onChange={val => setFormData({ ...formData, volunteerRole: val })}
@@ -596,8 +599,8 @@ const AdminDashboard = ({ userProfile }) => {
 
                   <div className="space-y-4">
                     {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
-                      <div key={category} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <h5 className="font-bold text-slate-700 text-xs uppercase mb-3 flex items-center gap-2">
+                      <div key={category} className={`${data.color} p-4 rounded-xl border bg-opacity-50`}>
+                        <h5 className={`font-bold text-xs uppercase mb-3 flex items-center gap-2 opacity-80`}>
                           {data.icon} {category}
                         </h5>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
