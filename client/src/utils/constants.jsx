@@ -95,7 +95,7 @@ export const SPECIALIZATIONS_DATA = {
 };
 
 export const VOLUNTEER_ROLES = {
-  K9: 'Unità Cinofila'
+  K9: 'Cinofilo'
 };
 
 export const hasAdminAccess = (user) => {

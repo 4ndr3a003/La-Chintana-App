@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users, House } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import Avatar from '../ui/Avatar';
+import NotificationPanel from '../notifications/NotificationPanel';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
 
 const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref) => (
@@ -40,9 +41,11 @@ const Header = ({ userProfile }) => {
     return location.pathname.startsWith(path);
   };
 
+  const [isNotifPanelOpen, setIsNotifPanelOpen] = useState(false);
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
   const navContainerRef = useRef(null);
   const navRefs = useRef({});
+  const notifButtonRef = useRef(null);
 
   const navItems = useMemo(() => {
     const items = [
@@ -97,13 +100,13 @@ const Header = ({ userProfile }) => {
           '--padding-end': '16px'
         }}
       >
-        <div className="flex justify-between items-center w-full px-2 lg:px-4">
+        <div className="flex justify-between items-center w-full px-0 lg:px-4">
           {/* Logo Section */}
           <IonButtons slot="start">
             <IonButton onClick={() => navigate('/')} fill="clear" className="h-auto hover:opacity-80 transition-opacity">
-              <div className="flex items-center gap-3.5">
+              <div className="flex items-center gap-2 md:gap-3.5">
                 <img src={logo} alt="Logo" className="h-12 w-auto drop-shadow-sm" />
-                <div className="leading-none text-left block">
+                <div className="leading-none text-left block whitespace-nowrap">
                   <h1 className="text-lg font-black tracking-tighter text-white">LA CHINTANA</h1>
                   <p className="text-[10px] text-yellow-400 font-bold uppercase tracking-widest">Protezione Civile</p>
                 </div>
@@ -146,7 +149,30 @@ const Header = ({ userProfile }) => {
 
           {/* User Profile Section */}
           <IonButtons slot="end">
-            <div className="flex items-center gap-3 pl-4">
+            <div className="flex items-center gap-1 md:gap-3 pl-0 relative">
+              {/* Notification Button */}
+              <IonButton
+                ref={notifButtonRef}
+                onClick={() => setIsNotifPanelOpen(!isNotifPanelOpen)}
+                shape="circle"
+                fill="clear"
+                className="hover:scale-110 transition-transform"
+                style={{
+                  '--padding-start': '8px',
+                  '--padding-end': '8px',
+                  '--color': isNotifPanelOpen ? 'var(--color-pc-yellow)' : 'var(--color-slate-50)'
+                }}
+              >
+                <Bell size={20} strokeWidth={isNotifPanelOpen ? 2.5 : 2} />
+              </IonButton>
+
+              <NotificationPanel
+                isOpen={isNotifPanelOpen}
+                onClose={() => setIsNotifPanelOpen(false)}
+                userProfile={userProfile}
+                anchorRef={notifButtonRef}
+              />
+
               <div className="h-8 w-px bg-blue-500/50 hidden lg:block"></div>
               <IonButton
                 onClick={() => navigate('/profile')}

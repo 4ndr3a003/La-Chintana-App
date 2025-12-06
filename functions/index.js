@@ -6,7 +6,7 @@ const db = admin.firestore();
 const messaging = admin.messaging();
 
 // Helper function to send notifications
-async function sendNotificationToAll(appId, title, body, options = {}) {
+async function sendNotificationToAll(appId, title, body, options = {}, data = {}) {
   try {
     // 1. Get all profiles to find tokens
     // Path: artifacts/{appId}/public/data/profiles
@@ -37,6 +37,7 @@ async function sendNotificationToAll(appId, title, body, options = {}) {
         title: title,
         body: body,
       },
+      data: data, // Add data payload here
       tokens: uniqueTokens,
     };
 
@@ -78,26 +79,34 @@ async function sendNotificationToAll(appId, title, body, options = {}) {
 exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/data/events/{eventId}").onCreate(async (snap, context) => {
   const data = snap.data();
   const appId = context.params.appId;
-  
+  const eventId = context.params.eventId;
+
   // Format date for display
   let dateStr = data.date;
   try {
-      const dateObj = new Date(data.date);
-      dateStr = dateObj.toLocaleDateString('it-IT');
+    const dateObj = new Date(data.date);
+    dateStr = dateObj.toLocaleDateString('it-IT');
   } catch (e) {
-      // keep original string if parse fails
+    // keep original string if parse fails
   }
 
   const title = `Nuovo Evento: ${data.title}`;
   const body = `È stato aggiunto un nuovo evento per il ${dateStr}. Controlla l'app!`;
 
-  await sendNotificationToAll(appId, title, body);
+  const payloadData = {
+    url: '/events',
+    type: 'event',
+    id: eventId
+  };
+
+  await sendNotificationToAll(appId, title, body, {}, payloadData);
 });
 
 // Trigger: New Communication Created
 exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}/public/data/communications/{commId}").onCreate(async (snap, context) => {
   const data = snap.data();
   const appId = context.params.appId;
+  const commId = context.params.commId;
 
   let title = `Nuova Comunicazione: ${data.title}`;
   const options = {};
@@ -106,15 +115,21 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
     title = `⚠️ ${title}`;
     options.isUrgent = true;
   }
-  
+
   // Truncate body if too long
   let bodyContent = data.content || '';
   if (bodyContent.length > 100) {
-      bodyContent = bodyContent.substring(0, 100) + '...';
+    bodyContent = bodyContent.substring(0, 100) + '...';
   }
   const body = bodyContent;
 
-  await sendNotificationToAll(appId, title, body, options);
+  const payloadData = {
+    url: '/comms',
+    type: 'communication',
+    id: commId
+  };
+
+  await sendNotificationToAll(appId, title, body, options, payloadData);
 });
 
 // Sync user role to custom claims
@@ -128,11 +143,11 @@ exports.syncUserRole = functions.firestore
       // User profile was deleted, do nothing for claims
       return null;
     }
-    
+
     // Role or email changed?
     const role = userData.role || 'Volontario';
     const oldRole = oldUserData ? oldUserData.role || 'Volontario' : null;
-    
+
     if (role === oldRole) {
       // Role hasn't changed, no need to update claims
       return null;
@@ -144,7 +159,7 @@ exports.syncUserRole = functions.firestore
 
       // Set custom claims
       await admin.auth().setCustomUserClaims(user.uid, { role: role });
-      
+
       console.log(`Custom claim for role '${role}' set for user ${user.uid}`);
       return null;
 

@@ -34,8 +34,9 @@ messaging.onBackgroundMessage((payload) => {
         title: 'Apri App'
       }
     ],
+    // Read data from payload if available
     data: {
-      url: '/' // Default URL to open
+      url: payload.data?.url || '/'
     }
   };
 
@@ -59,8 +60,16 @@ self.addEventListener('notificationclick', function (event) {
       // Check if there's already a tab open with this URL
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
-        if (client.url.includes(urlToOpen) && 'focus' in client) {
-          return client.focus();
+        // If the client is already on the same origin
+        // We can just focus it and navigate
+        if (client.url.includes(self.registration.scope) && 'focus' in client) {
+          return client.focus().then(focusedClient => {
+            // Navigate the focused client to the new URL if needed
+            if (focusedClient && 'navigate' in focusedClient) {
+              return focusedClient.navigate(urlToOpen);
+            }
+            return focusedClient;
+          });
         }
       }
       // If not, open a new window

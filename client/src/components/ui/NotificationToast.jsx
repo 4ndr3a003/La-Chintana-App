@@ -8,7 +8,7 @@ import {
     closeOutline
 } from 'ionicons/icons';
 
-const NotificationToast = ({ isOpen, onClose, type = 'info', title, message, duration = 4000 }) => {
+const NotificationToast = ({ isOpen, onClose, type = 'info', title, message, duration = 4000, onClick }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -69,8 +69,14 @@ const NotificationToast = ({ isOpen, onClose, type = 'info', title, message, dur
             className={`fixed top-4 right-0 left-0 md:left-auto md:right-4 z-[9999] px-4 md:px-0 flex justify-center md:justify-end transition-all duration-300 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}
         >
             <div
-                className="w-full md:w-96 bg-white shadow-lg rounded-lg overflow-hidden flex flex-row items-stretch pointer-events-auto"
+                className={`w-full md:w-96 bg-white shadow-lg rounded-lg overflow-hidden flex flex-row items-stretch pointer-events-auto ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}`}
                 style={{ borderLeft: currentConfig.borderStyle }}
+                onClick={() => {
+                    if (onClick) {
+                        onClick();
+                        handleClose();
+                    }
+                }}
             >
                 {/* Icon Section */}
                 <div className="flex-none w-12 flex items-center justify-center bg-transparent">

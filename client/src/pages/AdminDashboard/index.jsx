@@ -6,6 +6,7 @@ import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import CustomSelect from '../../components/ui/CustomSelect';
+import DeleteConfirmationModal from '../../components/ui/DeleteConfirmationModal';
 import { useAdminDashboard } from './AdminDashboardLogic';
 import './AdminDashboard.css';
 
@@ -290,7 +291,7 @@ const AdminDashboard = ({ userProfile }) => {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden space-y-3 pb-20">
+      <div className="md:hidden space-y-3 pb-2">
         {filteredUsers.map(user => (
           <div
             key={user.id}
@@ -702,60 +703,22 @@ const AdminDashboard = ({ userProfile }) => {
       )}
 
       {/* Bulk Delete Confirmation Modal */}
-      {isBulkDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in z-50">
-          <div className="modal-content max-w-md">
-            <div className="modal-header border-b-0 pb-0">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
-                <AlertTriangle className="text-red-600" size={24} />
-              </div>
-              <h3 className="text-xl font-bold text-center text-slate-800">Elimina Volontari</h3>
-            </div>
-            <div className="modal-body text-center">
-              <p className="text-slate-600 mb-6">
-                Stai per eliminare <span className="font-bold text-slate-800">{selectedUserIds.length}</span> volontari selezionati.
-                Questa azione è irreversibile. Sei sicuro di voler procedere?
-              </p>
-              <div className="flex justify-center gap-3">
-                <Button variant="outline" onClick={cancelDeleteSelected}>
-                  Annulla
-                </Button>
-                <Button onClick={confirmDeleteSelected} className="bg-red-600 hover:bg-red-700 text-white border-transparent">
-                  Elimina Definitivamente
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        isOpen={isBulkDeleteModalOpen}
+        onClose={cancelDeleteSelected}
+        onConfirm={confirmDeleteSelected}
+        title="Elimina Volontari"
+        message={`Stai per eliminare ${selectedUserIds.length} volontari selezionati. Questa azione è irreversibile. Sei sicuro di voler procedere?`}
+      />
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in z-50">
-          <div className="modal-content max-w-md">
-            <div className="modal-header border-b-0 pb-0">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
-                <AlertTriangle className="text-red-600" size={24} />
-              </div>
-              <h3 className="text-xl font-bold text-center text-slate-800">Elimina Volontario</h3>
-            </div>
-            <div className="modal-body text-center">
-              <p className="text-slate-600 mb-6">
-                Stai per eliminare il profilo di <span className="font-bold text-slate-800">{selectedUser?.name}</span>.
-                Questa azione è irreversibile. Sei sicuro di voler procedere?
-              </p>
-              <div className="flex justify-center gap-3">
-                <Button variant="outline" onClick={cancelDeleteUser}>
-                  Annulla
-                </Button>
-                <Button onClick={confirmDeleteUser} className="bg-red-600 hover:bg-red-700 text-white border-transparent">
-                  Elimina Definitivamente
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={cancelDeleteUser}
+        onConfirm={confirmDeleteUser}
+        title="Elimina Volontario"
+        message={selectedUser ? `Stai per eliminare il profilo di ${selectedUser.name}. Questa azione è irreversibile. Sei sicuro di voler procedere?` : ''}
+      />
     </div>
   );
 };

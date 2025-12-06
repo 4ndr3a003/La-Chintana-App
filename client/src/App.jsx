@@ -26,7 +26,8 @@ export default function App() {
     isOpen: false,
     message: '',
     title: '',
-    type: 'info' // info, success, warning, error
+    type: 'info', // info, success, warning, error
+    onClick: null
   });
 
   const [showNotifButton, setShowNotifButton] = useState(false);
@@ -34,12 +35,13 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const showToast = (message, title = '', type = 'info') => {
+  const showToast = (message, title = '', type = 'info', onClick = null) => {
     setToastInfo({
       isOpen: true,
       message,
       title,
-      type
+      type,
+      onClick
     });
   };
 
@@ -211,11 +213,18 @@ export default function App() {
       if (document.visibilityState === 'visible') {
         console.log('Message received. ', payload);
 
+        // Determine navigation action
+        let onClickAction = null;
+        if (payload.data && payload.data.url) {
+          onClickAction = () => navigate(payload.data.url);
+        }
+
         // Show custom in-app notification instead of native browser notification
         showToast(
           payload.notification.body,
           payload.notification.title,
-          'info' // You could map this from payload data if you send a 'type' field
+          'info', // You could map this from payload data if you send a 'type' field
+          onClickAction
         );
 
         // REMOVED: Native Notification generation to avoid double/ugly notifications
@@ -386,6 +395,7 @@ export default function App() {
           title={toastInfo.title}
           type={toastInfo.type}
           duration={5000}
+          onClick={toastInfo.onClick}
         />
       </div>
     </IonApp>
