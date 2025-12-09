@@ -8,6 +8,13 @@ const messaging = admin.messaging();
 // Helper function to send notifications
 async function sendNotificationToAll(appId, title, body, options = {}, data = {}) {
   try {
+    // 0. Constants (Mirroring Client Constants)
+    const EVENT_VISIBILITY = {
+      ALL: 'Tutti',
+      BOARD_ONLY: 'Solo Direttivo',
+      K9_ONLY: 'Solo Cinofili'
+    };
+
     // 1. Get all profiles to find tokens
     // Path: artifacts/{appId}/public/data/profiles
     const profilesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('profiles');
@@ -16,6 +23,14 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
     const tokens = [];
     snapshot.forEach(doc => {
       const data = doc.data();
+
+      // Apply Target Filter if provided
+      if (options.targetFilter && typeof options.targetFilter === 'function') {
+        if (!options.targetFilter(data)) {
+          return; // Skip this user
+        }
+      }
+
       if (data.fcmTokens && Array.isArray(data.fcmTokens)) {
         tokens.push(...data.fcmTokens);
       }
@@ -99,7 +114,32 @@ exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/
     id: eventId
   };
 
-  await sendNotificationToAll(appId, title, body, {}, payloadData);
+  // Define specific filtering logic for this event
+  let targetFilter = null;
+
+  // Constants
+  const EVENT_VISIBILITY = {
+    ALL: 'Tutti',
+    BOARD_ONLY: 'Solo Direttivo',
+    K9_ONLY: 'Solo Cinofili'
+  };
+
+  const isDirettivoEvent = data.type === 'Direttivo';
+  const visibility = data.visibility || EVENT_VISIBILITY.ALL;
+
+  if (isDirettivoEvent || visibility === EVENT_VISIBILITY.BOARD_ONLY) {
+    targetFilter = (user) => {
+      return user.role === 'direttivo' || user.role === 'presidente';
+    };
+  } else if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+    targetFilter = (user) => {
+      const isBoard = user.role === 'direttivo' || user.role === 'presidente';
+      const isK9 = user.volunteerRole === 'Cinofilo'; // Using string 'Cinofilo' matching client constant
+      return isBoard || isK9;
+    };
+  }
+
+  await sendNotificationToAll(appId, title, body, { targetFilter }, payloadData);
 });
 
 // Trigger: New Communication Created
@@ -129,7 +169,16 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
     id: commId
   };
 
-  await sendNotificationToAll(appId, title, body, options, payloadData);
+  // Filter for Direttivo communications
+  let targetFilter = null;
+  if (data.topic === 'Direttivo') {
+    targetFilter = (user) => {
+      return user.role === 'direttivo' || user.role === 'presidente';
+    };
+  }
+
+  // Pass filter in options
+  await sendNotificationToAll(appId, title, body, { ...options, targetFilter }, payloadData);
 });
 
 // Sync user role to custom claims

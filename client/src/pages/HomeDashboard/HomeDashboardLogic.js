@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants';
 
 export const useHomeDashboard = (userProfile) => {
   const [nextEvent, setNextEvent] = useState(null);
@@ -30,7 +31,29 @@ export const useHomeDashboard = (userProfile) => {
     );
 
     const unsubEvents = onSnapshot(qEvents, (snap) => {
-      const allFutureEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let allFutureEvents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Filter events based on visibility rules (Same as EventsDashboardLogic)
+      allFutureEvents = allFutureEvents.filter(event => {
+        const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
+
+        // Check visibility for 'Direttivo' type (Legacy)
+        if (event.type === 'Direttivo' && !isBoardOrPresident) return false;
+
+        // New Visibility Logic
+        const visibility = event.visibility || EVENT_VISIBILITY.ALL;
+
+        if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
+          if (!isBoardOrPresident) return false;
+        }
+
+        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
+          if (!isK9 && !isBoardOrPresident) return false;
+        }
+
+        return true;
+      });
 
       // Find the very next event (the first in the sorted list)
       const firstEvent = allFutureEvents.length > 0 ? allFutureEvents[0] : null;
@@ -107,7 +130,30 @@ export const useHomeDashboard = (userProfile) => {
     );
 
     const unsubMonthEvents = onSnapshot(qMonthEvents, (snap) => {
-      const events = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let events = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Filter events based on visibility rules
+      events = events.filter(event => {
+        const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
+
+        // Check visibility for 'Direttivo' type (Legacy)
+        if (event.type === 'Direttivo' && !isBoardOrPresident) return false;
+
+        // New Visibility Logic
+        const visibility = event.visibility || EVENT_VISIBILITY.ALL;
+
+        if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
+          if (!isBoardOrPresident) return false;
+        }
+
+        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
+          if (!isK9 && !isBoardOrPresident) return false;
+        }
+
+        return true;
+      });
+
       setMonthEvents(events);
     });
 

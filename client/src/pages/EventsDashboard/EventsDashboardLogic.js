@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { EVENT_VISIBILITY } from '../../utils/constants';
+import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants';
 import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useEventsDashboard = (userProfile) => {
@@ -244,7 +244,7 @@ export const useEventsDashboard = (userProfile) => {
     }
 
     if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-      const isK9 = userProfile?.volunteerRole === 'Unità Cinofila';
+      const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
       if (!isK9 && !isBoardOrPresident) return false;
     }
 

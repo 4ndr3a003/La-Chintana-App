@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Clock } from 'lucide-react';
+import { EVENT_VISIBILITY } from '../../utils/constants';
 
 const EventCard = ({ event }) => {
     const dateObj = new Date(event.date);
@@ -73,9 +74,21 @@ const EventCard = ({ event }) => {
                 <div className="flex flex-col flex-grow min-w-0 p-4">
                     <div className="flex justify-between items-start mb-2 gap-2">
                         <h3 className="text-lg font-bold text-slate-800 leading-tight line-clamp-2">{event.title}</h3>
-                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap h-fit shrink-0`}>
-                            {event.type}
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap h-fit shrink-0`}>
+                                {event.type}
+                            </span>
+                            {event.visibility && event.visibility !== EVENT_VISIBILITY.ALL && (
+                                <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md border whitespace-nowrap h-fit shrink-0 ${event.visibility === EVENT_VISIBILITY.BOARD_ONLY
+                                    ? 'bg-purple-100 text-purple-700 border-purple-200'
+                                    : event.visibility === EVENT_VISIBILITY.K9_ONLY
+                                        ? 'bg-amber-100 text-amber-700 border-amber-200'
+                                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}>
+                                    {event.visibility}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-1.5 mt-auto">

@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, MapPin, Users, X, CheckCircle, Trash2, Pencil } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Avatar from '../ui/Avatar';
-import { ROLE_LABELS, hasAdminAccess, SPECIALIZATIONS_DATA, VOLUNTEER_ROLES } from '../../utils/constants';
+import { ROLE_LABELS, hasAdminAccess, SPECIALIZATIONS_DATA, VOLUNTEER_ROLES, EVENT_VISIBILITY } from '../../utils/constants';
 
 const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onClick, showParticipants, onDelete, onEdit }) => {
   const isParticipating = event.participants?.includes(userProfile.id);
@@ -100,6 +100,16 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap h-fit`}>
                       {event.type}
                     </span>
+                    {event.visibility && event.visibility !== EVENT_VISIBILITY.ALL && (
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border whitespace-nowrap h-fit ${event.visibility === EVENT_VISIBILITY.BOARD_ONLY
+                        ? 'bg-purple-100 text-purple-700 border-purple-200'
+                        : event.visibility === EVENT_VISIBILITY.K9_ONLY
+                          ? 'bg-amber-100 text-amber-700 border-amber-200'
+                          : 'bg-slate-100 text-slate-700 border-slate-200'
+                        }`}>
+                        {event.visibility}
+                      </span>
+                    )}
                     <div className="flex gap-1">
                       {isAdmin && onEdit && (
                         <button

@@ -18,29 +18,33 @@ messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
   // Customize notification here
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/logo_chintana.png', // Main icon
-    badge: '/logo_chintana.png', // Small monochrome icon for status bar (Android)
-    image: payload.notification.image, // Support for large images
-    vibrate: [200, 100, 200, 100, 200], // Vibration pattern
-    tag: 'general-notification', // Group notifications by tag to avoid stacking
-    renotify: true, // Vibrate again even if replacing an old notification with same tag
-    requireInteraction: false, // Default: auto-dismiss
-    actions: [
-      {
-        action: 'open_app',
-        title: 'Apri App'
-      }
-    ],
-    // Read data from payload if available
-    data: {
-      url: payload.data?.url || '/'
-    }
-  };
+  // [ANTI-DUPLICATE FIX]
+  // Since the server sends a 'notification' payload, the browser/OS displays it automatically.
+  // We MUST NOT call showNotification manually here, otherwise the user receives two notifications.
+  // To customize the notification (icon, actions), the server should send those details in the payload.
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  // const notificationTitle = payload.notification.title;
+  // const notificationOptions = {
+  //   body: payload.notification.body,
+  //   icon: '/logo_chintana.png',
+  //   badge: '/logo_chintana.png',
+  //   image: payload.notification.image,
+  //   vibrate: [200, 100, 200, 100, 200],
+  //   tag: 'general-notification',
+  //   renotify: true,
+  //   requireInteraction: false,
+  //   actions: [
+  //     {
+  //       action: 'open_app',
+  //       title: 'Apri App'
+  //     }
+  //   ],
+  //   data: {
+  //     url: payload.data?.url || '/'
+  //   }
+  // };
+
+  // self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 self.addEventListener('notificationclick', function (event) {
