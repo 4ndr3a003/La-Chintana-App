@@ -68,10 +68,23 @@ app.post('/api/send-notification', async (req, res) => {
     // 2. Send Multicast Message
     // Firebase allows up to 500 tokens per batch. If more, we need to split.
     // For this demo, assuming < 500.
+
+    // [CUSTOMIZATION] Add Icon/Badge
+    const BASE_URL = 'https://chintana-events-handler.firebaseapp.com';
+    const DEFAULT_ICON = `${BASE_URL}/logo_chintana.png`;
+    const DEFAULT_BADGE = `${BASE_URL}/logo_chintana.png`;
+
     const message = {
       notification: {
         title: title,
         body: body,
+        icon: DEFAULT_ICON,
+      },
+      webpush: {
+        notification: {
+          icon: DEFAULT_ICON,
+          badge: DEFAULT_BADGE,
+        }
       },
       tokens: uniqueTokens,
     };

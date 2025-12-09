@@ -47,10 +47,30 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
     // 2. Send Multicast Message
     // Note: sendEachForMulticast handles up to 500 tokens. 
     // If you expect more, you should chunk the array.
+
+    // [CUSTOMIZATION] Add Icon/Badge
+    // Since we disabled the Service Worker manual notification to avoid duplicates,
+    // we must provide visual details here in the server payload.
+    const BASE_URL = 'https://chintana-events-handler.firebaseapp.com';
+    const DEFAULT_ICON = `${BASE_URL}/logo_chintana.png`;
+    // For badge, we use the same icon or a monochrome version if available. 
+    // Browsers/Android might mask it to white.
+    const DEFAULT_BADGE = `${BASE_URL}/logo_chintana.png`;
+
     const message = {
       notification: {
         title: title,
         body: body,
+        // Standard Web Push properties
+        icon: options.icon || DEFAULT_ICON,
+        // image: options.image || undefined, // Optional big picture
+      },
+      webpush: {
+        notification: {
+          icon: options.icon || DEFAULT_ICON,
+          badge: options.badge || DEFAULT_BADGE,
+          // actions here if needed, but they might duplicate if SW also adds them (we commented SW out so it stands)
+        }
       },
       data: data, // Add data payload here
       tokens: uniqueTokens,
@@ -60,6 +80,7 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
       message.android = {
         notification: {
           color: "#FF0000", // Rosso per le notifiche urgenti
+          icon: "ic_stat_notification", // Native Android resource name if available
         },
       };
       // Per iOS, si potrebbero aggiungere personalizzazioni come suoni specifici
