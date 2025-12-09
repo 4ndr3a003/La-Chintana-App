@@ -49,13 +49,10 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
     // If you expect more, you should chunk the array.
 
     // [CUSTOMIZATION] Add Icon/Badge
-    // Since we disabled the Service Worker manual notification to avoid duplicates,
-    // we must provide visual details here in the server payload.
     const BASE_URL = 'https://chintana-events-handler.firebaseapp.com';
     const DEFAULT_ICON = `${BASE_URL}/logo_chintana.png`;
-    // For badge, we use the same icon or a monochrome version if available. 
-    // Browsers/Android might mask it to white.
-    const DEFAULT_BADGE = `${BASE_URL}/logo_chintana.png`;
+    // For web badge, we use the white transparent icon we just copied to public
+    const DEFAULT_BADGE = `${BASE_URL}/ic_stat_icon.png`;
 
     const message = {
       notification: {
@@ -63,13 +60,22 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
         body: body,
         // Standard Web Push properties
         icon: options.icon || DEFAULT_ICON,
-        // image: options.image || undefined, // Optional big picture
       },
       webpush: {
         notification: {
+          title: title, // Explicitly repeat title
+          body: body,   // Explicitly repeat body
           icon: options.icon || DEFAULT_ICON,
           badge: options.badge || DEFAULT_BADGE,
-          // actions here if needed, but they might duplicate if SW also adds them (we commented SW out so it stands)
+        },
+        fcm_options: {
+          link: BASE_URL // Optional: helps with clicking
+        }
+      },
+      android: {
+        notification: {
+          icon: 'ic_stat_icon', // Native Android Resource ID (must be in res/drawable)
+          color: '#254E2A' // Official Green Color? Or use the yellow/white if preferred? keeping default for now or user specific.
         }
       },
       data: data, // Add data payload here
