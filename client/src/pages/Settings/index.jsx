@@ -52,16 +52,23 @@ const Settings = ({ enableNotifications, disableNotifications, isNotificationsEn
               try {
                 // Try multiple import styles to handle different build environments
                 const module = await import('@capacitor/live-updates');
-                const LiveUpdates = module.LiveUpdates || module.default;
 
-                if (!LiveUpdates) {
-                  alert('ERRORE: Plugin LiveUpdates non trovato nel modulo. Keys: ' + Object.keys(module).join(', '));
-                  return;
+                // Check if the module itself exports the methods directly (which seems to be the case based on user logs)
+                let Plugin = module.LiveUpdates || module.default || module;
+
+                if (!Plugin || typeof Plugin.sync !== 'function') {
+                  // Fallback: check if 'module' itself has sync (which user screenshot confirms)
+                  if (typeof module.sync === 'function') {
+                    Plugin = module;
+                  } else {
+                    alert('ERRORE: Plugin non riconosciuto. Keys: ' + Object.keys(module).join(', '));
+                    return;
+                  }
                 }
 
-                alert('Plugin trovato, avvio sync...');
+                alert('Plugin caricato correttamente! Avvio sync...');
                 try {
-                  const result = await LiveUpdates.sync();
+                  const result = await Plugin.sync();
                   alert('RISULTATO SYNC: ' + JSON.stringify(result));
                 } catch (syncError) {
                   alert('ERRORE SYNC: ' + (syncError.message || JSON.stringify(syncError)));
