@@ -58,24 +58,23 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
       notification: {
         title: title,
         body: body,
-        // Standard Web Push properties
-        icon: options.icon || DEFAULT_ICON,
+        // REMOVED top-level icon to avoid confusing Android Native client
       },
       webpush: {
         notification: {
-          title: title, // Explicitly repeat title
-          body: body,   // Explicitly repeat body
-          icon: options.icon || DEFAULT_ICON,
-          badge: options.badge || DEFAULT_BADGE,
+          title: title,
+          body: body,
+          icon: DEFAULT_ICON, // URL for Web
+          badge: DEFAULT_BADGE, // URL for Web
         },
         fcm_options: {
-          link: BASE_URL // Optional: helps with clicking
+          link: BASE_URL
         }
       },
       android: {
         notification: {
-          icon: 'ic_stat_icon', // Native Android Resource ID (must be in res/drawable)
-          color: '#254E2A' // Official Green Color? Or use the yellow/white if preferred? keeping default for now or user specific.
+          icon: 'ic_stat_icon', // Resource Name for Android Native
+          color: '#254E2A'
         }
       },
       data: data, // Add data payload here
