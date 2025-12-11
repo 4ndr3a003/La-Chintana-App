@@ -82,45 +82,43 @@ src/
 
 L'applicazione gestisce dati sensibili dei volontari. L'accesso è protetto tramite autenticazione Firebase e le regole di sicurezza del database garantiscono che solo gli utenti autorizzati possano accedere alle informazioni riservate.
 
-## 📱 Build Android (APK)
+## 🌍 Deployment & Aggiornamenti
+Questo progetto vive su due piattaforme simultaneamente. Usa il metodo corretto per aggiornare la versione desiderata.
 
-Per generare l'applicazione Android installabile (.apk):
+### 1. Versione Web (PC, iOS, Browser)
+Per aggiornare il sito web (PWA) che usi da computer o iPhone.
 
-1.  **Genera la build web e sincronizza con Android**
-    Esegui questi comandi nella cartella `client`:
+1.  **Build & Deploy**:
     ```bash
-    npm run build
-    npx cap sync
+    npm run build --prefix client
+    firebase deploy
     ```
+2.  **Verifica**: Visita l'URL del sito. Potrebbe servire un refresh forzato o svuotare la cache.
 
-2.  **Apri Android Studio**
-    ```bash
-    npx cap open android
-    ```
-    Oppure apri manualmente la cartella `client/android` con Android Studio.
+*Nota: I plugin nativi (come LiveUpdates) sono disabilitati automaticamente sul web.*
 
-3.  **Genera l'APK**
-    - In Android Studio, vai su **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-    - Al termine, clicca su "locate" nella notifica per trovare il file `.apk` (solitamente in `client/android/app/build/outputs/apk/debug/app-debug.apk`).
+---
 
-## 🔄 Live Updates (Appflow)
+### 2. Versione Nativa (App Android)
+Per aggiornare l'applicazione `.apk` installata sui telefoni Android.
 
-L'app è configurata per ricevere aggiornamenti "over-the-air" senza dover rilasciare una nuova versione sugli store.
+**A. Prima Installazione (o modifiche Native)**
+Se hai modificato plugin, icone o configurazioni native:
+1.  Sincronizza: `npx cap sync`
+2.  Apri Android Studio: `npx cap open android`
+3.  Genera APK e installa col cavo USB / invia file.
 
-### Rilasciare un aggiornamento
-Per aggiornare il codice web (JS/CSS/HTML) sui dispositivi che hanno già l'app installata:
-
-1.  **Build Web**:
-    ```bash
-    npm run build
-    ```
-2.  **Deploy su Appflow**:
+**B. Aggiornamento Rapido (Live Updates)**
+Se hai modificato solo codice React (pagine, logica JS, CSS):
+1.  Assicurati che `capacitor.config.json` abbia `"autoUpdateMethod": "background"`.
+2.  Fai una **Web Build** su Ionic Appflow (dashboard online) o da riga di comando:
     ```bash
     ionic deploy build --app-id="ff632d26" --channel-name="Production"
     ```
-    *Nota: Richiede login a Ionic Appflow.*
+3.  L'app scaricherà l'aggiornamento in background mentre la usi. Al **prossimo riavvio** (chiudi e riapri), vedrai le novità.
 
-Gli utenti riceveranno l'aggiornamento automaticamente al successivo riavvio dell'app.
+**Debug Live Updates**:
+Nelle Impostazioni dell'app (solo Android) c'è un'area "Debug" visibile solo su nativo per forzare il controllo aggiornamenti.
 
 ## Credenziali di Test
 
@@ -131,4 +129,3 @@ Gli utenti riceveranno l'aggiornamento automaticamente al successivo riavvio del
 **Volontario**
 - email: andrea8102003@gmail.com
 - password: 1234
-

@@ -42,46 +42,45 @@ const Settings = ({ enableNotifications, disableNotifications, isNotificationsEn
           </div>
         </div>
 
-        {/* Debug Section */}
-        <div className="bg-red-50 rounded-3xl shadow-sm p-4 md:p-8 border border-red-100">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-red-900">Area Debug</h3>
-          </div>
-          <button
-            onClick={async () => {
-              try {
-                // Try multiple import styles to handle different build environments
-                const module = await import('@capacitor/live-updates');
-
-                // Check if the module itself exports the methods directly (which seems to be the case based on user logs)
-                let Plugin = module.LiveUpdates || module.default || module;
-
-                if (!Plugin || typeof Plugin.sync !== 'function') {
-                  // Fallback: check if 'module' itself has sync (which user screenshot confirms)
-                  if (typeof module.sync === 'function') {
-                    Plugin = module;
-                  } else {
-                    alert('ERRORE: Plugin non riconosciuto. Keys: ' + Object.keys(module).join(', '));
-                    return;
-                  }
-                }
-
-                alert('Plugin caricato correttamente! Avvio sync...');
+        {/* Debug Section - Only visible on Native App */}
+        {window.Capacitor?.isNativePlatform() && (
+          <div className="bg-red-50 rounded-3xl shadow-sm p-4 md:p-8 border border-red-100">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-red-900">Area Debug (Native)</h3>
+            </div>
+            <button
+              onClick={async () => {
                 try {
-                  const result = await Plugin.sync();
-                  alert('RISULTATO SYNC: ' + JSON.stringify(result));
-                } catch (syncError) {
-                  alert('ERRORE SYNC: ' + (syncError.message || JSON.stringify(syncError)));
+                  const module = await import('@capacitor/live-updates');
+                  // Check direct exports or default or named 'LiveUpdates'
+                  let Plugin = module.LiveUpdates || module.default || module;
+
+                  if (!Plugin || typeof Plugin.sync !== 'function') {
+                    if (typeof module.sync === 'function') {
+                      Plugin = module;
+                    } else {
+                      alert('ERRORE: Plugin non riconosciuto. Keys: ' + Object.keys(module).join(', '));
+                      return;
+                    }
+                  }
+
+                  alert('Avvio sync...');
+                  try {
+                    const result = await Plugin.sync();
+                    alert('RISULTATO SYNC: ' + JSON.stringify(result));
+                  } catch (syncError) {
+                    alert('ERRORE SYNC: ' + (syncError.message || JSON.stringify(syncError)));
+                  }
+                } catch (e) {
+                  alert('ERRORE IMPORT: ' + (e.message || JSON.stringify(e)));
                 }
-              } catch (e) {
-                alert('ERRORE IMPORT CRITICO: ' + (e.message || JSON.stringify(e)));
-              }
-            }}
-            className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
-          >
-            Controlla Aggiornamenti Live (Fix)
-          </button>
-        </div>
+              }}
+              className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+            >
+              Controllo Aggiornamenti Live
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
