@@ -50,21 +50,29 @@ const Settings = ({ enableNotifications, disableNotifications, isNotificationsEn
           <button
             onClick={async () => {
               try {
-                // Dynamic import to avoid issues if plugin is missing/mocked
-                const { LiveUpdates } = await import('@capacitor/live-updates');
-                alert('Avvio sync...');
-                const result = await LiveUpdates.sync();
-                alert('Risultato: ' + JSON.stringify(result));
-                if (result.activeApplicationId) {
-                  alert('Update scaricato! Riavvia l\'app.');
+                // Try multiple import styles to handle different build environments
+                const module = await import('@capacitor/live-updates');
+                const LiveUpdates = module.LiveUpdates || module.default;
+
+                if (!LiveUpdates) {
+                  alert('ERRORE: Plugin LiveUpdates non trovato nel modulo. Keys: ' + Object.keys(module).join(', '));
+                  return;
+                }
+
+                alert('Plugin trovato, avvio sync...');
+                try {
+                  const result = await LiveUpdates.sync();
+                  alert('RISULTATO SYNC: ' + JSON.stringify(result));
+                } catch (syncError) {
+                  alert('ERRORE SYNC: ' + (syncError.message || JSON.stringify(syncError)));
                 }
               } catch (e) {
-                alert('Errore: ' + (e.message || JSON.stringify(e)));
+                alert('ERRORE IMPORT CRITICO: ' + (e.message || JSON.stringify(e)));
               }
             }}
             className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
           >
-            Controlla Aggiornamenti Live
+            Controlla Aggiornamenti Live (Fix)
           </button>
         </div>
       </div>
