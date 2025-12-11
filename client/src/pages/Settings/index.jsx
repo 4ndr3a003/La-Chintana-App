@@ -41,6 +41,32 @@ const Settings = ({ enableNotifications, disableNotifications, isNotificationsEn
             </button>
           </div>
         </div>
+
+        {/* Debug Section */}
+        <div className="bg-red-50 rounded-3xl shadow-sm p-4 md:p-8 border border-red-100">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-red-900">Area Debug</h3>
+          </div>
+          <button
+            onClick={async () => {
+              try {
+                // Dynamic import to avoid issues if plugin is missing/mocked
+                const { LiveUpdates } = await import('@capacitor/live-updates');
+                alert('Avvio sync...');
+                const result = await LiveUpdates.sync();
+                alert('Risultato: ' + JSON.stringify(result));
+                if (result.activeApplicationId) {
+                  alert('Update scaricato! Riavvia l\'app.');
+                }
+              } catch (e) {
+                alert('Errore: ' + (e.message || JSON.stringify(e)));
+              }
+            }}
+            className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+          >
+            Controlla Aggiornamenti Live
+          </button>
+        </div>
       </div>
     </div>
   );
