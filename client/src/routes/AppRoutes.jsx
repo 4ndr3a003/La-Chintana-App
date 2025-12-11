@@ -10,9 +10,10 @@ import CommunicationsView from '../pages/CommunicationsView';
 import UserProfileView from '../pages/UserProfileView';
 import AdminDashboard from '../pages/AdminDashboard';
 import DirettivoDashboard from '../pages/DirettivoDashboard';
+import Settings from '../pages/Settings';
 import { hasAdminAccess } from '../utils/constants';
 
-const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
+const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled }) => {
     return (
         <Routes>
             <Route path="/login" element={
@@ -44,6 +45,17 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout }) => {
             <Route path="/profile" element={
                 <ProtectedRoute userProfile={userProfile}>
                     <UserProfileView userProfile={userProfile} onLogout={onLogout} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/settings" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    <Settings
+                        userProfile={userProfile}
+                        enableNotifications={enableNotifications}
+                        disableNotifications={disableNotifications}
+                        isNotificationsEnabled={isNotificationsEnabled}
+                    />
                 </ProtectedRoute>
             } />
 

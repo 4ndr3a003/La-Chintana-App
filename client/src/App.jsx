@@ -3,8 +3,8 @@ import { IonApp, IonButton, IonIcon } from '@ionic/react';
 import { notificationsOutline } from 'ionicons/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
-import { getToken, onMessage } from 'firebase/messaging';
+import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { getToken, onMessage, deleteToken } from 'firebase/messaging';
 import { auth, db, appId, messaging } from './services/firebase';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
@@ -318,6 +318,28 @@ export default function App() {
     }
   };
 
+  const disableWebNotifications = async () => {
+    try {
+      if (fcmToken) {
+        // 1. Remove from Firestore
+        if (userProfile && userProfile.id) {
+          const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+          await updateDoc(profileRef, {
+            fcmTokens: arrayRemove(fcmToken)
+          });
+        }
+
+        // 2. Delete from Messaging
+        await deleteToken(messaging);
+        setFcmToken(null);
+        showToast('Notifiche disattivate.', 'Successo', 'success');
+      }
+    } catch (error) {
+      console.error("Error disabling notifications:", error);
+      showToast('Errore disattivazione notifiche', 'Errore', 'error');
+    }
+  };
+
   const handleLogout = async () => {
     localStorage.removeItem('pc_profile_id');
     setActiveProfileId(null);
@@ -357,6 +379,9 @@ export default function App() {
               userProfile={userProfile}
               onLoginSuccess={handleLoginSuccess}
               onLogout={handleLogout}
+              enableNotifications={enableWebNotifications}
+              disableNotifications={disableWebNotifications}
+              isNotificationsEnabled={!!fcmToken}
             />
             {/* Spacer for bottom nav on mobile */}
             {userProfile && location.pathname !== '/login' && (

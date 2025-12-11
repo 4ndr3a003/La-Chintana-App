@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
+import ProfileMenu from './ProfileMenu';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
 
 const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref) => (
@@ -46,6 +47,9 @@ const Header = ({ userProfile }) => {
   const navContainerRef = useRef(null);
   const navRefs = useRef({});
   const notifButtonRef = useRef(null);
+
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileButtonRef = useRef(null);
 
   const navItems = useMemo(() => {
     const items = [
@@ -90,14 +94,15 @@ const Header = ({ userProfile }) => {
   }, [location.pathname, navItems]);
 
   return (
-    <IonHeader className="ion-no-border pt-0 px-0 pb-0 md:pt-4 md:px-4 md:pb-2" style={{ '--background': 'transparent' }}>
+    <IonHeader className="ion-no-border pt-0 px-0 pb-0 md:pt-4 md:px-4 md:pb-2 !overflow-visible" style={{ '--background': 'transparent' }}>
       <IonToolbar
-        className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10"
+        className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10 !overflow-visible"
         style={{
           '--background': 'var(--color-pc-blue-700)',
           '--min-height': '80px',
           '--padding-start': '16px',
-          '--padding-end': '16px'
+          '--padding-end': '16px',
+          overflow: 'visible'
         }}
       >
         <div className="flex justify-between items-center w-full px-0 lg:px-4">
@@ -174,28 +179,37 @@ const Header = ({ userProfile }) => {
               />
 
               <div className="h-8 w-px bg-blue-500/50 hidden lg:block"></div>
-              <IonButton
-                onClick={() => navigate('/profile')}
-                shape="round"
-                fill="clear"
-                className={`group transition-all duration-300 ease-in-out ${isActive('/profile') ? 'scale-105 profile-button-active' : 'hover:scale-105 profile-button'}`}
-                style={{
-                  height: 'auto',
-                  '--padding-start': '12px',
-                  '--padding-end': '12px',
-                  '--border-radius': '20px',
-                  '--background': isActive('/profile') && window.innerWidth >= 1024 ? 'var(--color-pc-yellow)' : 'transparent',
-                  '--background-hover': isActive('/profile') && window.innerWidth >= 1024 ? 'var(--color-pc-yellow-400)' : 'rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                <div className="flex items-center gap-3 py-1.5 px-1">
-                  <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-2px] transition-transform duration-300">
-                    <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') ? 'text-blue-900' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
-                    <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') ? 'text-blue-800' : 'text-blue-200'}`}>{ROLE_LABELS[userProfile.role]}</div>
+              <div className="relative">
+                <IonButton
+                  ref={profileButtonRef}
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  shape="round"
+                  fill="clear"
+                  className={`group transition-all duration-300 ease-in-out ${isActive('/profile') ? 'scale-105 profile-button-active' : 'hover:scale-105 profile-button'}`}
+                  style={{
+                    height: 'auto',
+                    '--padding-start': '12px',
+                    '--padding-end': '12px',
+                    '--border-radius': '20px',
+                    '--background': isActive('/profile') || isProfileMenuOpen ? 'var(--color-pc-yellow)' : 'transparent',
+                    '--background-hover': isActive('/profile') || isProfileMenuOpen ? 'var(--color-pc-yellow-400)' : 'rgba(255, 255, 255, 0.1)'
+                  }}
+                >
+                  <div className="flex items-center gap-3 py-1.5 px-1">
+                    <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-2px] transition-transform duration-300">
+                      <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-900' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
+                      <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-800' : 'text-blue-200'}`}>{ROLE_LABELS[userProfile.role]}</div>
+                    </div>
+                    <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
                   </div>
-                  <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
-                </div>
-              </IonButton>
+                </IonButton>
+
+                <ProfileMenu
+                  isOpen={isProfileMenuOpen}
+                  onClose={() => setIsProfileMenuOpen(false)}
+                  anchorRef={profileButtonRef}
+                />
+              </div>
             </div>
           </IonButtons>
         </div>
