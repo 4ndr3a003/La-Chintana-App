@@ -13,6 +13,7 @@
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
     "@capacitor/core": "^7.4.4",
+    "@capacitor/live-updates": "^0.4.0",
     "@capacitor/push-notifications": "^7.0.3",
     "@ionic/react": "^8.7.10",
     "firebase": "^12.6.0",
