@@ -219,7 +219,7 @@ const CommunicationsView = ({ userProfile }) => {
             {canManageContent(userProfile) && (
               <button
                 onClick={openCreateModal}
-                className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
+                className="hidden lg:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto"
               >
                 <MessageSquarePlus size={18} />
                 Nuova
@@ -324,7 +324,7 @@ const CommunicationsView = ({ userProfile }) => {
       {canManageContent(userProfile) && (
         <button
           onClick={openCreateModal}
-          className="fab-btn lg:hidden"
+          className="fixed right-6 bottom-24 lg:hidden w-14 h-14 bg-blue-600 dark:bg-[#facc15] text-white dark:!text-[#0f172a] rounded-full shadow-lg flex items-center justify-center z-40 transition-transform active:scale-95"
         >
           <MessageSquarePlus size={28} />
         </button>

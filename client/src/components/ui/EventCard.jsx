@@ -43,11 +43,11 @@ const EventCard = ({ event }) => {
                 };
             default:
                 return {
-                    cardBg: 'bg-amber-50',
-                    dateBg: 'bg-amber-100',
-                    borderColor: 'border-amber-200',
-                    dateText: 'text-amber-700',
-                    badge: 'bg-white text-amber-700 border-amber-200',
+                    cardBg: 'bg-yellow-50',
+                    dateBg: 'bg-yellow-100',
+                    borderColor: 'border-yellow-200',
+                    dateText: 'text-yellow-700',
+                    badge: 'bg-white text-yellow-700 border-yellow-200',
                 };
         }
     };

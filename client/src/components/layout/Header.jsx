@@ -19,17 +19,17 @@ const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref
       '--background': 'transparent',
       '--background-hover': 'transparent',
       '--color': active ? 'var(--color-pc-blue-900)' : 'var(--color-slate-50)',
-      '--border-radius': '20px',
-      '--padding-start': '16px',
-      '--padding-end': '16px',
+      '--border-radius': '1.25rem',
+      '--padding-start': '1rem',
+      '--padding-end': '1rem',
       '--box-shadow': 'none',
-      height: '40px',
-      margin: '0 2px'
+      height: '2.5rem',
+      margin: '0 0.125rem'
     }}
   >
     <span className="flex items-center gap-2.5 normal-case">
-      {React.cloneElement(icon, { size: 18, strokeWidth: active ? 2.5 : 2, className: `transition-colors duration-300 ${active ? 'text-blue-900' : 'text-blue-200'}` })}
-      <span className={`transition-colors duration-300 ${active ? 'text-blue-900' : 'text-blue-50'}`}>{children}</span>
+      {React.cloneElement(icon, { size: 18, strokeWidth: active ? 2.5 : 2, className: `transition-colors duration-300 ${active ? 'text-blue-900 dark:text-slate-50' : 'text-blue-200 dark:text-slate-500'}` })}
+      <span className={`transition-colors duration-300 ${active ? 'text-blue-900 dark:text-slate-50' : 'text-blue-50 dark:text-slate-800'}`}>{children}</span>
     </span>
   </IonButton>
 ));
@@ -98,10 +98,10 @@ const Header = ({ userProfile }) => {
       <IonToolbar
         className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10 !overflow-visible"
         style={{
-          '--background': 'var(--color-pc-blue-700)',
-          '--min-height': '80px',
-          '--padding-start': '16px',
-          '--padding-end': '16px',
+          '--background': 'var(--bg-header)',
+          '--min-height': '5rem',
+          '--padding-start': '1rem',
+          '--padding-end': '1rem',
           overflow: 'visible'
         }}
       >
@@ -111,9 +111,9 @@ const Header = ({ userProfile }) => {
             <IonButton onClick={() => navigate('/')} fill="clear" className="h-auto hover:opacity-80 transition-opacity">
               <div className="flex items-center gap-2 md:gap-3.5">
                 <img src={logo} alt="Logo" className="h-12 w-auto drop-shadow-sm" />
-                <div className="leading-none text-left block whitespace-nowrap">
-                  <h1 className="text-lg font-black tracking-tighter text-white">LA CHINTANA</h1>
-                  <p className="text-[10px] text-yellow-400 font-bold uppercase tracking-widest">Protezione Civile</p>
+                <div className="leading-none text-left block">
+                  <h1 className="text-base sm:text-lg font-black tracking-tighter text-white">LA CHINTANA</h1>
+                  <p className="text-[0.5625rem] sm:text-[0.625rem] text-yellow-400 font-bold uppercase tracking-widest leading-tight">Protezione Civile</p>
                 </div>
               </div>
             </IonButton>
@@ -127,13 +127,13 @@ const Header = ({ userProfile }) => {
             >
               {/* The Pill */}
               <div
-                className="absolute bg-yellow-500 rounded-[20px] shadow-sm transition-all duration-300 ease-in-out"
+                className="absolute bg-yellow-500 rounded-[1.25rem] shadow-sm transition-all duration-300 ease-in-out"
                 style={{
                   left: pillStyle.left,
                   width: pillStyle.width,
-                  height: '40px',
+                  height: '2.5rem',
                   opacity: pillStyle.opacity,
-                  top: '6px'
+                  top: '0.375rem'
                 }}
               />
 
@@ -163,9 +163,9 @@ const Header = ({ userProfile }) => {
                 fill="clear"
                 className="hover:scale-110 transition-transform"
                 style={{
-                  '--padding-start': '8px',
-                  '--padding-end': '8px',
-                  '--color': isNotifPanelOpen ? 'var(--color-pc-yellow)' : 'var(--color-slate-50)'
+                  '--padding-start': '0.5rem',
+                  '--padding-end': '0.5rem',
+                  '--color': isNotifPanelOpen ? 'var(--color-pc-yellow)' : '#ffffff'
                 }}
               >
                 <Bell size={20} strokeWidth={isNotifPanelOpen ? 2.5 : 2} />
@@ -188,17 +188,17 @@ const Header = ({ userProfile }) => {
                   className={`group transition-all duration-300 ease-in-out ${isActive('/profile') ? 'scale-105 profile-button-active' : 'hover:scale-105 profile-button'}`}
                   style={{
                     height: 'auto',
-                    '--padding-start': '12px',
-                    '--padding-end': '12px',
-                    '--border-radius': '20px',
+                    '--padding-start': '0.75rem',
+                    '--padding-end': '0.75rem',
+                    '--border-radius': '1.25rem',
                     '--background': isActive('/profile') || isProfileMenuOpen ? 'var(--color-pc-yellow)' : 'transparent',
                     '--background-hover': isActive('/profile') || isProfileMenuOpen ? 'var(--color-pc-yellow-400)' : 'rgba(255, 255, 255, 0.1)'
                   }}
                 >
                   <div className="flex items-center gap-3 py-1.5 px-1">
-                    <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-2px] transition-transform duration-300">
-                      <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-900' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
-                      <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-800' : 'text-blue-200'}`}>{ROLE_LABELS[userProfile.role]}</div>
+                    <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-0.125rem] transition-transform duration-300">
+                      <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-900 dark:text-slate-50' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
+                      <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-800 dark:text-slate-50' : 'text-blue-200 dark:text-slate-400'}`}>{ROLE_LABELS[userProfile.role]}</div>
                     </div>
                     <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
                   </div>

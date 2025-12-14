@@ -151,5 +151,32 @@ body {
     --background: var(--color-pc-yellow);
     /* Desktop: Official Yellow */
     --background-hover: var(--color-pc-yellow-400);
+    --color: var(--color-slate-50) !important;
+    /* Dark text for contrast */
   }
+
+  .nav-button-active {
+    --background: var(--color-pc-yellow) !important;
+    --color: var(--color-slate-50) !important;
+    /* Dark text for contrast */
+  }
+}
+
+/* Global Dark Mode Overrides for Tailwind Classes */
+.bg-white {
+  background-color: var(--color-white) !important;
+}
+
+.bg-black {
+  background-color: var(--color-black) !important;
+}
+
+/* Invert black text to white in dark mode */
+.text-black {
+  color: var(--color-black) !important;
+}
+
+/* Force white text to ALWAYS be white */
+.text-white {
+  color: #ffffff !important;
 }

@@ -350,3 +350,33 @@
         max-height: calc(100vh - 12rem);
     }
 }
+
+/* DARK MODE OVERRIDES */
+html.dark .modal-container {
+    background-color: var(--color-slate-50);
+}
+
+html.dark .modal-title,
+html.dark .modal-close-btn {
+    color: var(--color-slate-50);
+    /* Dark Blue on Yellow */
+}
+
+/* Force dark inputs in dark mode */
+html.dark .form-input,
+html.dark .form-textarea,
+html.dark .form-select {
+    background-color: var(--color-slate-100) !important;
+    color: #ffffff;
+    border-color: var(--color-slate-200);
+}
+
+html.dark ::placeholder {
+    color: var(--color-slate-400);
+}
+
+/* Fix Button Contrast in Dark Mode if needed */
+html.dark .form-submit-btn {
+    color: var(--color-slate-50);
+    /* Dark Blue Text on Light Blue Button */
+}

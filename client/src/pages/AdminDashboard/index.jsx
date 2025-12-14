@@ -158,12 +158,13 @@ const AdminDashboard = ({ userProfile }) => {
               />
             </div>
             {canManageVolunteers(userProfile) && (
-              <Button
+              <button
                 onClick={openCreate}
+                className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 <UserRoundPlus size={18} />
                 Nuovo Volontario
-              </Button>
+              </button>
             )}
           </div>
         </div>
@@ -202,11 +203,11 @@ const AdminDashboard = ({ userProfile }) => {
                     disabled={!canManageVolunteers(userProfile)}
                   />
                 </th>
-                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Volontario</th>
-                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Codice Emercomnet</th>
-                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Ruolo</th>
-                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider">Stato</th>
-                <th className="p-4 text-xs font-bold text-slate-800 uppercase tracking-wider text-right">Azioni</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Volontario</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Codice Emercomnet</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Ruolo</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Stato</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider text-right">Azioni</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -388,7 +389,7 @@ const AdminDashboard = ({ userProfile }) => {
       {canManageVolunteers(userProfile) && (
         <button
           onClick={openCreate}
-          className="fab-btn lg:hidden"
+          className="fixed right-6 bottom-24 md:hidden w-14 h-14 bg-blue-600 dark:bg-[#facc15] text-white dark:!text-[#0f172a] rounded-full shadow-lg flex items-center justify-center z-40 transition-transform active:scale-95"
         >
           <UserRoundPlus size={28} />
         </button>
@@ -419,27 +420,27 @@ const AdminDashboard = ({ userProfile }) => {
                 <div className="info-grid">
                   <div className="info-card">
                     <p className="info-label"><Mail size={14} /> Email</p>
-                    <p className="info-value break-all">{selectedUser.email}</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.email}>{selectedUser.email}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><Phone size={14} /> Telefono</p>
-                    <p className="info-value">{selectedUser.phone || '-'}</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.phone}>{selectedUser.phone || '-'}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><CreditCard size={14} /> Codice Fiscale</p>
-                    <p className="info-value uppercase">{selectedUser.cf || '-'}</p>
+                    <p className="info-value uppercase whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.cf}>{selectedUser.cf || '-'}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><Calendar size={14} /> Data di Nascita</p>
-                    <p className="info-value">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><Hash size={14} /> Codice Emercomnet</p>
-                    <p className="info-value">{selectedUser.emercomnetId || '-'}</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.emercomnetId}>{selectedUser.emercomnetId || '-'}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><Home size={14} /> Residenza</p>
-                    <p className="info-value">{selectedUser.city || '-'}</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.city}>{selectedUser.city || '-'}</p>
                   </div>
                 </div>
 
@@ -453,7 +454,7 @@ const AdminDashboard = ({ userProfile }) => {
                       if (userSpecs.length === 0) return null;
                       return (
                         <div key={category} className="spec-category-card">
-                          <h5 className={`spec-category-title ${data.color.split(' ')[1]}`}>
+                          <h5 className={`spec-category-title ${data.titleColor}`}>
                             {data.icon} {category}
                           </h5>
                           <div className="spec-tags-wrapper">
@@ -623,7 +624,7 @@ const AdminDashboard = ({ userProfile }) => {
                     <div className="space-y-4">
                       {Object.entries(SPECIALIZATIONS_DATA).map(([category, data]) => (
                         <div key={category} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                          <h5 className={`flex items-center gap-2 font-bold text-xs uppercase mb-3 ${data.color.split(' ')[1]}`}>
+                          <h5 className={`flex items-center gap-2 font-bold text-xs uppercase mb-3 ${data.titleColor}`}>
                             {data.icon} {category}
                           </h5>
                           <div className="flex flex-wrap gap-2">
@@ -634,7 +635,7 @@ const AdminDashboard = ({ userProfile }) => {
                                 onClick={() => toggleSpec(item)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${formData.specializations.includes(item)
                                   ? `${data.color} border-transparent shadow-sm`
-                                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:dark:border-slate-600'
                                   }`}
                               >
                                 {item}
@@ -645,15 +646,15 @@ const AdminDashboard = ({ userProfile }) => {
                       ))}
 
                       {/* Custom Specializations */}
-                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <h5 className="flex items-center gap-2 font-bold text-xs uppercase mb-3 text-slate-500">
+                      <div className="bg-slate-50 dark:bg-[var(--color-slate-100)] p-3 rounded-xl border border-slate-100 dark:border-slate-200">
+                        <h5 className="flex items-center gap-2 font-bold text-xs uppercase mb-3 text-slate-500 dark:text-slate-400">
                           <PlusCircle size={14} /> Altre Abilitazioni
                         </h5>
                         <div className="flex flex-wrap gap-2 mb-3">
                           {formData.specializations
                             .filter(s => !Object.values(SPECIALIZATIONS_DATA).flatMap(d => d.items).includes(s))
                             .map(s => (
-                              <div key={s} className="flex items-center gap-1 bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm">
+                              <div key={s} className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm">
                                 {s}
                                 <button
                                   type="button"
@@ -671,14 +672,14 @@ const AdminDashboard = ({ userProfile }) => {
                             value={customSpec}
                             onChange={e => setCustomSpec(e.target.value)}
                             placeholder="Nuova abilitazione..."
-                            className="flex-grow px-3 py-2 rounded-lg text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            className="flex-grow px-3 py-2 rounded-lg text-sm border border-slate-200 bg-white dark:bg-[var(--color-slate-50)] dark:text-white dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                             onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addCustomSpec())}
                           />
                           <button
                             type="button"
                             onClick={addCustomSpec}
                             disabled={!customSpec.trim()}
-                            className="bg-slate-800 text-white px-3 py-2 rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="bg-slate-800 dark:bg-[#bae0ff] text-white dark:text-[#1e293b] px-3 py-2 rounded-lg hover:bg-slate-700 dark:hover:bg-[#a0d2f0] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             <PlusCircle size={18} />
                           </button>

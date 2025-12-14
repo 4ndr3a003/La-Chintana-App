@@ -12,11 +12,13 @@ const MobileNav = ({ userProfile }) => {
   const showAdmin = userProfile && (userProfile.role === ROLES.PRESIDENT || userProfile.role === ROLES.BOARD);
 
   return (
-    <div className="px-6 pb-6 pt-2 bg-transparent pointer-events-none">
+    <div className="px-6 pb-3 pt-2 bg-transparent pointer-events-none">
       <IonTabBar
-        className="rounded-2xl shadow-xl border border-white/10 overflow-hidden h-16 md:max-w-md md:mx-auto pointer-events-auto backdrop-blur-xl"
+        className="rounded-2xl shadow-xl border border-white/10 h-auto min-h-[4rem] md:max-w-md md:mx-auto pointer-events-auto backdrop-blur-xl"
         style={{
-          '--background': 'var(--color-pc-blue-700)',
+          '--background': 'var(--bg-mobile-nav)',
+          paddingTop: '0.25rem',
+          paddingBottom: '0.25rem'
         }}
       >
         <IonTabButton
@@ -26,8 +28,8 @@ const MobileNav = ({ userProfile }) => {
           className="mobile-tab-btn"
           style={{ '--background': 'transparent' }}
         >
-          <MessageSquare size={24} className={isActive('/comms') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
-          <IonLabel className={isActive('/comms') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Avvisi</IonLabel>
+          <MessageSquare size={24} className={isActive('/comms') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+          <IonLabel className={isActive('/comms') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Avvisi</IonLabel>
         </IonTabButton>
 
         <IonTabButton
@@ -37,8 +39,8 @@ const MobileNav = ({ userProfile }) => {
           className="mobile-tab-btn"
           style={{ '--background': 'transparent' }}
         >
-          <House strokeWidth={1.5} size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
-          <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Home</IonLabel>
+          <House strokeWidth={1.5} size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+          <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Home</IonLabel>
         </IonTabButton>
 
         <IonTabButton
@@ -48,8 +50,8 @@ const MobileNav = ({ userProfile }) => {
           className="mobile-tab-btn"
           style={{ '--background': 'transparent' }}
         >
-          <Calendar size={24} className={isActive('/events') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
-          <IonLabel className={isActive('/events') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Eventi</IonLabel>
+          <Calendar size={24} className={isActive('/events') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+          <IonLabel className={isActive('/events') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Eventi</IonLabel>
         </IonTabButton>
 
         {showAdmin && (
@@ -60,8 +62,8 @@ const MobileNav = ({ userProfile }) => {
             className="mobile-tab-btn"
             style={{ '--background': 'transparent' }}
           >
-            <Users size={24} className={isActive('/admin') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 transition-all duration-200"} />
-            <IonLabel className={isActive('/admin') ? "text-yellow-400 font-bold text-[10px] mt-1 transition-all duration-200" : "text-blue-200 font-medium text-[10px] mt-1 transition-all duration-200"}>Volontari</IonLabel>
+            <Users size={24} className={isActive('/admin') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+            <IonLabel className={isActive('/admin') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Volontari</IonLabel>
           </IonTabButton>
         )}
       </IonTabBar>

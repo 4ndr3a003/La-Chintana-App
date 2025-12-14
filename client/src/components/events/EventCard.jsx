@@ -4,7 +4,7 @@ import Badge from '../ui/Badge';
 import Avatar from '../ui/Avatar';
 import { ROLE_LABELS, hasAdminAccess, SPECIALIZATIONS_DATA, VOLUNTEER_ROLES, EVENT_VISIBILITY } from '../../utils/constants';
 
-const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onClick, showParticipants, onDelete, onEdit }) => {
+const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onClick, showParticipants, onDelete, onEdit, isModal }) => {
   const isParticipating = event.participants?.includes(userProfile.id);
   const dateObj = new Date(event.date);
   const isPast = dateObj < new Date();
@@ -12,60 +12,63 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
 
   // Determine theme based on type
   const getTheme = (type) => {
+    const opacity = isModal ? '' : '/40';
+    const sidebarOpacity = isModal ? '' : '/20';
+
     switch (type) {
       case 'Emergenza':
         return {
-          cardBg: 'bg-red-100',
-          dateBg: 'bg-red-200',
-          borderColor: 'border-red-300',
-          dateText: 'text-red-800',
-          badge: 'bg-white text-red-800 border-red-300',
-          sidebarBg: 'bg-red-100/50'
+          cardBg: `bg-red-100 dark:bg-red-950${opacity}`,
+          dateBg: 'bg-red-200 dark:bg-red-900/60',
+          borderColor: 'border-red-300 dark:border-white/30',
+          dateText: 'text-red-800 dark:text-white',
+          badge: 'bg-white dark:bg-red-900/80 text-red-800 dark:text-white border-red-300 dark:border-white/20',
+          sidebarBg: `bg-red-100/50 dark:bg-red-950${sidebarOpacity}`
         };
       case 'Esercitazione':
         return {
-          cardBg: 'bg-blue-50',
-          dateBg: 'bg-blue-100',
-          borderColor: 'border-blue-200',
-          dateText: 'text-blue-700',
-          badge: 'bg-white text-blue-700 border-blue-200',
-          sidebarBg: 'bg-blue-50/50'
+          cardBg: `bg-blue-50 dark:bg-blue-950${opacity}`,
+          dateBg: 'bg-blue-100 dark:bg-blue-900/60',
+          borderColor: 'border-blue-200 dark:border-white/30',
+          dateText: 'text-blue-700 dark:text-white',
+          badge: 'bg-white dark:bg-blue-900/80 text-blue-700 dark:text-white border-blue-200 dark:border-white/20',
+          sidebarBg: `bg-blue-50/50 dark:bg-blue-950${sidebarOpacity}`
         };
       case 'Riunione':
         return {
-          cardBg: 'bg-slate-100',
-          dateBg: 'bg-slate-200',
-          borderColor: 'border-slate-300',
-          dateText: 'text-slate-800',
-          badge: 'bg-white text-slate-800 border-slate-300',
-          sidebarBg: 'bg-slate-100/50'
+          cardBg: `bg-slate-100 dark:bg-slate-950${opacity}`,
+          dateBg: 'bg-slate-200 dark:bg-slate-900/60',
+          borderColor: 'border-slate-300 dark:border-white/30',
+          dateText: 'text-slate-800 dark:text-white',
+          badge: 'bg-white dark:bg-slate-800/80 text-slate-800 dark:text-white border-slate-300 dark:border-white/20',
+          sidebarBg: `bg-slate-100/50 dark:bg-slate-950${sidebarOpacity}`
         };
       case 'Formazione':
         return {
-          cardBg: 'bg-emerald-50',
-          dateBg: 'bg-emerald-100',
-          borderColor: 'border-emerald-200',
-          dateText: 'text-emerald-700',
-          badge: 'bg-white text-emerald-700 border-emerald-200',
-          sidebarBg: 'bg-emerald-50/50'
+          cardBg: `bg-green-50 dark:bg-green-950${opacity}`,
+          dateBg: 'bg-green-100 dark:bg-green-900/60',
+          borderColor: 'border-green-200 dark:border-white/30',
+          dateText: 'text-green-700 dark:text-white',
+          badge: 'bg-white dark:bg-green-900/80 text-green-700 dark:text-white border-green-200 dark:border-white/20',
+          sidebarBg: `bg-green-50/50 dark:bg-green-950${sidebarOpacity}`
         };
       case 'Direttivo':
         return {
-          cardBg: 'bg-purple-50',
-          dateBg: 'bg-purple-100',
-          borderColor: 'border-purple-200',
-          dateText: 'text-purple-700',
-          badge: 'bg-white text-purple-700 border-purple-200',
-          sidebarBg: 'bg-purple-50/50'
+          cardBg: `bg-purple-50 dark:bg-purple-950${opacity}`,
+          dateBg: 'bg-purple-100 dark:bg-purple-900/60',
+          borderColor: 'border-purple-200 dark:border-white/30',
+          dateText: 'text-purple-700 dark:text-white',
+          badge: 'bg-white dark:bg-purple-900/80 text-purple-700 dark:text-white border-purple-200 dark:border-white/20',
+          sidebarBg: `bg-purple-50/50 dark:bg-purple-950${sidebarOpacity}`
         };
       default:
         return {
-          cardBg: 'bg-amber-50',
-          dateBg: 'bg-amber-100',
-          borderColor: 'border-amber-200',
-          dateText: 'text-amber-700',
-          badge: 'bg-white text-amber-700 border-amber-200',
-          sidebarBg: 'bg-amber-50/50'
+          cardBg: `bg-yellow-50 dark:bg-yellow-950${opacity}`,
+          dateBg: 'bg-yellow-100 dark:bg-yellow-900/60',
+          borderColor: 'border-yellow-200 dark:border-white/30',
+          dateText: 'text-yellow-700 dark:text-white',
+          badge: 'bg-white dark:bg-yellow-900/80 text-yellow-700 dark:text-white border-yellow-200 dark:border-white/20',
+          sidebarBg: `bg-yellow-50/50 dark:bg-yellow-950${sidebarOpacity}`
         };
     }
   };
@@ -83,7 +86,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
           {/* Main Content Area */}
           <div className="flex flex-1 min-w-0">
             {/* Left Date Strip */}
-            <div className={`w-20 md:w-24 flex flex-col items-center justify-center p-2 py-4 ${theme.dateText} shrink-0 border-r ${theme.borderColor} ${theme.dateBg}`}>
+            <div className={`min-w-[5rem] md:min-w-[6rem] flex flex-col items-center justify-center p-2 py-4 ${theme.dateText} shrink-0 border-r ${theme.borderColor} ${theme.dateBg}`}>
               <div className="flex flex-col items-center">
                 <span className="text-xs font-bold uppercase tracking-wider opacity-80">{dateObj.toLocaleDateString('it-IT', { weekday: 'short' })}</span>
                 <span className="text-2xl md:text-3xl font-black leading-none my-1">{dateObj.getDate()}</span>
@@ -94,18 +97,18 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
             {/* Right Content Wrapper */}
             <div className="flex flex-col flex-grow min-w-0">
               <div className="p-4 flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-2 gap-2">
-                  <h3 className="text-lg font-bold text-slate-800 leading-tight line-clamp-2 mt-6">{event.title}</h3>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap h-fit`}>
+                <div className="flex flex-wrap justify-between items-start mb-2 gap-x-2 gap-y-1">
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-white leading-tight line-clamp-2 mt-6 mr-1 min-w-[12.5rem]">{event.title}</h3>
+                  <div className="flex flex-col items-end gap-1 ml-auto shrink-0">
+                    <span className={`text-[0.625rem] sm:text-xs font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap h-fit`}>
                       {event.type}
                     </span>
                     {event.visibility && event.visibility !== EVENT_VISIBILITY.ALL && (
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border whitespace-nowrap h-fit ${event.visibility === EVENT_VISIBILITY.BOARD_ONLY
-                        ? 'bg-purple-100 text-purple-700 border-purple-200'
+                      <span className={`text-[0.625rem] sm:text-xs font-bold uppercase px-2 py-0.5 rounded-md border whitespace-nowrap h-fit ${event.visibility === EVENT_VISIBILITY.BOARD_ONLY
+                        ? 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/60 dark:text-white dark:border-purple-700/50'
                         : event.visibility === EVENT_VISIBILITY.K9_ONLY
-                          ? 'bg-amber-100 text-amber-700 border-amber-200'
-                          : 'bg-slate-100 text-slate-700 border-slate-200'
+                          ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/60 dark:text-white dark:border-amber-700/50'
+                          : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/60 dark:text-white dark:border-slate-700/50'
                         }`}>
                         {event.visibility}
                       </span>
@@ -165,10 +168,10 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                         return p ? <Avatar key={uid} src={p.photoUrl} name={p.name} size="xs" className="ring-2 ring-transparent bg-transparent" /> : null;
                       })}
                       {(event.participants?.length || 0) > 5 && (
-                        <div className="w-6 h-6 rounded-full bg-transparent ring-2 ring-transparent flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-100">+{event.participants.length - 5}</div>
+                        <div className="w-6 h-6 rounded-full bg-transparent ring-2 ring-transparent flex items-center justify-center text-xs font-bold text-slate-500 border border-slate-100">+{event.participants.length - 5}</div>
                       )}
                       {(!event.participants || event.participants.length === 0) && (
-                        <span className="text-[10px] text-slate-400 italic">Nessuno</span>
+                        <span className="text-xs text-slate-400 italic">Nessuno</span>
                       )}
                     </div>
                   </div>
@@ -189,7 +192,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                       <div key={shift.id} className="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-100">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium text-slate-700">{shift.startTime} - {shift.endTime}</span>
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-xs text-slate-500">
                             {currentParticipants} {maxParticipants ? `/ ${maxParticipants}` : ''} iscritti
                           </span>
                         </div>
@@ -250,7 +253,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                 {event.shifts && event.shifts.length > 0 ? (
                   event.shifts.map(shift => (
                     <div key={shift.id}>
-                      <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">
+                      <h5 className="text-xs font-bold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">
                         {shift.startTime} - {shift.endTime}
                       </h5>
                       {shift.participants?.map(uid => {
@@ -262,7 +265,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                             <Avatar src={p.photoUrl} name={p.name} size="xs" />
                             <div className="overflow-hidden min-w-0">
                               <p className="text-xs font-bold text-slate-700 truncate">{p.name}</p>
-                              <p className="text-[9px] font-bold uppercase text-slate-400 truncate">
+                              <p className="text-[0.5625rem] font-bold uppercase text-slate-400 truncate">
                                 {ROLE_LABELS[p.role]}
                                 {isCinofilo && <span className="ml-1 text-amber-600">• Cinofilo</span>}
                               </p>
@@ -271,7 +274,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                         );
                       })}
                       {(!shift.participants || shift.participants.length === 0) && (
-                        <p className="text-[10px] text-slate-400 italic">Nessun iscritto.</p>
+                        <p className="text-xs text-slate-400 italic">Nessun iscritto.</p>
                       )}
                     </div>
                   ))
@@ -286,7 +289,7 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                           <Avatar src={p.photoUrl} name={p.name} size="xs" />
                           <div className="overflow-hidden min-w-0">
                             <p className="text-xs font-bold text-slate-700 truncate">{p.name}</p>
-                            <p className="text-[9px] font-bold uppercase text-slate-400 truncate">
+                            <p className="text-[0.5625rem] font-bold uppercase text-slate-400 truncate">
                               {ROLE_LABELS[p.role]}
                               {isCinofilo && <span className="ml-1 text-amber-600">• Cinofilo</span>}
                             </p>

@@ -71,7 +71,7 @@ const AvailabilityWidget = ({ currentMonth, onMonthChange, events = [] }) => {
                             const colorClass = getEventColor(dayEvents[0].type);
                             cellClass = `${colorClass} font-bold`;
                         } else if (isToday) {
-                            cellClass = "bg-slate-900 text-white";
+                            cellClass = "bg-slate-900 text-slate-50";
                         }
 
                         return (

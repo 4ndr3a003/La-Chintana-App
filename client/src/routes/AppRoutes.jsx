@@ -13,7 +13,7 @@ import DirettivoDashboard from '../pages/DirettivoDashboard';
 import Settings from '../pages/Settings';
 import { hasAdminAccess } from '../utils/constants';
 
-const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled }) => {
+const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode }) => {
     return (
         <Routes>
             <Route path="/login" element={
@@ -55,6 +55,8 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications,
                         enableNotifications={enableNotifications}
                         disableNotifications={disableNotifications}
                         isNotificationsEnabled={isNotificationsEnabled}
+                        toggleDarkMode={toggleDarkMode}
+                        darkMode={darkMode}
                     />
                 </ProtectedRoute>
             } />

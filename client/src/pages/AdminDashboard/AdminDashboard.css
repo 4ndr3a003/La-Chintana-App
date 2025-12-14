@@ -235,11 +235,10 @@
 }
 
 .spec-category-card {
-    background-color: rgba(248, 250, 252, 0.5);
-    /* slate-50/50 */
+    background-color: var(--color-slate-50);
     border-radius: 0.75rem;
     padding: 0.75rem;
-    border: 1px solid var(--color-slate-100);
+    border: 1px solid var(--color-slate-200);
 }
 
 .spec-category-title {
@@ -424,7 +423,7 @@
 /* Stile per lo sfondo giallo del nome del volontario su mobile */
 @media (max-width: 767px) {
     .volunteer-card-mobile .flex.items-center.gap-3>div {
-        background-color: #fffacd;
+        background-color: var(--color-pc-yellow-200);
         /* Giallo chiaro */
         padding: 0.5rem;
         border-radius: 0.5rem;
@@ -434,7 +433,7 @@
 /* Stile per lo sfondo giallo dell'header della card del volontario su mobile */
 @media (max-width: 767px) {
     .volunteer-card-mobile>.flex.items-start.justify-between {
-        background-color: #ffecb3;
+        background-color: var(--color-pc-yellow-100);
         /* Giallo chiaro più scuro */
         padding: 1rem;
         margin: -1rem;
@@ -469,4 +468,39 @@
         max-height: 78vh;
         margin-bottom: 35px;
     }
+}
+
+/** DARK MODE OVERRIDES **/
+html.dark .modal-header h3,
+html.dark .modal-header .modal-close-btn {
+    color: var(--color-slate-50);
+}
+
+html.dark .volunteer-card-mobile>.flex.items-start.justify-between {
+    background-color: #facc15;
+}
+
+html.dark .volunteer-card-mobile .flex.items-center.gap-3>div h4,
+html.dark .volunteer-card-mobile .flex.items-center.gap-3>div p {
+    color: var(--color-slate-50);
+}
+
+html.dark .spec-category-card {
+    background-color: var(--color-slate-100);
+    border-color: var(--color-slate-200);
+}
+
+.tag-patenti {
+    background-color: var(--color-slate-200);
+    color: var(--color-slate-700);
+    border: 1px solid var(--color-slate-300);
+}
+
+html.dark .tag-patenti,
+html.dark .spec-tag.tag-patenti button.tag-patenti {
+    background-color: #1e293b !important;
+    /* slate-800 */
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    /* slate-700 */
 }

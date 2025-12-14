@@ -49,6 +49,29 @@ export default function App() {
     setToastInfo(prev => ({ ...prev, isOpen: false }));
   };
 
+  // Dark Mode Logic
+  const [darkMode, setDarkMode] = useState(() => {
+    if (localStorage.getItem('theme') === 'dark') {
+      return true;
+    }
+    // Default to light mode (false) if no preference is saved, ignoring system preference
+    return false;
+  });
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+  };
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
   // Auth Initialization
   useEffect(() => {
     const initAuth = async () => {
@@ -362,7 +385,7 @@ export default function App() {
 
   return (
     <IonApp>
-      <div className="flex flex-col h-full w-full bg-slate-50">
+      <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
         {/* HEADER */}
         {userProfile && location.pathname !== '/login' && (
           <div className="flex-none z-20">
@@ -382,6 +405,8 @@ export default function App() {
               enableNotifications={enableWebNotifications}
               disableNotifications={disableWebNotifications}
               isNotificationsEnabled={!!fcmToken}
+              toggleDarkMode={toggleDarkMode}
+              darkMode={darkMode}
             />
             {/* Spacer for bottom nav on mobile */}
             {userProfile && location.pathname !== '/login' && (

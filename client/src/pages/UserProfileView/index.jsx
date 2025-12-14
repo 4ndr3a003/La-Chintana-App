@@ -37,7 +37,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4">
-          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
             <h3 className="text-xl font-bold mb-4 text-slate-800">Ritaglia Immagine</h3>
             <div className="max-h-[60vh] overflow-y-auto">
               <ReactCrop
@@ -61,11 +61,12 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       )}
 
       {/* Top Card: Profile Header */}
-      <div className="bg-white rounded-3xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)] relative">
-        <div className="absolute top-6 right-6">
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)] dark:border-slate-200 relative">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <Badge
             text={ROLE_LABELS[userProfile.role]}
             color={userProfile.role === ROLES.PRESIDENT ? 'yellow' : userProfile.role === ROLES.BOARD ? 'purple' : 'blue'}
+            className="text-[10px] px-1.5 py-0.5 md:text-xs md:px-2.5 md:py-1"
           />
         </div>
 
@@ -74,7 +75,10 @@ const UserProfileView = ({ userProfile, onLogout }) => {
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--color-slate-50)] shadow-sm">
             <Avatar src={userProfile.photoUrl} name={userProfile.name} size="xl" className="w-full h-full object-cover" />
           </div>
-          <label className="absolute bottom-0 right-0 bg-[var(--color-slate-800)] text-white p-2 rounded-full cursor-pointer hover:bg-[var(--color-slate-700)] transition-colors shadow-md">
+          <label
+            className="absolute bottom-0 right-0 p-2 rounded-full cursor-pointer hover:opacity-90 transition-opacity shadow-md border"
+            style={{ backgroundColor: '#1e293b', color: '#ffffff', borderColor: '#ffffff' }}
+          >
             <Camera size={16} />
             <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} />
           </label>
@@ -98,7 +102,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       {/* Middle Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Dati Personali */}
-        <div className="bg-white rounded-3xl shadow-sm p-8 border border-[var(--color-slate-100)] relative">
+        <div className="bg-white rounded-xl shadow-sm p-8 border border-[var(--color-slate-100)] dark:border-slate-200 relative">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-xl font-bold text-[var(--color-slate-900)]">Dati Personali</h3>
           </div>
@@ -141,7 +145,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       </div>
 
       {/* Bottom Card: Specializzazioni e Patenti */}
-      <div className="bg-white rounded-3xl shadow-sm p-8 border border-[var(--color-slate-100)] relative mb-6">
+      <div className="bg-white rounded-xl shadow-sm p-8 border border-[var(--color-slate-100)] dark:border-slate-200 relative mb-6">
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-xl font-bold text-[var(--color-slate-900)]">Specializzazioni e Patenti</h3>
         </div>
@@ -187,7 +191,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 
       <div className="flex flex-col gap-3">
 
-        <button onClick={onLogout} className="w-full py-4 rounded-3xl bg-[var(--color-pc-red-100)] text-[var(--color-pc-red-700)] font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-pc-red-200)] transition-all shadow-sm">
+        <button onClick={onLogout} className="w-full py-4 rounded-xl bg-[var(--color-pc-red-100)] text-[var(--color-pc-red-700)] font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-pc-red-200)] transition-all shadow-sm">
           <LogOut size={20} /> Esci dal Profilo
         </button>
       </div>

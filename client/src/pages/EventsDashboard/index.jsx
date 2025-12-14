@@ -86,28 +86,29 @@ const EventsDashboard = ({ userProfile }) => {
   return (
     <div className="events-container">
       <div className="events-header">
-        <div className="events-title-row">
-          <div className="events-title-group">
-            <h3 className="events-title">
-              <Calendar className="text-blue-600" size={28} /> Calendario Attività
+        <div className="events-title-row flex-nowrap gap-2 overflow-hidden">
+          <div className="events-title-group !gap-2 flex-shrink min-w-0">
+            <h3 className="events-title !text-base md:!text-xl whitespace-nowrap overflow-hidden text-ellipsis">
+              <Calendar className="text-blue-600 shrink-0" size={20} /> <span className="truncate">Calendario Attività</span>
             </h3>
-            <span className="events-count-badge">{filteredEvents.length} Eventi</span>
+            <span className="events-count-badge whitespace-nowrap !text-[10px] md:!text-xs !px-1.5 md:!px-2 !py-0.5 md:!py-1">{filteredEvents.length} Eventi</span>
           </div>
-          <div className="view-toggle-group">
+          <div className="view-toggle-group ml-auto shrink-0 space-x-0.5">
             <button
               onClick={() => setViewMode('list')}
-              className={`view-toggle-btn ${viewMode === 'list' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
+              className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'list' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
             >
-              <List size={20} />
+              <List size={18} />
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={`view-toggle-btn ${viewMode === 'calendar' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
+              className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'calendar' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
             >
-              <Calendar size={20} />
+              <Calendar size={18} />
             </button>
           </div>
         </div>
+
 
         <div className="flex flex-col gap-4 mb-6">
           {/* Search Bar Row */}
@@ -133,7 +134,7 @@ const EventsDashboard = ({ userProfile }) => {
             {canManageContent(userProfile) && (
               <button
                 onClick={openCreateModal}
-                className="hidden lg:flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm shrink-0 ml-auto"
+                className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto"
               >
                 <CalendarPlus size={18} />
                 Nuovo Evento
@@ -158,13 +159,13 @@ const EventsDashboard = ({ userProfile }) => {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => { setFilterType('Tutti'); toggleFilters(); }}
-                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-800 dark:border-slate-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
                     >
                       Tutti
                     </button>
                     {Object.entries(EVENT_TYPES).map(([type, data]) => {
                       const isSelected = filterType === type;
-                      let selectedClass = isSelected ? 'bg-slate-500 text-white border-slate-500' : data.color;
+                      let selectedClass = isSelected ? 'bg-slate-500 dark:bg-slate-600 text-white border-slate-500 dark:border-slate-600' : data.color;
                       return (
                         <button
                           key={type}
@@ -180,7 +181,7 @@ const EventsDashboard = ({ userProfile }) => {
                   <p className="font-bold text-sm text-slate-500 px-1">Partecipazione</p>
                   <button
                     onClick={() => { setFilterParticipation(filterParticipation === 'Tutti' ? 'I miei eventi' : 'Tutti'); toggleFilters(); }}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border flex items-center justify-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'}`}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border flex items-center justify-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
                   >
                     <User size={16} />
                     Filtra i miei eventi
@@ -194,7 +195,7 @@ const EventsDashboard = ({ userProfile }) => {
           <div className="hidden md:flex flex-wrap items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
             <button
               onClick={() => setFilterType('Tutti')}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 text-white border-slate-800 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-800 dark:border-slate-100 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
             >
               Tutti
             </button>
@@ -208,10 +209,19 @@ const EventsDashboard = ({ userProfile }) => {
                   selectedClass = 'bg-[var(--color-pc-yellow)] text-slate-900 border-[var(--color-pc-yellow)] shadow-md';
                   break;
                 case 'Riunione':
-                  selectedClass = 'bg-slate-200 text-slate-800 border-slate-300 shadow-md';
+                  selectedClass = 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 border-slate-300 dark:border-slate-600 shadow-md';
+                  break;
+                case 'Formazione':
+                  selectedClass = 'bg-[var(--color-pc-green)] text-white border-[var(--color-pc-green)] shadow-md';
+                  break;
+                case 'Esercitazione':
+                  selectedClass = 'bg-[var(--color-pc-blue)] text-white border-[var(--color-pc-blue)] shadow-md';
+                  break;
+                case 'Emergenza':
+                  selectedClass = 'bg-[var(--color-pc-red)] text-white border-[var(--color-pc-red)] shadow-md';
                   break;
                 default:
-                  // Extract base color name from the class string
+                  // Fallback for custom types
                   const colorMatch = data.color.match(/bg-(\w+)-50/);
                   const colorName = colorMatch ? colorMatch[1] : 'slate';
                   selectedClass = `bg-${colorName}-500 text-white border-${colorName}-500 shadow-md`;
@@ -235,7 +245,7 @@ const EventsDashboard = ({ userProfile }) => {
 
             <button
               onClick={() => setFilterParticipation(filterParticipation === 'Tutti' ? 'I miei eventi' : 'Tutti')}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-all border flex items-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-[var(--color-pc-yellow-600)] text-white border-[var(--color-pc-yellow-600)] shadow-md' : 'bg-[var(--color-pc-yellow-50)] text-slate-700 border-[var(--color-pc-yellow-200)] hover:bg-[var(--color-pc-yellow-100)]'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all border flex items-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-[var(--color-pc-yellow-600)] text-white border-[var(--color-pc-yellow-600)] shadow-md' : 'bg-[var(--color-pc-yellow-50)] dark:bg-yellow-900/20 text-slate-700 dark:text-yellow-100 border-[var(--color-pc-yellow-200)] dark:border-yellow-800 hover:bg-[var(--color-pc-yellow-100)] dark:hover:bg-yellow-900/40'}`}
             >
               <User size={16} />
               I miei eventi
@@ -244,20 +254,47 @@ const EventsDashboard = ({ userProfile }) => {
         </div>
       </div>
 
-      {viewMode === 'calendar' ? (
-        <CalendarGrid events={filteredEvents} userProfile={userProfile} onEventClick={setSelectedEvent} />
-      ) : (
-        <>
-          {filteredEvents.length === 0 ? (
-            <Card className="empty-state">
-              <div className="empty-icon-wrapper">
-                <Calendar size={32} />
+      {
+        viewMode === 'calendar' ? (
+          <CalendarGrid events={filteredEvents} userProfile={userProfile} onEventClick={setSelectedEvent} />
+        ) : (
+          <>
+            {filteredEvents.length === 0 ? (
+              <Card className="empty-state">
+                <div className="empty-icon-wrapper">
+                  <Calendar size={32} />
+                </div>
+                <p className="empty-text">Nessuna attività trovata con i filtri selezionati.</p>
+              </Card>
+            ) : (
+              <div className="events-grid">
+                {filteredEvents.map(event => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    userProfile={userProfile}
+                    allProfiles={allProfiles}
+                    onToggleParticipation={toggleParticipation}
+                    onClick={() => setSelectedEvent(event)}
+                    onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                    onEdit={canManageContent(userProfile) ? openEditModal : undefined}
+                  />
+                ))}
               </div>
-              <p className="empty-text">Nessuna attività trovata con i filtri selezionati.</p>
-            </Card>
-          ) : (
-            <div className="events-grid">
-              {filteredEvents.map(event => (
+            )}
+          </>
+        )
+      }
+
+      {
+        viewMode !== 'calendar' && pastEvents.length > 0 && (
+          <div className="mt-12 border-t border-slate-200 pt-8">
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <Calendar className="text-slate-400" size={20} />
+              Eventi Conclusi
+            </h3>
+            <div className="events-grid opacity-90 hover:opacity-100 transition-opacity">
+              {pastEvents.map(event => (
                 <EventCard
                   key={event.id}
                   event={event}
@@ -270,216 +307,202 @@ const EventsDashboard = ({ userProfile }) => {
                 />
               ))}
             </div>
-          )}
-        </>
-      )}
+          </div>
+        )
+      }
 
-      {viewMode !== 'calendar' && pastEvents.length > 0 && (
-        <div className="mt-12 border-t border-slate-200 pt-8">
-          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <Calendar className="text-slate-400" size={20} />
-            Eventi Conclusi
-          </h3>
-          <div className="events-grid opacity-90 hover:opacity-100 transition-opacity">
-            {pastEvents.map(event => (
+      {
+        selectedEvent && (
+          <div className="modal-overlay animate-in fade-in">
+            <div className="modal-content-wrapper modal-wide">
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="modal-close-btn-large"
+              >
+                <X size={32} />
+              </button>
               <EventCard
-                key={event.id}
-                event={event}
+                event={selectedEvent}
                 userProfile={userProfile}
                 allProfiles={allProfiles}
                 onToggleParticipation={toggleParticipation}
-                onClick={() => setSelectedEvent(event)}
+                showParticipants={true}
+                isModal={true}
                 onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
                 onEdit={canManageContent(userProfile) ? openEditModal : undefined}
               />
-            ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {selectedEvent && (
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-content-wrapper modal-wide">
-            <button
-              onClick={() => setSelectedEvent(null)}
-              className="modal-close-btn-large"
-            >
-              <X size={32} />
-            </button>
-            <EventCard
-              event={selectedEvent}
-              userProfile={userProfile}
-              allProfiles={allProfiles}
-              onToggleParticipation={toggleParticipation}
-              showParticipants={true}
-              onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
-              onEdit={canManageContent(userProfile) ? openEditModal : undefined}
-            />
-          </div>
-        </div>
-      )}
+      {
+        canManageContent(userProfile) && (
+          <button
+            onClick={openCreateModal}
+            className="fixed right-6 bottom-24 lg:hidden w-14 h-14 bg-blue-600 dark:bg-[#facc15] text-white dark:!text-[#0f172a] rounded-full shadow-lg flex items-center justify-center z-40 transition-transform active:scale-95"
+          >
+            <CalendarPlus size={28} />
+          </button>
+        )
+      }
 
-      {canManageContent(userProfile) && (
-        <button
-          onClick={openCreateModal}
-          className="fab-btn lg:hidden"
-        >
-          <CalendarPlus size={28} />
-        </button>
-      )}
-
-      {isDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="text-amber-600" size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Evento</h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Sei sicuro di voler eliminare questo evento? Questa azione non può essere annullata.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={cancelDeleteEvent}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                >
-                  Annulla
-                </button>
-                <button
-                  onClick={confirmDeleteEvent}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Elimina
-                </button>
+      {
+        isDeleteModalOpen && (
+          <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 border border-slate-100 dark:border-slate-200">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="text-amber-600" size={24} />
+                </div>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Evento</h3>
+                <p className="text-sm text-slate-500 mb-6">
+                  Sei sicuro di voler eliminare questo evento? Questa azione non può essere annullata.
+                </p>
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={cancelDeleteEvent}
+                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    onClick={confirmDeleteEvent}
+                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                  >
+                    Elimina
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {isCreateModalOpen && (
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h3 className="modal-title">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleCreateEvent} className="form-space">
-                <div>
-                  <label className="form-label">Titolo Evento</label>
-                  <input type="text" className="form-input" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} required />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {
+        isCreateModalOpen && (
+          <div className="modal-overlay animate-in fade-in">
+            <div className="modal-container">
+              <div className="modal-header">
+                <h3 className="modal-title">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</h3>
+                <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleCreateEvent} className="form-space">
                   <div>
-                    <label className="form-label">Tipologia</label>
-                    <CustomSelect
-                      value={newEvent.type}
-                      onChange={val => setNewEvent({ ...newEvent, type: val })}
-                      options={eventTypeOptions}
-                    />
+                    <label className="form-label">Titolo Evento</label>
+                    <input type="text" className="form-input" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} required />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="form-label">Tipologia</label>
+                      <CustomSelect
+                        value={newEvent.type}
+                        onChange={val => setNewEvent({ ...newEvent, type: val })}
+                        options={eventTypeOptions}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Visibilità</label>
+                      <CustomSelect
+                        value={newEvent.visibility}
+                        onChange={val => setNewEvent({ ...newEvent, visibility: val })}
+                        options={visibilityOptions}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-grid">
+                    <div>
+                      <label className="form-label">Data</label>
+                      <input type="date" className="form-input" value={newEvent.date} onChange={e => setNewEvent({ ...newEvent, date: e.target.value })} required />
+                    </div>
+                    <div>
+                      <label className="form-label">Ora</label>
+                      <input type="time" className="form-input" value={newEvent.time} onChange={e => setNewEvent({ ...newEvent, time: e.target.value })} required />
+                    </div>
                   </div>
                   <div>
-                    <label className="form-label">Visibilità</label>
-                    <CustomSelect
-                      value={newEvent.visibility}
-                      onChange={val => setNewEvent({ ...newEvent, visibility: val })}
-                      options={visibilityOptions}
-                    />
-                  </div>
-                </div>
-                <div className="form-grid">
-                  <div>
-                    <label className="form-label">Data</label>
-                    <input type="date" className="form-input" value={newEvent.date} onChange={e => setNewEvent({ ...newEvent, date: e.target.value })} required />
+                    <label className="form-label">Luogo</label>
+                    <input type="text" className="form-input" value={newEvent.location} onChange={e => setNewEvent({ ...newEvent, location: e.target.value })} required />
                   </div>
                   <div>
-                    <label className="form-label">Ora</label>
-                    <input type="time" className="form-input" value={newEvent.time} onChange={e => setNewEvent({ ...newEvent, time: e.target.value })} required />
-                  </div>
-                </div>
-                <div>
-                  <label className="form-label">Luogo</label>
-                  <input type="text" className="form-input" value={newEvent.location} onChange={e => setNewEvent({ ...newEvent, location: e.target.value })} required />
-                </div>
-                <div>
-                  <label className="form-label">Descrizione</label>
-                  <textarea className="form-textarea" rows="3" value={newEvent.description} onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}></textarea>
-                </div>
-
-                {/* Gestione Turni */}
-                <div className="border-t border-slate-100 pt-4 mt-2">
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="form-label mb-0">Turni (Opzionale)</label>
-                    <button
-                      type="button"
-                      onClick={addShift}
-                      className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
-                    >
-                      + Aggiungi Turno
-                    </button>
+                    <label className="form-label">Descrizione</label>
+                    <textarea className="form-textarea" rows="3" value={newEvent.description} onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}></textarea>
                   </div>
 
-                  {newEvent.shifts && newEvent.shifts.length > 0 ? (
-                    <div className="space-y-3">
-                      {newEvent.shifts.map((shift, index) => (
-                        <div key={shift.id || index} className="bg-slate-50 p-3 rounded-xl border border-slate-200 relative">
-                          <button
-                            type="button"
-                            onClick={() => removeShift(index)}
-                            className="absolute top-2 right-2 text-slate-400 hover:text-red-500"
-                          >
-                            <X size={16} />
-                          </button>
-                          <div className="grid grid-cols-3 gap-3 pr-6">
-                            <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase">Inizio</label>
-                              <input
-                                type="time"
-                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
-                                value={shift.startTime}
-                                onChange={e => updateShift(index, 'startTime', e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase">Fine</label>
-                              <input
-                                type="time"
-                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
-                                value={shift.endTime}
-                                onChange={e => updateShift(index, 'endTime', e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] font-bold text-slate-500 uppercase">Max Pers.</label>
-                              <input
-                                type="number"
-                                className="w-full p-2 rounded-lg border border-slate-200 text-sm"
-                                value={shift.maxParticipants}
-                                onChange={e => updateShift(index, 'maxParticipants', e.target.value)}
-                                placeholder="∞"
-                              />
+                  {/* Gestione Turni */}
+                  <div className="border-t border-slate-100 pt-4 mt-2">
+                    <div className="flex justify-between items-center mb-3">
+                      <label className="form-label mb-0">Turni (Opzionale)</label>
+                      <button
+                        type="button"
+                        onClick={addShift}
+                        className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        + Aggiungi Turno
+                      </button>
+                    </div>
+
+                    {newEvent.shifts && newEvent.shifts.length > 0 ? (
+                      <div className="space-y-3">
+                        {newEvent.shifts.map((shift, index) => (
+                          <div key={shift.id || index} className="bg-slate-50 p-3 rounded-xl border border-slate-200 relative">
+                            <button
+                              type="button"
+                              onClick={() => removeShift(index)}
+                              className="absolute top-2 right-2 text-slate-400 hover:text-red-500"
+                            >
+                              <X size={16} />
+                            </button>
+                            <div className="grid grid-cols-3 gap-3 pr-6">
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Inizio</label>
+                                <input
+                                  type="time"
+                                  className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                  value={shift.startTime}
+                                  onChange={e => updateShift(index, 'startTime', e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Fine</label>
+                                <input
+                                  type="time"
+                                  className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                  value={shift.endTime}
+                                  onChange={e => updateShift(index, 'endTime', e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Max Pers.</label>
+                                <input
+                                  type="number"
+                                  className="w-full p-2 rounded-lg border border-slate-200 text-sm"
+                                  value={shift.maxParticipants}
+                                  onChange={e => updateShift(index, 'maxParticipants', e.target.value)}
+                                  placeholder="∞"
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs text-slate-400 italic">Nessun turno definito. L'evento sarà a partecipazione unica.</p>
-                  )}
-                </div>
-                <div className="form-submit-wrapper">
-                  <Button type="submit" className="form-submit-btn">{isEditing ? 'Salva Modifiche' : 'Pubblica Evento'}</Button>
-                </div>
-              </form>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">Nessun turno definito. L'evento sarà a partecipazione unica.</p>
+                    )}
+                  </div>
+                  <div className="form-submit-wrapper">
+                    <Button type="submit" className="form-submit-btn">{isEditing ? 'Salva Modifiche' : 'Pubblica Evento'}</Button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

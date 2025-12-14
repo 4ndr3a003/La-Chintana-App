@@ -69,16 +69,16 @@ const CalendarGrid = ({ events, userProfile, onEventClick }) => {
             today.getFullYear() === currentDate.getFullYear();
 
           return (
-            <div key={day} className={`min-h-0 md:min-h-[100px] aspect-square md:aspect-auto rounded-lg md:rounded-xl border ${isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-blue-200'} p-0.5 md:p-1 flex flex-col items-start justify-start transition-colors relative group overflow-hidden`}>
+            <div key={day} className={`min-h-[75px] md:min-h-[100px] rounded-lg md:rounded-xl border ${isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-blue-200'} p-0.5 md:p-1 flex flex-col items-start justify-start transition-colors relative group`}>
               <span className={`text-[10px] md:text-xs font-bold mb-0.5 md:mb-1 ml-0.5 md:ml-1 ${isToday ? 'text-blue-600' : 'text-slate-700'}`}>{day}</span>
-              <div className="flex flex-col gap-0.5 md:gap-1 w-full px-0.5 md:px-1 overflow-y-auto max-h-[calc(100%-16px)] md:max-h-[80px] custom-scrollbar">
+              <div className="flex flex-col gap-0.5 md:gap-1 w-full px-0.5 md:px-1 w-full h-full">
                 {dayEvents.map(ev => {
                   const timeStr = new Date(ev.date).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                   return (
                     <div
                       key={ev.id}
                       onClick={() => onEventClick(ev)}
-                      className={`text-[8px] md:text-[9px] font-bold px-1 py-0.5 md:px-1.5 md:py-1 rounded w-full cursor-pointer hover:opacity-80 transition-opacity ${getEventStyle(ev.type)}`}
+                      className={`text-[8px] md:text-[9px] font-bold px-1 py-0.5 md:px-1.5 md:py-1 rounded w-full cursor-pointer hover:opacity-80 transition-opacity ${getEventStyle(ev.type)} flex-shrink-0`}
                       title={`${ev.title} \n${timeStr} - ${ev.location}`}
                     >
                       <div className="truncate leading-tight max-w-full">{ev.title}</div>

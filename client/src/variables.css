@@ -25,46 +25,50 @@
   --color-pc-orange-200: #fed7aa;
   --color-pc-orange-300: #fdba74;
   --color-pc-orange-400: #fb923c;
-  --color-pc-orange-500: #ec6907; /* Orange - Pantone 1505 C / RAL 2008 */
+  --color-pc-orange-500: #ec6907;
+  /* Orange - Pantone 1505 C / RAL 2008 */
   --color-pc-orange-600: #ea580c;
   --color-pc-orange-700: #c2410c;
   --color-pc-orange-800: #9a3412;
   --color-pc-orange-900: #7c2d12;
   --color-pc-orange: var(--color-pc-orange-500);
 
-  
+
   --color-pc-blue-50: #f0f7ff;
   --color-pc-blue-100: #e0f0ff;
   --color-pc-blue-200: #bae0ff;
   --color-pc-blue-300: #7cc0ff;
   --color-pc-blue-400: #369eff;
-  --color-pc-blue-500: #004d9d;  /* Blue - Pantone 2945 C / RAL 5017 */
+  --color-pc-blue-500: #004d9d;
+  /* Blue - Pantone 2945 C / RAL 5017 */
   --color-pc-blue-600: #003d7a;
   --color-pc-blue-700: #002e5c;
   --color-pc-blue-800: #001f3d;
   --color-pc-blue-900: #000f1f;
   --color-pc-blue: var(--color-pc-blue-500);
 
-  
+
   --color-pc-yellow-50: #fefce8;
   --color-pc-yellow-100: #fef9c3;
   --color-pc-yellow-200: #fef08a;
   --color-pc-yellow-300: #fde047;
   --color-pc-yellow-400: #facc15;
-  --color-pc-yellow-500: #ffdf00; /* Yellow - Pantone 115 C / RAL 1018 */
+  --color-pc-yellow-500: #ffdf00;
+  /* Yellow - Pantone 115 C / RAL 1018 */
   --color-pc-yellow-600: #ca8a04;
   --color-pc-yellow-700: #a16207;
   --color-pc-yellow-800: #854d0e;
   --color-pc-yellow-900: #713f12;
   --color-pc-yellow: var(--color-pc-yellow-500);
 
-  
+
   --color-pc-green-50: #f0fdf4;
   --color-pc-green-100: #dcfce7;
   --color-pc-green-200: #bbf7d0;
   --color-pc-green-300: #86efac;
   --color-pc-green-400: #4ade80;
-  --color-pc-green-500: #009453; /* Green - Pantone 347 C / RAL 6032 */
+  --color-pc-green-500: #009453;
+  /* Green - Pantone 347 C / RAL 6032 */
   --color-pc-green-600: #007c3a;
   --color-pc-green-700: #005d2b;
   --color-pc-green-800: #003e1d;
@@ -76,7 +80,8 @@
   --color-pc-red-200: #fecaca;
   --color-pc-red-300: #fca5a5;
   --color-pc-red-400: #f87171;
-  --color-pc-red-500: #e63329; /* Red - Pantone Red 032 C / RAL 2002 */
+  --color-pc-red-500: #e63329;
+  /* Red - Pantone Red 032 C / RAL 2002 */
   --color-pc-red-600: #dc2626;
   --color-pc-red-700: #b91c1c;
   --color-pc-red-800: #991b1b;
@@ -152,6 +157,10 @@
   --ion-background-color-rgb: 247, 247, 247;
   --ion-text-color: var(--color-slate-800);
   --ion-text-color-rgb: 30, 41, 59;
+
+  /* Semantic UI Colors */
+  --bg-header: var(--color-pc-blue-700);
+  --bg-mobile-nav: var(--color-pc-blue-700);
 }
 
 /* Ionic Component Styles */
@@ -201,4 +210,164 @@ ion-segment-button {
   --indicator-color: var(--color-white);
   --border-radius: 0.5rem;
   font-weight: 700;
+
+
+}
+
+/* Dark Mode Overrides */
+/* Dark Mode Overrides */
+html.dark {
+  /* Dark Backgrounds */
+  --color-slate-50: #0f172a;
+  /* slate-900 */
+  --color-slate-100: #1e293b;
+  /* slate-800 */
+  --color-slate-200: #334155;
+  /* slate-700 */
+  --color-slate-300: #475569;
+  /* slate-600 */
+  --color-slate-400: #94a3b8;
+  /* slate-400 */
+  --color-slate-500: #cbd5e1;
+  /* slate-300 */
+  --color-slate-600: #e2e8f0;
+  /* slate-200 */
+  --color-slate-700: #f1f5f9;
+  /* slate-100 */
+  --color-slate-800: #f8fafc;
+  /* slate-50 */
+  --color-slate-900: #ffffff;
+  /* white */
+
+  /* Base Overrides */
+  --color-white: #1e293b;
+  /* dark card bg */
+  --color-black: #ffffff;
+
+  /* Ionic Theme Overrides for Dark Mode */
+  --ion-background-color: var(--color-slate-50);
+  --ion-background-color-rgb: 15, 23, 42;
+
+  --bg-header: var(--color-slate-100);
+  --bg-mobile-nav: var(--color-slate-100);
+
+  --ion-text-color: var(--color-slate-800);
+  --ion-text-color-rgb: 248, 250, 252;
+
+  --ion-color-step-50: #1e293b;
+  --ion-color-step-100: #263345;
+  --ion-color-step-150: #2e3d50;
+  --ion-color-step-200: #36475a;
+  --ion-color-step-250: #3e5265;
+  --ion-color-step-300: #465c6f;
+  --ion-color-step-350: #4e6679;
+  --ion-color-step-400: #567084;
+  --ion-color-step-450: #5e7a9e;
+  --ion-color-step-500: #668499;
+  --ion-color-step-550: #6e8ea3;
+  --ion-color-step-600: #7698ad;
+  --ion-color-step-650: #7ea3b8;
+  --ion-color-step-700: #86adc2;
+  --ion-color-step-750: #8eb7cc;
+  --ion-color-step-800: #96c1d7;
+  --ion-color-step-850: #9ecbe1;
+  --ion-color-step-900: #a6d5eb;
+  --ion-color-step-950: #aedff6;
+  /* Dark Mode Palette Overrides */
+
+  /* Blue Overrides for Dark Mode */
+  --color-pc-blue-50: rgba(0, 77, 157, 0.1);
+  --color-pc-blue-100: rgba(0, 77, 157, 0.2);
+  --color-pc-blue-200: rgba(0, 77, 157, 0.3);
+  --color-pc-blue-500: #369eff;
+  /* Lighter blue for better visibility on dark */
+  --color-pc-blue-600: #7cc0ff;
+  --color-pc-blue-700: #bae0ff;
+  /* Lightest for text */
+  --color-pc-blue-800: #e0f0ff;
+  --color-pc-blue-900: #f0f7ff;
+
+  /* Orange Overrides for Dark Mode */
+  --color-pc-orange-50: rgba(236, 105, 7, 0.1);
+  --color-pc-orange-100: rgba(236, 105, 7, 0.2);
+  --color-pc-orange-200: rgba(236, 105, 7, 0.3);
+  --color-pc-orange-500: #fb923c;
+  --color-pc-orange-600: #fdba74;
+  --color-pc-orange-700: #fed7aa;
+  --color-pc-orange-800: #ffedd5;
+  --color-pc-orange-900: #fff8ed;
+
+  /* Yellow Overrides for Dark Mode */
+  --color-pc-yellow-50: rgba(255, 223, 0, 0.1);
+  --color-pc-yellow-100: rgba(255, 223, 0, 0.2);
+  --color-pc-yellow-200: rgba(255, 223, 0, 0.3);
+  --color-pc-yellow-500: #facc15;
+  --color-pc-yellow-600: #fde047;
+  --color-pc-yellow-700: #fef08a;
+  --color-pc-yellow-800: #fef9c3;
+  --color-pc-yellow-900: #fefce8;
+
+  /* Green Overrides for Dark Mode */
+  --color-pc-green-50: rgba(0, 148, 83, 0.1);
+  --color-pc-green-100: rgba(0, 148, 83, 0.2);
+  --color-pc-green-200: rgba(0, 148, 83, 0.3);
+  --color-pc-green-500: #4ade80;
+  --color-pc-green-600: #86efac;
+  --color-pc-green-700: #bbf7d0;
+  --color-pc-green-800: #dcfce7;
+  --color-pc-green-900: #f0fdf4;
+
+  /* Red Overrides for Dark Mode */
+  --color-pc-red-50: rgba(230, 51, 41, 0.1);
+  --color-pc-red-100: rgba(230, 51, 41, 0.2);
+  --color-pc-red-200: rgba(230, 51, 41, 0.3);
+  --color-pc-red-500: #f87171;
+  --color-pc-red-600: #fca5a5;
+  --color-pc-red-700: #fecaca;
+  --color-pc-red-800: #fee2e2;
+  --color-pc-red-900: #fef2f2;
+}
+
+/* Component Overrides for Dark Mode */
+html.dark ion-content {
+  --background: var(--color-slate-50);
+}
+
+html.dark ion-card {
+  --background: var(--color-slate-100);
+  --color: var(--color-slate-800);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+html.dark ion-item {
+  --background: var(--color-slate-100);
+  --color: var(--color-slate-800);
+  --border-color: var(--color-slate-200);
+}
+
+html.dark ion-input {
+  --background: var(--color-slate-50);
+  --color: var(--color-slate-800);
+  --placeholder-color: var(--color-slate-400);
+  border-color: var(--color-slate-200);
+}
+
+html.dark ion-segment {
+  --background: var(--color-slate-200);
+}
+
+html.dark ion-segment-button {
+  --color: var(--color-slate-400);
+  --color-checked: var(--color-pc-blue-300);
+  /* Lighter blue for dark mode */
+  --indicator-color: var(--color-slate-100);
+}
+
+/* Utility to Force Light Text on Colored Buttons irrespective of mode */
+ion-button[color="warning"],
+ion-button[color="danger"],
+ion-button[color="success"],
+ion-button[color="primary"],
+ion-button[color="secondary"] {
+  --color: #ffffff;
 }
