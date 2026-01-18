@@ -1,48 +1,10 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Funzione helper per verificare i ruoli di amministrazione
-    function isAdmin() {
-      return request.auth.token.role == 'Presidente' || request.auth.token.role == 'Direttivo';
-    }
 
-    // REGOLA 1: Permetti a chiunque di LEGGERE qualsiasi dato pubblico.
-    match /artifacts/{appId}/public/data/{collection}/{docId} {
-      allow read: if true;
-    }
-
-    // Regole per i profili utente/volontari
-    match /artifacts/{appId}/public/data/profiles/{userId} {
-      // Chiunque può creare il proprio profilo. Gli admin possono creare qualsiasi profilo.
-      allow create: if request.auth.uid == userId || isAdmin();
-      
-      // L'utente può aggiornare il proprio profilo. Gli admin possono aggiornare qualsiasi profilo.
-      // Qualsiasi utente autenticato può aggiornare fcmTokens e photoUrl per le notifiche.
-      allow update: if request.auth != null && (
-        request.auth.uid == userId || 
-        isAdmin() ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fcmTokens', 'photoUrl'])
-      );
-      
-      // L'utente può eliminare il proprio profilo. Gli admin possono eliminare qualsiasi profilo.
-      allow delete: if request.auth.uid == userId || isAdmin();
-    }
-
-    // Regole per gli eventi
-    match /artifacts/{appId}/public/data/events/{eventId} {
-      // Solo gli admin possono creare ed eliminare gli eventi.
-      allow create, delete: if isAdmin();
-
-      // Gli admin possono aggiornare qualsiasi campo. 
-      // Qualsiasi utente autenticato può aggiornare solo la lista dei partecipanti.
-      allow update: if isAdmin() || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participants']));
-    }
-
-    // Regole per le comunicazioni
-    match /artifacts/{appId}/public/data/communications/{commId} {
-      // Solo gli admin possono creare, aggiornare ed eliminare le comunicazioni.
-      allow create, update, delete: if isAdmin();
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2029, 12, 21);
     }
   }
 }
