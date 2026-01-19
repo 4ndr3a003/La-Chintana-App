@@ -313,8 +313,8 @@ const EventsDashboard = ({ userProfile }) => {
 
       {
         selectedEvent && (
-          <div className="modal-overlay animate-in fade-in">
-            <div className="modal-content-wrapper modal-wide">
+          <div className="modal-overlay animate-in fade-in" onClick={() => setSelectedEvent(null)}>
+            <div className="modal-content-wrapper modal-wide" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setSelectedEvent(null)}
                 className="modal-close-btn-large"
@@ -349,8 +349,8 @@ const EventsDashboard = ({ userProfile }) => {
 
       {
         isDeleteModalOpen && (
-          <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }}>
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 border border-slate-100 dark:border-slate-200">
+          <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }} onClick={cancelDeleteEvent}>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 border border-slate-100 dark:border-slate-200" onClick={(e) => e.stopPropagation()}>
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                   <AlertTriangle className="text-amber-600" size={24} />
@@ -381,8 +381,8 @@ const EventsDashboard = ({ userProfile }) => {
 
       {
         isCreateModalOpen && (
-          <div className="modal-overlay animate-in fade-in">
-            <div className="modal-container">
+          <div className="modal-overlay animate-in fade-in" onClick={() => setIsCreateModalOpen(false)}>
+            <div className="modal-container" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3 className="modal-title">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</h3>
                 <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>

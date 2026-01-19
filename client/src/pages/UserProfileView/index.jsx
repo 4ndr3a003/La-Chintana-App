@@ -36,8 +36,14 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       <h1 className="text-3xl font-extrabold text-[var(--color-slate-900)] mb-8">Profilo Volontario</h1>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-xl font-bold mb-4 text-slate-800">Ritaglia Immagine</h3>
             <div className="max-h-[60vh] overflow-y-auto">
               <ReactCrop

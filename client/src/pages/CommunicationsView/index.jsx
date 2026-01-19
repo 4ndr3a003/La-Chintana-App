@@ -396,8 +396,8 @@ const CommunicationsView = ({ userProfile }) => {
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-        <div className="modal-overlay animate-in fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
+        <div className="modal-overlay animate-in fade-in" onClick={cancelDeleteComm}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="text-amber-600" size={32} />
@@ -426,8 +426,8 @@ const CommunicationsView = ({ userProfile }) => {
       )}
 
       {isCreateModalOpen && (
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-container">
+        <div className="modal-overlay animate-in fade-in" onClick={() => setIsCreateModalOpen(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</h3>
               <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>

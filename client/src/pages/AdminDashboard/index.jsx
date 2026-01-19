@@ -397,8 +397,8 @@ const AdminDashboard = ({ userProfile }) => {
 
       {/* VIEW MODAL */}
       {isViewing && selectedUser && (
-        <div className="modal-overlay animate-in fade-in">
-          <div className="modal-content max-w-2xl">
+        <div className="modal-overlay animate-in fade-in" onClick={() => setIsViewing(false)}>
+          <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="font-bold text-slate-800">Scheda Volontario</h3>
               <button onClick={() => setIsViewing(false)} className="modal-close-btn"><X size={20} /></button>
@@ -500,8 +500,8 @@ const AdminDashboard = ({ userProfile }) => {
 
       {/* Edit/Create Modal */}
       {(isEditing || isCreating) && (
-        <div className="modal-overlay animate-in fade-in edit-create-modal">
-          <div className="modal-content max-w-2xl">
+        <div className="modal-overlay animate-in fade-in edit-create-modal" onClick={closeAll}>
+          <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
               <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
