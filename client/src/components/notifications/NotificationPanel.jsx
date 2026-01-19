@@ -84,8 +84,8 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
         const unsubEvents = onSnapshot(eventsQuery, (snap) => {
             const events = snap.docs.map(doc => ({
                 id: doc.id,
-                type: 'event',
-                ...doc.data()
+                ...doc.data(),
+                itemType: 'event' // Distinct field to avoid overwrite by doc.data().type
             }));
             updateNotifications(events, 'events');
         });
@@ -93,8 +93,8 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
         const unsubComms = onSnapshot(commsQuery, (snap) => {
             const comms = snap.docs.map(doc => ({
                 id: doc.id,
-                type: 'communication',
-                ...doc.data()
+                ...doc.data(),
+                itemType: 'communication'
             }));
             updateNotifications(comms, 'comms');
         });
@@ -109,10 +109,22 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
 
             // Filter logic (same as dashboards)
             const visibleEvents = currentEvents.filter(event => {
-                // Basic visibility check from EventsDashboard logic (simplified)
-                const isDirettivoEvent = event.type === 'Direttivo';
                 const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
-                if (isDirettivoEvent && !isBoardOrPresident) return false;
+
+                // 1. Check strict 'Direttivo' type
+                // Note: event.type comes from doc.data()
+                if (event.type === 'Direttivo' && !isBoardOrPresident) return false;
+
+                // 2. Check Visibility
+                const visibility = event.visibility || 'Tutti'; // Default to 'Tutti'
+
+                if (visibility === 'Solo Direttivo') {
+                    if (!isBoardOrPresident) return false;
+                } else if (visibility === 'Solo Cinofili') {
+                    const isK9 = userProfile?.volunteerRole === 'Cinofilo';
+                    if (!isBoardOrPresident && !isK9) return false;
+                }
+
                 return true;
             });
 
@@ -121,22 +133,25 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
                 if (msg.expirationDate) {
                     const expDate = new Date(msg.expirationDate);
                     const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Compare with start of today
-                    if (expDate < today) {
-                        return false;
-                    }
+                    today.setHours(0, 0, 0, 0);
+                    if (expDate < today) return false;
                 }
 
-                // Basic visibility check
-                const isDirettivoContent = msg.topic === 'Direttivo';
                 const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
-                if (isDirettivoContent && !isBoardOrPresident) return false;
+
+                // Topic Filtering
+                if (msg.topic === 'Direttivo' && !isBoardOrPresident) return false;
+
+                if (msg.topic === 'Cinofili') {
+                    const isK9 = userProfile?.volunteerRole === 'Cinofilo';
+                    if (!isBoardOrPresident && !isK9) return false;
+                }
+
                 return true;
             });
 
             // Merge and Sort
             const all = [...visibleEvents, ...visibleComms].sort((a, b) => {
-                // Use 'date' for both.
                 return new Date(b.date) - new Date(a.date);
             });
 
@@ -152,10 +167,37 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
 
     const handleItemClick = (item) => {
         onClose();
-        if (item.type === 'event') {
-            navigate('/events', { state: { selectedEventId: item.id } }); // Pass state to highlight/open
+        if (item.itemType === 'event') {
+            navigate('/events', { state: { selectedEventId: item.id } });
         } else {
-            navigate('/comms', { state: { selectedCommId: item.id } }); // Pass state to highlight/open (need to implement in CommsView)
+            navigate('/comms', { state: { selectedCommId: item.id } });
+        }
+    };
+
+    // Helper to get Icon and Color based on type/topic
+    const getItemStyle = (item) => {
+        if (item.itemType === 'event') {
+            // eventTypeData might be useful later, but for now specific switch
+            // item.type here refers to the actual Firestore data 'type' field (e.g. 'Emergenza')
+            switch (item.type) {
+                case 'Emergenza': return 'bg-red-100 text-red-600';
+                case 'Servizio': return 'bg-amber-100 text-amber-600';
+                case 'Formazione': return 'bg-emerald-100 text-emerald-600';
+                case 'Riunione': return 'bg-slate-100 text-slate-600';
+                case 'Esercitazione': return 'bg-blue-100 text-blue-600';
+                case 'Direttivo': return 'bg-purple-100 text-purple-600';
+                default: return 'bg-slate-100 text-slate-600';
+            }
+        } else {
+            // Communications
+            switch (item.topic) {
+                case 'Urgente': return 'bg-red-100 text-red-600';
+                case 'Direttivo': return 'bg-purple-100 text-purple-600';
+                case 'Cinofili': return 'bg-orange-100 text-orange-600';
+                case 'Formazione': return 'bg-emerald-100 text-emerald-600';
+                case 'Servizio': return 'bg-amber-100 text-amber-600';
+                default: return 'bg-blue-100 text-blue-600';
+            }
         }
     };
 
@@ -165,7 +207,7 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
         <div
             ref={panelRef}
             className="fixed w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[99999]"
-            style={{ top: 0, left: 0 }} // Will be overridden by useEffect
+            style={{ top: 0, left: 0 }}
         >
             <div className="bg-slate-50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -190,18 +232,18 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
                     <div className="divide-y divide-slate-50">
                         {notifications.map(item => (
                             <div
-                                key={`${item.type}-${item.id}`}
+                                key={`${item.itemType}-${item.id}`}
                                 onClick={() => handleItemClick(item)}
-                                className="p-4 hover:bg-blue-50/50 transition-colors cursor-pointer group"
+                                className="p-4 hover:bg-slate-50 transition-colors cursor-pointer group"
                             >
                                 <div className="flex gap-3">
-                                    <div className={`flex-none w-10 h-10 rounded-full flex items-center justify-center ${item.type === 'event' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
-                                        {item.type === 'event' ? <Calendar size={18} /> : <MessageSquare size={18} />}
+                                    <div className={`flex-none w-10 h-10 rounded-full flex items-center justify-center ${getItemStyle(item)}`}>
+                                        {item.itemType === 'event' ? <Calendar size={18} /> : <MessageSquare size={18} />}
                                     </div>
                                     <div className="flex-grow min-w-0">
                                         <div className="flex justify-between items-start mb-0.5">
                                             <p className="text-xs font-bold uppercase text-slate-400">
-                                                {item.type === 'event' ? 'Evento' : 'Comunicazione'}
+                                                {item.itemType === 'event' ? 'Evento' : 'Comunicazione'}
                                             </p>
                                             <span className="text-[10px] text-slate-400 whitespace-nowrap ml-2">
                                                 {new Date(item.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
