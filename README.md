@@ -1,131 +1,124 @@
 # 🛡️ La Chintana - Portale Protezione Civile
 
-Applicazione web gestionale per il coordinamento dei volontari della Protezione Civile "La Chintana".
-Il portale permette la gestione operativa di eventi, comunicazioni, turni e anagrafica dei volontari.
+Applicazione gestionale moderna per il coordinamento dei volontari della Protezione Civile "La Chintana". Il sistema unifica la gestione operativa, le comunicazioni e le attività di volontariato in un'unica piattaforma accessibile via Web e App Mobile (Android).
 
-## 🚀 Funzionalità Principali
+## 🏗️ Architettura del Progetto
+
+Il progetto è strutturato come monorepo diviso in componenti distinti:
+
+-   **`client/`**: Frontend sviluppato con **React 19**, **Vite** e **Tailwind CSS**. Gestisce l'interfaccia utente, la PWA e la logica lato client. Utilizza **Capacitor** per la build nativa Android.
+-   **`functions/`**: Backend serverless su **Firebase Cloud Functions**. Gestisce i trigger automatici (es. notifiche alla creazione di eventi/comunicazioni) e la sincronizzazione sicura dei ruoli (Custom Claims).
+-   **`server/`**: Server **Node.js/Express** addizionale per API custom e gestione centralizzata delle notifiche push (FCM) al di fuori dei trigger automatici.
+-   **`android/`**: Progetto nativo generato da Capacitor per la compilazione dell'APK Android.
+
+## 🚀 Funzionalità
 
 ### 👥 Gestione Utenti e Ruoli
-- **Autenticazione**: Accesso sicuro con email/password.
-- **Ruoli**:
-  - **Presidente**: Accesso completo a tutte le funzionalità.
-  - **Direttivo**: Gestione operativa e amministrativa.
-  - **Volontario**: Accesso alle proprie attività e comunicazioni.
-- **Profilo Utente**: Gestione dati anagrafici, contatti e specializzazioni (es. Patenti, Corsi Sicurezza, Primo Soccorso).
+-   **Ruoli Gerarchici**:
+    -   **Presidente**: Super-admin con controllo totale.
+    -   **Direttivo**: Gestione operativa (eventi, comunicazioni, volontari).
+    -   **Volontario**: Accesso limitato a calendari personali e avvisi.
+-   **Specializzazioni**: Gestione profili con tracciamento certificazioni (es. Primo Soccorso, Cinofili) e scadenze.
+-   **Sicurezza**: Autenticazione Firebase e sincronizzazione ruoli tramite Cloud Functions.
 
-### 📅 Gestione Eventi e Attività
-- **Calendario**: Visualizzazione mensile e lista delle attività.
-- **Tipologie Eventi**: Servizi, Esercitazioni, Riunioni, Emergenze, Formazione.
-- **Iscrizioni**: I volontari possono dare la propria disponibilità per gli eventi.
-- **Monitoraggio**: Visualizzazione dei partecipanti in tempo reale.
+### 📅 Eventi e Operatività
+-   **Calendario Interattivo**: Visualizzazione turni, esercitazioni e servizi.
+-   **Iscrizioni**: Sistema di adesione agli eventi con monitoraggio presenze in tempo reale.
+-   **Filtri Ruolo**: Eventi visibili solo a gruppi specifici (es. "Solo Direttivo", "Cinofili").
 
-### 📢 Comunicazioni
-- **Bacheca Avvisi**: Sistema di messaggistica interna per comunicazioni ufficiali.
-- **Priorità**: Avvisi con diversi livelli di importanza (Alta, Normale, Bassa).
-- **Filtri**: Ricerca per argomento e priorità.
+### 📢 Comunicazioni e Notifiche
+-   **Bacheca Avvisi**: Messaggi prioritari (Alta/Normale/Bassa).
+-   **Notifiche Push**: Sistema integrato (FCM) che notifica gli utenti su Web e Android alla creazione di nuovi eventi o comunicazioni urgenti.
+-   **Targeting**: Le notifiche vengono inviate solo agli utenti interessati (es. notifiche "Cinofili" arrivano solo ai cinofili).
 
-### 🛠️ Pannello di Amministrazione
-- **Gestione Organico**: Aggiunta, modifica e visualizzazione dettagliata dei volontari.
-- **Assegnazione Ruoli**: Gestione delle cariche e delle specializzazioni.
+## 🛠️ Installazione e Setup
 
-## 💻 Stack Tecnologico
+### Prerequisiti
+-   Node.js (v18+ raccomandato)
+-   Nonde Package Manager (npm)
+-   Firebase CLI (`npm install -g firebase-tools`)
 
-- **Frontend**: React 19, Vite
-- **Styling**: Tailwind CSS, Lucide React (Icone)
-- **Backend & Database**: Firebase (Authentication, Firestore, Storage)
-- **Linguaggio**: JavaScript (ESModules)
+### 1. Setup Client (Frontend)
+```bash
+cd client
+npm install
+```
+Configura le variabili d'ambiente creando un file `.env` nella cartella `client` con le chiavi del tuo progetto Firebase.
 
-## 📦 Installazione e Avvio
+### 2. Setup Server (Opzionale)
+Il server Express è necessario se si desidera utilizzare le API manuali per le notifiche.
+```bash
+cd server
+npm install
+```
+*Nota: Scarica `serviceAccountKey.json` dalla console Firebase e posizionalo nella cartella `server/`.*
 
-1.  **Clona il repository**
+### 3. Setup Functions (Backend)
+```bash
+cd functions
+npm install
+```
+
+## ▶️ Avvio Sviluppo
+
+### Frontend (Web App)
+Lancia l'applicazione in modalità sviluppo (con Hot Module Replacement):
+```bash
+cd client
+npm run dev
+```
+L'app sarà accessibile su `http://localhost:5173`.
+
+### Server API
+```bash
+cd server
+node index.js
+```
+Il server girerà su `http://localhost:3000`.
+
+## 📱 Sviluppo Mobile (Android)
+Il progetto utilizza Capacitor per il runtime nativo.
+
+1.  **Build del frontend**:
     ```bash
-    git clone https://github.com/tuo-username/protezione-civile.git
-    cd protezione-civile
-    ```
-
-2.  **Installa le dipendenze**
-    ```bash
-    npm install
-    ```
-
-3.  **Configura Firebase**
-    Assicurati di avere le credenziali Firebase configurate nel file `src/App.jsx` (o meglio, in variabili d'ambiente `.env`).
-
-4.  **Avvia l'ambiente di sviluppo**
-    ```bash
-    npm run dev
-    ```
-
-5.  **Build per produzione**
-    ```bash
+    cd client
     npm run build
     ```
-
-6.  **Anteprima della build**
-    Per visualizzare l'anteprima della build di produzione (accessibile anche da rete locale):
+2.  **Sincronizzazione risorse native**:
     ```bash
-    npm run preview -- --host
+    npx cap sync
     ```
+3.  **Apertura Android Studio**:
+    ```bash
+    npx cap open android
+    ```
+    Da qui puoi avviare l'emulatore o compilare l'APK.
 
-## 📂 Struttura del Progetto
+## 🌍 Deployment
 
+### Web Hosting (Firebase)
+Per pubblicare la versione web (PWA):
+```bash
+cd client
+npm run build
+firebase deploy --only hosting
 ```
-src/
-├── assets/         # Immagini e risorse statiche
-├── App.jsx         # Componente principale e logica dell'applicazione
-├── main.jsx        # Entry point React
-├── index.css       # Stili globali e direttive Tailwind
-└── ...
+
+### Cloud Functions
+Per aggiornare la logica di backend (trigger notifiche):
+```bash
+firebase deploy --only functions
 ```
 
-## 🔐 Sicurezza e Privacy
+### Mobile Updates (Live)
+Per aggiornamenti di codice JS/CSS senza passare dallo store (su dispositivi Android già installati):
+```bash
+ionic deploy build --app-id="ff632d26" --channel-name="Production"
+```
 
-L'applicazione gestisce dati sensibili dei volontari. L'accesso è protetto tramite autenticazione Firebase e le regole di sicurezza del database garantiscono che solo gli utenti autorizzati possano accedere alle informazioni riservate.
+## 🔐 Credenziali di Test (Demo/Sviluppo)
 
-## 🌍 Deployment & Aggiornamenti
-Questo progetto vive su due piattaforme simultaneamente. Usa il metodo corretto per aggiornare la versione desiderata.
-
-### 1. Versione Web (PC, iOS, Browser)
-Per aggiornare il sito web (PWA) che usi da computer o iPhone.
-
-1.  **Build & Deploy**:
-    ```bash
-    npm run build --prefix client
-    firebase deploy
-    ```
-2.  **Verifica**: Visita l'URL del sito. Potrebbe servire un refresh forzato o svuotare la cache.
-
-*Nota: I plugin nativi (come LiveUpdates) sono disabilitati automaticamente sul web.*
-
----
-
-### 2. Versione Nativa (App Android)
-Per aggiornare l'applicazione `.apk` installata sui telefoni Android.
-
-**A. Prima Installazione (o modifiche Native)**
-Se hai modificato plugin, icone o configurazioni native:
-1.  Sincronizza: `npx cap sync`
-2.  Apri Android Studio: `npx cap open android`
-3.  Genera APK e installa col cavo USB / invia file.
-
-**B. Aggiornamento Rapido (Live Updates)**
-Se hai modificato solo codice React (pagine, logica JS, CSS):
-1.  Assicurati che `capacitor.config.json` abbia `"autoUpdateMethod": "background"`.
-2.  Fai una **Web Build** su Ionic Appflow (dashboard online) o da riga di comando:
-    ```bash
-    ionic deploy build --app-id="ff632d26" --channel-name="Production"
-    ```
-3.  L'app scaricherà l'aggiornamento in background mentre la usi. Al **prossimo riavvio** (chiudi e riapri), vedrai le novità.
-
-**Debug Live Updates**:
-Nelle Impostazioni dell'app (solo Android) c'è un'area "Debug" visibile solo su nativo per forzare il controllo aggiornamenti.
-
-## Credenziali di Test
-
-**Presidente**
-- email: mantelli.alessandro@gmail.com
-- password: 1234
-
-**Volontario**
-- email: andrea8102003@gmail.com
-- password: 1234
+| Ruolo | Email | Password |
+| :--- | :--- | :--- |
+| **Presidente** | mantelli.alessandro@gmail.com | 1234 |
+| **Volontario** | andrea8102003@gmail.com | 1234 |
