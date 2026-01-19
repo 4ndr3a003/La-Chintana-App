@@ -60,6 +60,18 @@ export const useEventsDashboard = (userProfile) => {
     return () => { unsubEvents(); unsubProfiles(); };
   }, []);
 
+  // Sync selectedEvent with real-time updates
+  useEffect(() => {
+    if (selectedEvent) {
+      const updatedEvent = upcomingEvents.find(e => e.id === selectedEvent.id) || 
+                           pastEvents.find(e => e.id === selectedEvent.id);
+      
+      if (updatedEvent && updatedEvent !== selectedEvent) {
+        setSelectedEvent(updatedEvent);
+      }
+    }
+  }, [upcomingEvents, pastEvents, selectedEvent]);
+
   const toggleParticipation = async (event, shiftId = null) => {
     const eventRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', event.id);
     let updates = {};

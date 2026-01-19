@@ -59,10 +59,20 @@ export const useCommunicationsView = (userProfile) => {
     // Check visibility for 'Direttivo' topic
     const isDirettivoContent = msg.topic === 'Direttivo';
 
+    // Check visibility for 'Cinofili' topic
+    const isCinofiliContent = msg.topic === 'Cinofili';
+
     // Check for ANY board member or president
     const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
 
+    // Check for K9 role
+    const isK9 = userProfile?.volunteerRole === 'Cinofilo';
+
     if (isDirettivoContent && !isBoardOrPresident) {
+      return false;
+    }
+
+    if (isCinofiliContent && !isBoardOrPresident && !isK9) {
       return false;
     }
 

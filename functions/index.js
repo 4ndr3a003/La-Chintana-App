@@ -155,6 +155,7 @@ exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/
 
   if (isDirettivoEvent || visibility === EVENT_VISIBILITY.BOARD_ONLY) {
     targetFilter = (user) => {
+      // STRICT FILTER: Only Board Members and President
       return user.role === 'direttivo' || user.role === 'presidente';
     };
   } else if (visibility === EVENT_VISIBILITY.K9_ONLY) {
@@ -195,11 +196,20 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
     id: commId
   };
 
-  // Filter for Direttivo communications
+  // Filter for specific topics
   let targetFilter = null;
+
   if (data.topic === 'Direttivo') {
     targetFilter = (user) => {
+      // STRICT FILTER: Only Board Members and President
       return user.role === 'direttivo' || user.role === 'presidente';
+    };
+  } else if (data.topic === 'Cinofili') {
+    targetFilter = (user) => {
+      // Board Members AND K9 Volunteers
+      const isBoard = user.role === 'direttivo' || user.role === 'presidente';
+      const isK9 = user.volunteerRole === 'Cinofilo';
+      return isBoard || isK9;
     };
   }
 

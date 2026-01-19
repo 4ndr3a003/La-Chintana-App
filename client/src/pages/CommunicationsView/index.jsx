@@ -46,6 +46,15 @@ const getTheme = (topic) => {
         badge: 'bg-white text-purple-700 border-purple-200',
         dotColor: 'bg-purple-500'
       };
+    case 'Cinofili':
+      return {
+        bg: 'bg-orange-50',
+        contentBg: 'bg-orange-50/30',
+        border: 'border-orange-200',
+        text: 'text-orange-800',
+        badge: 'bg-white text-orange-700 border-orange-200',
+        dotColor: 'bg-orange-500'
+      };
     case 'Generale':
       return {
         bg: 'bg-slate-50',
@@ -98,7 +107,7 @@ const CommunicationsView = ({ userProfile }) => {
     isSubmitting
   } = useCommunicationsView(userProfile);
 
-  const topicOptions = ['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Altro'].map(topic => ({
+  const topicOptions = ['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map(topic => ({
     value: topic,
     label: topic,
     color: getTheme(topic).dotColor
@@ -158,7 +167,7 @@ const CommunicationsView = ({ userProfile }) => {
                         Tutti gli argomenti
                       </button>
                       <div className="h-px bg-slate-100 my-1"></div>
-                      {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Altro'].map((topic) => {
+                      {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map((topic) => {
                         const theme = getTheme(topic);
                         return (
                           <button
@@ -248,7 +257,7 @@ const CommunicationsView = ({ userProfile }) => {
                     >
                       Tutti
                     </button>
-                    {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Altro'].map((topic) => {
+                    {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map((topic) => {
                       const isSelected = filterTopic === topic;
                       const theme = getTheme(topic);
 
