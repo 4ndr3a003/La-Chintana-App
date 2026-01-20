@@ -37,20 +37,24 @@ export const useDirettivoDashboard = () => {
                 const data = doc.data();
                 usersList.push({ id: doc.id, ...data });
 
-                total++;
-                if (data.status === 'Operativo') active++;
-                else inactive++;
+                usersList.push({ id: doc.id, ...data });
 
-                if (data.joinedAt) {
-                    const joinDate = new Date(data.joinedAt);
-                    if (joinDate.getMonth() === currentMonth && joinDate.getFullYear() === currentYear) {
-                        newThisMonth++;
-                    }
+                if (!data.isHidden) {
+                    total++;
+                    if (data.status === 'Operativo') active++;
+                    else inactive++;
 
-                    // Calculate trend
-                    const monthDiff = (currentYear - joinDate.getFullYear()) * 12 + (currentMonth - joinDate.getMonth());
-                    if (monthDiff >= 0 && monthDiff < 6) {
-                        memberTrend[5 - monthDiff]++;
+                    if (data.joinedAt) {
+                        const joinDate = new Date(data.joinedAt);
+                        if (joinDate.getMonth() === currentMonth && joinDate.getFullYear() === currentYear) {
+                            newThisMonth++;
+                        }
+
+                        // Calculate trend
+                        const monthDiff = (currentYear - joinDate.getFullYear()) * 12 + (currentMonth - joinDate.getMonth());
+                        if (monthDiff >= 0 && monthDiff < 6) {
+                            memberTrend[5 - monthDiff]++;
+                        }
                     }
                 }
             });

@@ -76,7 +76,7 @@ export const useAdminDashboard = () => {
       (filterRole === VOLUNTEER_ROLES.K9 ? user.volunteerRole === VOLUNTEER_ROLES.K9 : user.role === filterRole);
     const matchesStatus = filterStatus === 'Tutti' || user.status === filterStatus;
 
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesRole && matchesStatus && !user.isHidden;
   });
 
   const openEdit = (user) => {

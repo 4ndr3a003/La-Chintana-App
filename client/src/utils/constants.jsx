@@ -15,6 +15,8 @@ export const ROLES = {
   VOLUNTEER: 'volontario'
 };
 
+export const IS_HIDDEN_FIELD = 'isHidden';
+
 export const BOARD_ROLES = {
   VP: 'Vicepresidente',
   SECRETARY: 'Segretario',
