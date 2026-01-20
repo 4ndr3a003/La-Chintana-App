@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useDirettivoDashboard } from './DirettivoDashboardLogic';
 import './DirettivoDashboard.css';
+import WeatherWidget from '../../components/WeatherWidget/WeatherWidget';
 
 const DirettivoDashboard = ({ userProfile }) => {
     const navigate = useNavigate();
@@ -139,71 +140,23 @@ const DirettivoDashboard = ({ userProfile }) => {
                 </div>
 
                 {/* Main Content Grid */}
+                {/* Main Content Grid */}
                 <div className="dashboard-main-grid">
 
-                    {/* Left Column (2/3) */}
+                    {/* Left Column (Operational - ~35%) */}
                     <div className="left-column">
 
-                        {/* Quick Actions */}
-                        <section className="dashboard-card">
-                            <div className="card-header">
-                                <h3 className="card-title">Gestione Rapida</h3>
-                            </div>
-                            <div className="quick-actions-grid">
-                                <button onClick={() => navigate('/events')} className="action-btn">
-                                    <div className="action-icon-box">
-                                        <Calendar size={24} />
-                                    </div>
-                                    <span className="action-text">Gestione Eventi e Turni</span>
-                                </button>
-
-                                <button onClick={() => navigate('/comms')} className="action-btn">
-                                    <div className="action-icon-box">
-                                        <Megaphone size={24} />
-                                    </div>
-                                    <span className="action-text">Comunicazioni e Avvisi</span>
-                                </button>
-
-                                <button onClick={() => navigate('/admin')} className="action-btn">
-                                    <div className="action-icon-box">
-                                        <Users size={24} />
-                                    </div>
-                                    <span className="action-text">Anagrafica Volontari</span>
-                                </button>
-                            </div>
-                        </section>
-
-                        {/* General Statistics Chart */}
-                        <section className="dashboard-card">
-                            <div className="card-header">
-                                <h3 className="card-title">Statistiche Generali</h3>
-                                <div className="card-header-actions">
-                                    <span className="filter-pill-active">Anno Corrente</span>
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <h4 className="chart-section-title">Eventi per Mese</h4>
-                                <div className="chart-container">
-                                    {monthlyStats.map((val, i) => (
-                                        <div key={i} className="chart-bar-group">
-                                            <div
-                                                className="chart-bar group"
-                                                style={{ height: `${(val / maxEvents) * 100}%` }}
-                                                data-value={`${val} eventi`}
-                                            ></div>
-                                            <span className="chart-label">{['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'][i]}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                        {/* 1. Situational Awareness (Top Priority) */}
+                        <section>
+                            <WeatherWidget />
                         </section>
 
                     </div>
 
-                    {/* Right Column (1/3) */}
+                    {/* Right Column (Management - ~65%) */}
                     <div className="right-column">
 
-                        {/* Planning Board (Bacheca Programmazione) */}
+                        {/* 2. Planning Board */}
                         <section className="dashboard-card">
                             <div className="card-header">
                                 <h3 className="card-title">Bacheca Programmazione</h3>
