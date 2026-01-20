@@ -175,15 +175,15 @@
   color: var(--color-pc-blue-700);
 }
 
-.stat-value {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 800;
+.dashboard-stat-value {
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 500;
   color: var(--color-slate-800);
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
-.stat-value.alert-text {
+.dashboard-stat-value.alert-text {
   color: var(--color-pc-red-700);
 }
 

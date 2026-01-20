@@ -64,7 +64,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                                 <span className="stat-title">Volontari Attivi</span>
                                 <span className="stat-badge badge-success">Attivi</span>
                             </div>
-                            <div className="stat-value">{stats.volunteers.active}</div>
+                            <div className="dashboard-stat-value">{stats.volunteers.active}</div>
                             <div className="stat-subtext">su {stats.volunteers.total} registrati</div>
                         </div>
                         {/* Progress Bar for Active/Total */}
@@ -89,7 +89,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                                 <span className="stat-title">Eventi in Corso</span>
                                 <span className="stat-badge badge-warning">In Corso</span>
                             </div>
-                            <div className="stat-value">{stats.events.inProgress}</div>
+                            <div className="dashboard-stat-value">{stats.events.inProgress}</div>
                             <div className="stat-subtext">{stats.events.upcoming} in programma</div>
                         </div>
                         {/* 6-Month Trend Chart */}
@@ -111,7 +111,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                                 <span className="stat-title">Nuove Iscrizioni</span>
                                 <span className="stat-badge badge-info">Mese</span>
                             </div>
-                            <div className="stat-value">{stats.volunteers.newThisMonth}</div>
+                            <div className="dashboard-stat-value">{stats.volunteers.newThisMonth}</div>
                             <div className="stat-subtext">Ultimi 30 giorni</div>
                         </div>
                         {/* 6-Month Trend Chart */}
@@ -133,7 +133,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                                 <span className="stat-title alert-text">Allerte Urgenti</span>
                                 <ShieldAlert size={16} className="icon-danger" />
                             </div>
-                            <div className="stat-value alert-text">{stats.alerts.urgent}</div>
+                            <div className="dashboard-stat-value alert-text">{stats.alerts.urgent}</div>
                             <div className="stat-subtext alert-text">Richiedono attenzione</div>
                         </div>
                     </div>
