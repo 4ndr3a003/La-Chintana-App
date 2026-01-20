@@ -52,32 +52,40 @@ self.addEventListener('notificationclick', function (event) {
 
   event.notification.close();
 
-  // Define the URL to open
-  const urlToOpen = event.notification.data?.url || '/';
+  // 1. Construct the absolute URL to open
+  //    Default to root if no URL provided in data
+  const connectionString = event.notification.data?.url || '/';
 
-  // This looks to see if the current window is already open and focuses if it is
+  // Ensure we have a full URL (important for matching client.url)
+  const urlToOpen = new URL(connectionString, self.location.origin).href;
+
+  console.log('[firebase-messaging-sw.js] Attempting to open:', urlToOpen);
+
   event.waitUntil(
     clients.matchAll({
       type: 'window',
       includeUncontrolled: true
     }).then(function (clientList) {
-      // Check if there's already a tab open with this URL
+      // 2. Check if there is already a window/tab open with the app
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
-        // If the client is already on the same origin
-        // We can just focus it and navigate
-        if (client.url.includes(self.registration.scope) && 'focus' in client) {
-          return client.focus().then(focusedClient => {
-            // Navigate the focused client to the new URL if needed
-            if (focusedClient && 'navigate' in focusedClient) {
+
+        // Check if the client matches our origin
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          console.log('[firebase-messaging-sw.js] Found existing client, focusing:', client.url);
+          return client.focus().then((focusedClient) => {
+            // After focusing, navigate if it's a different URL
+            if (focusedClient.url !== urlToOpen) {
               return focusedClient.navigate(urlToOpen);
             }
             return focusedClient;
           });
         }
       }
-      // If not, open a new window
+
+      // 3. If no window is open, open a new one
       if (clients.openWindow) {
+        console.log('[firebase-messaging-sw.js] No existing client found, opening new window.');
         return clients.openWindow(urlToOpen);
       }
     })
