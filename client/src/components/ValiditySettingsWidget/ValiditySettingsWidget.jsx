@@ -3,7 +3,7 @@ import { Settings, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 import './ValiditySettingsWidget.css';
 
-const ValiditySettingsWidget = ({ settings, onUpdate, loading }) => {
+const ValiditySettingsWidget = ({ settings, onUpdate, loading, headless = false }) => {
     const [localSettings, setLocalSettings] = useState(settings || {});
     const [hasChanges, setHasChanges] = useState(false);
 
@@ -30,12 +30,15 @@ const ValiditySettingsWidget = ({ settings, onUpdate, loading }) => {
         setHasChanges(false);
     };
 
+    const containerClass = headless ? "settings-widget-headless" : "settings-widget-container";
+    const headerClass = headless ? "settings-header-headless" : "settings-header";
+
     return (
-        <div className="settings-widget-container">
-            <div className="settings-header flex justify-between items-center">
+        <div className={containerClass}>
+            <div className={`${headerClass} flex justify-between items-center`}>
                 <h3 className="settings-title">
                     <Settings size={20} className="text-blue-600" />
-                    Impostazioni Scadenze
+                    Impostazioni Scadenze (in anni)
                 </h3>
                 {hasChanges && (
                     <button

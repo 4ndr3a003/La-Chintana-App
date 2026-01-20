@@ -37,7 +37,7 @@ export const useDirettivoDashboard = () => {
                 const data = doc.data();
                 usersList.push({ id: doc.id, ...data });
 
-                usersList.push({ id: doc.id, ...data });
+
 
                 if (!data.isHidden) {
                     total++;

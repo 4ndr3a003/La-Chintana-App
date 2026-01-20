@@ -21,6 +21,12 @@ const DirettivoDashboard = ({ userProfile }) => {
     const [newNote, setNewNote] = useState('');
     const [noteType, setNoteType] = useState('event');
 
+    // Mobile Tab State: 'operative' or 'management'
+    const [activeTab, setActiveTab] = useState('operative');
+
+    // Mobile Sub-Tab for Expiration/Settings: 'list' or 'settings'
+    const [expiryTab, setExpiryTab] = useState('list');
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -57,7 +63,25 @@ const DirettivoDashboard = ({ userProfile }) => {
 
             <div className="dashboard-content">
 
-                {/* Stats Cards Row */}
+                {/* Mobile Tabs Navigation (Visible only on < 1024px via CSS) */}
+                <div className="mobile-tabs-container">
+                    <button
+                        className={`mobile-tab-btn ${activeTab === 'operative' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('operative')}
+                    >
+                        <ShieldAlert size={18} />
+                        <span>Operativo</span>
+                    </button>
+                    <button
+                        className={`mobile-tab-btn ${activeTab === 'management' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('management')}
+                    >
+                        <Calendar size={18} />
+                        <span>Gestione</span>
+                    </button>
+                </div>
+
+                {/* Stats Cards Row (Horizontal Scroll on Mobile) */}
                 <div className="stats-grid">
                     {/* Volunteers Card */}
                     <div className="stat-card">
@@ -142,22 +166,20 @@ const DirettivoDashboard = ({ userProfile }) => {
                 </div>
 
                 {/* Main Content Grid */}
-                {/* Main Content Grid */}
                 <div className="dashboard-main-grid">
 
-                    {/* Left Column (Operational - ~66%) */}
-                    <div className="left-column">
+                    {/* Left Column (Operational: Weather, Expiry, Validity) */}
+                    <div className={`left-column ${activeTab !== 'operative' ? 'mobile-hidden' : ''}`}>
 
                         <section>
                             <WeatherWidget />
                         </section>
 
-                        {/* Expiration & Settings Row */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                        {/* DESKTOP LAYOUT (>= 1024px) - Side by Side, no unified card */}
+                        <div className="desktop-widgets-grid hidden lg:grid grid-cols-2 gap-6">
                             <section className="h-[400px]">
                                 <ExpirationWidget users={users} />
                             </section>
-
                             <section className="h-[400px]">
                                 <ValiditySettingsWidget
                                     settings={validitySettings}
@@ -167,13 +189,48 @@ const DirettivoDashboard = ({ userProfile }) => {
                             </section>
                         </div>
 
+                        {/* MOBILE LAYOUT (< 1024px) - Unified Card with Toggle */}
+                        <div className="mobile-unified-card lg:hidden dashboard-card h-[500px] flex flex-col p-4">
+                            {/* Card Header with Toggle */}
+                            <div className="flex flex-col items-center gap-4 mb-4">
+                                <div className="mobile-sub-toggle">
+                                    <button
+                                        className={`sub-toggle-btn ${expiryTab === 'list' ? 'active' : ''}`}
+                                        onClick={() => setExpiryTab('list')}
+                                    >
+                                        Scadenze
+                                    </button>
+                                    <button
+                                        className={`sub-toggle-btn ${expiryTab === 'settings' ? 'active' : ''}`}
+                                        onClick={() => setExpiryTab('settings')}
+                                    >
+                                        Impostazioni
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Headless Content */}
+                            <div className="flex-1 overflow-hidden">
+                                {expiryTab === 'list' ? (
+                                    <ExpirationWidget users={users} headless={true} />
+                                ) : (
+                                    <ValiditySettingsWidget
+                                        settings={validitySettings}
+                                        onUpdate={updateValiditySettings}
+                                        loading={loading}
+                                        headless={true}
+                                    />
+                                )}
+                            </div>
+                        </div>
+
                     </div>
 
-                    {/* Right Column (Management - ~33%) */}
-                    <div className="right-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {/* Right Column (Management: Planning) */}
+                    <div className={`right-column ${activeTab !== 'management' ? 'mobile-hidden' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                         {/* Planning Board */}
-                        <section className="dashboard-card">
+                        <section className="dashboard-card h-full">
                             <div className="card-header">
                                 <h3 className="card-title">Bacheca Programmazione</h3>
                             </div>
@@ -232,6 +289,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                     </div>
 
                 </div>
+
 
             </div>
         </div>

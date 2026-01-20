@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Clock, AlertTriangle, AlertCircle } from 'lucide-react';
 import './ExpirationWidget.css';
 
-const ExpirationWidget = ({ users }) => {
+const ExpirationWidget = ({ users, headless = false }) => {
     const expiringItems = useMemo(() => {
         const today = new Date();
         const warningThreshold = 30; // days
@@ -35,13 +35,25 @@ const ExpirationWidget = ({ users }) => {
         return items.sort((a, b) => a.expirationDate - b.expirationDate);
     }, [users]);
 
+    const containerClass = headless ? "expiration-widget-headless" : "expiration-widget";
+
     if (expiringItems.length === 0) {
         return (
-            <div className="expiration-widget">
-                <div className="flex items-center gap-2 mb-4">
-                    <Clock className="text-blue-600" size={20} />
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-white">Scadenze Imminenti</h3>
-                </div>
+            <div className={containerClass}>
+                {!headless && (
+                    <div className="flex items-center gap-2 mb-4">
+                        <Clock className="text-blue-600" size={20} />
+                        <h3 className="font-bold text-lg text-slate-800 dark:text-white">Scadenze Imminenti</h3>
+                    </div>
+                )}
+                {headless && (
+                    <div className="flex items-center gap-2 mb-4">
+                        <Clock className="text-blue-600" size={20} />
+                        <h3 className="font-bold text-lg text-slate-800 dark:text-white">Scadenze Imminenti</h3>
+                    </div>
+                )}
+                {/* Logic above is redundant, simplified below */}
+
                 <div className="flex flex-col items-center justify-center h-full text-slate-400 py-8">
                     <Clock size={40} className="mb-2 opacity-50" />
                     <p className="text-sm">Nessuna scadenza nei prossimi 30 giorni.</p>
@@ -51,7 +63,7 @@ const ExpirationWidget = ({ users }) => {
     }
 
     return (
-        <div className="expiration-widget">
+        <div className={containerClass}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Clock className="text-blue-600" size={20} />

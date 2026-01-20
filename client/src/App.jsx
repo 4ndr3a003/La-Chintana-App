@@ -278,6 +278,8 @@ export default function App() {
         try {
           registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
           console.log('Service Worker registration successful with scope: ', registration.scope);
+          // FORCE UPDATE CHECK:
+          registration.update();
         } catch (err) {
           console.error('Service Worker registration failed: ', err);
           showToast('Errore Service Worker: ' + err.message, 'Errore', 'error');
