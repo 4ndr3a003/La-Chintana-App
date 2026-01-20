@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home } from 'lucide-react';
+import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -67,7 +67,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       )}
 
       {/* Top Card: Profile Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-[var(--color-slate-100)] dark:border-slate-200 relative">
+      <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 border border-white/60 dark:border-slate-200 relative">
         <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <Badge
             text={ROLE_LABELS[userProfile.role]}
@@ -105,10 +105,45 @@ const UserProfileView = ({ userProfile, onLogout }) => {
         </div>
       </div>
 
+      {/* Expiration Alerts */}
+      {(() => {
+        const expiringCerts = userProfile.certifications ? Object.entries(userProfile.certifications).filter(([_, cert]) => {
+          if (!cert.expirationDate) return false;
+          const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+          return days <= 30;
+        }) : [];
+
+        if (expiringCerts.length > 0) {
+          return (
+            <div className="bg-amber-50 rounded-xl shadow-sm p-4 mb-6 border border-amber-200 relative animate-in slide-in-from-top-2 fade-in">
+              <div className="flex items-center gap-2 mb-3 text-amber-800 font-bold text-lg">
+                <AlertTriangle size={20} />
+                <h3>Attenzione: Scadenze Rilevate</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {expiringCerts.map(([name, cert]) => {
+                  const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+                  const isExpired = days < 0;
+                  return (
+                    <div key={name} className="flex items-center justify-between text-sm bg-white p-3 rounded-lg border border-amber-100 shadow-sm">
+                      <span className="font-medium text-slate-700">{name}</span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-md ${isExpired ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {isExpired ? `Scaduto da ${Math.abs(days)} gg` : `Scade tra ${days} gg`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Middle Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Dati Personali */}
-        <div className="bg-white rounded-xl shadow-sm p-8 border border-[var(--color-slate-100)] dark:border-slate-200 relative">
+        <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-8 border border-white/60 dark:border-slate-200 relative">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-xl font-bold text-[var(--color-slate-900)]">Dati Personali</h3>
           </div>
@@ -133,7 +168,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
         </div>
 
         {/* Informazioni di Contatto */}
-        <div className="bg-white rounded-3xl shadow-sm p-8 border border-[var(--color-slate-100)] relative">
+        <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-8 border border-white/60 relative">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-xl font-bold text-[var(--color-slate-900)]">Informazioni di Contatto</h3>
           </div>
@@ -151,7 +186,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       </div>
 
       {/* Bottom Card: Specializzazioni e Patenti */}
-      <div className="bg-white rounded-xl shadow-sm p-8 border border-[var(--color-slate-100)] dark:border-slate-200 relative mb-6">
+      <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-8 border border-white/60 dark:border-slate-200 relative mb-6">
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-xl font-bold text-[var(--color-slate-900)]">Specializzazioni e Patenti</h3>
         </div>

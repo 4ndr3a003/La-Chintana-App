@@ -58,7 +58,7 @@ const EventCard = ({ event }) => {
         <Link
             to="/events"
             state={{ selectedEventId: event.id }}
-            className={`${theme.cardBg} ${theme.borderColor} rounded-xl shadow-sm border overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 group h-full`}
+            className={`${theme.cardBg} ${theme.borderColor} rounded-3xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.04)] border overflow-hidden flex flex-col hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 group h-full`}
         >
             <div className="flex flex-row h-full">
                 {/* Left Date Strip */}

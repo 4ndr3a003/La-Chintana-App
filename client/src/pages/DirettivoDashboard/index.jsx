@@ -12,10 +12,12 @@ import {
 import { useDirettivoDashboard } from './DirettivoDashboardLogic';
 import './DirettivoDashboard.css';
 import WeatherWidget from '../../components/WeatherWidget/WeatherWidget';
+import ExpirationWidget from '../../components/ExpirationWidget/ExpirationWidget';
+import ValiditySettingsWidget from '../../components/ValiditySettingsWidget/ValiditySettingsWidget';
 
 const DirettivoDashboard = ({ userProfile }) => {
     const navigate = useNavigate();
-    const { stats, monthlyStats, planningNotes, addNote, deleteNote, loading } = useDirettivoDashboard();
+    const { stats, monthlyStats, planningNotes, addNote, deleteNote, loading, users, validitySettings, updateValiditySettings } = useDirettivoDashboard();
     const [newNote, setNewNote] = useState('');
     const [noteType, setNoteType] = useState('event');
 
@@ -143,20 +145,34 @@ const DirettivoDashboard = ({ userProfile }) => {
                 {/* Main Content Grid */}
                 <div className="dashboard-main-grid">
 
-                    {/* Left Column (Operational - ~35%) */}
+                    {/* Left Column (Operational - ~66%) */}
                     <div className="left-column">
 
-                        {/* 1. Situational Awareness (Top Priority) */}
                         <section>
                             <WeatherWidget />
                         </section>
 
+                        {/* Expiration & Settings Row */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+                            <section className="h-[400px]">
+                                <ExpirationWidget users={users} />
+                            </section>
+
+                            <section className="h-[400px]">
+                                <ValiditySettingsWidget
+                                    settings={validitySettings}
+                                    onUpdate={updateValiditySettings}
+                                    loading={loading}
+                                />
+                            </section>
+                        </div>
+
                     </div>
 
-                    {/* Right Column (Management - ~65%) */}
-                    <div className="right-column">
+                    {/* Right Column (Management - ~33%) */}
+                    <div className="right-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                        {/* 2. Planning Board */}
+                        {/* Planning Board */}
                         <section className="dashboard-card">
                             <div className="card-header">
                                 <h3 className="card-title">Bacheca Programmazione</h3>

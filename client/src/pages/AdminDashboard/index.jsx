@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw } from 'lucide-react';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
@@ -51,7 +51,8 @@ const AdminDashboard = ({ userProfile }) => {
     handleExportCSV,
     handleImportCSV,
     notification,
-    closeNotification
+    closeNotification,
+    handleCertificationChange
   } = useAdminDashboard();
 
   const formatName = (fullName) => {
@@ -416,6 +417,41 @@ const AdminDashboard = ({ userProfile }) => {
                 )}
               </div>
 
+              {/* Expiration Alerts */}
+              {(() => {
+                const expiringCerts = selectedUser.certifications ? Object.entries(selectedUser.certifications).filter(([_, cert]) => {
+                  if (!cert.expirationDate) return false;
+                  const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+                  return days <= 30;
+                }) : [];
+
+                if (expiringCerts.length > 0) {
+                  return (
+                    <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl animate-in slide-in-from-top-2 fade-in">
+                      <div className="flex items-center gap-2 mb-2 text-amber-800 dark:text-amber-400 font-bold">
+                        <AlertTriangle size={18} />
+                        <h4>Attenzione: Scadenze Rilevate</h4>
+                      </div>
+                      <ul className="space-y-2">
+                        {expiringCerts.map(([name, cert]) => {
+                          const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+                          const isExpired = days < 0;
+                          return (
+                            <li key={name} className="flex items-center justify-between text-sm bg-white dark:bg-slate-800 p-2 rounded-lg border border-amber-100 dark:border-amber-900/50">
+                              <span className="font-medium text-slate-700 dark:text-slate-300">{name}</span>
+                              <span className={`text-xs font-bold px-2 py-1 rounded-md ${isExpired ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                                {isExpired ? `Scaduto da ${Math.abs(days)} gg` : `Scade tra ${days} gg`}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               <div className="space-y-6">
                 <div className="info-grid">
                   <div className="info-card">
@@ -627,20 +663,60 @@ const AdminDashboard = ({ userProfile }) => {
                           <h5 className={`flex items-center gap-2 font-bold text-xs uppercase mb-3 ${data.titleColor}`}>
                             {data.icon} {category}
                           </h5>
-                          <div className="flex flex-wrap gap-2">
-                            {data.items.map(item => (
-                              <button
-                                key={item}
-                                type="button"
-                                onClick={() => toggleSpec(item)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${formData.specializations.includes(item)
-                                  ? `${data.color} border-transparent shadow-sm`
-                                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:dark:border-slate-600'
-                                  }`}
-                              >
-                                {item}
-                              </button>
-                            ))}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {data.items.map(item => {
+                              const isSelected = formData.specializations.includes(item);
+                              const certData = formData.certifications?.[item] || {};
+                              const isPatente = category === "Patenti di Guida";
+
+                              return (
+                                <div
+                                  key={item}
+                                  className={`rounded-xl border transition-all duration-200 overflow-hidden ${isSelected
+                                    ? `${data.color} shadow-sm ring-1 ring-black/5 dark:ring-white/10`
+                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                    }`}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleSpec(item)}
+                                    className="w-full text-left px-4 py-3 flex items-center justify-between text-xs font-bold bg-transparent"
+                                  >
+                                    <span className="truncate pr-2">{item}</span>
+                                    {isSelected ? (
+                                      <CheckCircle size={18} className="shrink-0 opacity-100 transition-opacity" />
+                                    ) : (
+                                      <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 shrink-0" />
+                                    )}
+                                  </button>
+
+                                  {isSelected && !isPatente && (
+                                    <div className="px-4 pb-4 pt-0 animate-in slide-in-from-top-1 fade-in duration-200">
+                                      <div className="bg-white/50 dark:bg-black/20 p-2.5 rounded-lg border border-black/5 dark:border-white/5 backdrop-blur-[2px]">
+                                        <label className="text-[10px] uppercase font-bold opacity-70 block mb-1.5 tracking-wider">
+                                          Data Conseguimento
+                                        </label>
+                                        <div className="relative">
+                                          <input
+                                            type="date"
+                                            className="w-full text-sm px-3 py-2 pl-9 rounded-md border-0 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-400 appearance-none"
+                                            value={certData.completionDate || ''}
+                                            onChange={(e) => handleCertificationChange(item, 'completionDate', e.target.value)}
+                                          />
+                                          <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                                        </div>
+                                        {certData.expirationDate && (
+                                          <div className="mt-2 flex items-center justify-between text-xs pt-2 border-t border-black/5 dark:border-white/5">
+                                            <span className="opacity-70">Scadenza:</span>
+                                            <span className="font-bold">{new Date(certData.expirationDate).toLocaleDateString('it-IT')}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       ))}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { ROLES, VOLUNTEER_ROLES } from '../../utils/constants';
+import { ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useAdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -31,8 +31,10 @@ export const useAdminDashboard = () => {
   // Form State
   const [formData, setFormData] = useState({});
   const [customSpec, setCustomSpec] = useState("");
+  const [validitySettings, setValiditySettings] = useState({});
 
   useEffect(() => {
+    // 1. Fetch Users
     const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'));
     const unsub = onSnapshot(q, (snap) => {
       const usersList = [];
@@ -51,7 +53,19 @@ export const useAdminDashboard = () => {
 
       setUsers(usersList);
     });
-    return () => unsub();
+
+    // 2. Fetch Validity Settings
+    const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+    const unsubSettings = onSnapshot(settingsRef, (snap) => {
+      if (snap.exists()) {
+        setValiditySettings(snap.data());
+      }
+    });
+
+    return () => {
+      unsub();
+      unsubSettings();
+    };
   }, []);
 
   const filteredUsers = users.filter(user => {
@@ -74,6 +88,7 @@ export const useAdminDashboard = () => {
       firstName: firstName || '',
       lastName: lastName || '',
       specializations: user.specializations || [],
+      certifications: user.certifications || {}, // Load certifications
       emercomnetId: user.emercomnetId || '',
       status: user.status || 'Operativo',
       boardRole: user.boardRole || '',
@@ -98,10 +113,11 @@ export const useAdminDashboard = () => {
       emercomnetId: '',
       status: 'Operativo',
       role: ROLES.VOLUNTEER,
-      role: ROLES.VOLUNTEER,
+      // role: ROLES.VOLUNTEER, // Removed duplicate
       boardRole: '',
       volunteerRole: '',
       specializations: [],
+      certifications: {}, // Initialize certifications
       joinedAt: new Date().toISOString(),
       photoUrl: ''
     });
@@ -158,10 +174,11 @@ export const useAdminDashboard = () => {
       name: fullName,
       email: formData.email,
       role: formData.role,
-      role: formData.role,
+      // role: formData.role, // Removed duplicate
       boardRole: formData.boardRole || null,
       volunteerRole: formData.volunteerRole || null,
       specializations: formData.specializations,
+      certifications: formData.certifications || {}, // Save certifications
       phone: formData.phone || '',
       cf: formData.cf || '',
       birthDate: formData.birthDate || '',
@@ -204,20 +221,89 @@ export const useAdminDashboard = () => {
   const toggleSpec = (spec) => {
     setFormData(prev => {
       const specs = prev.specializations || [];
+      const certs = { ...prev.certifications };
+      let newSpecs;
+
       if (specs.includes(spec)) {
-        return { ...prev, specializations: specs.filter(s => s !== spec) };
+        // Remove
+        newSpecs = specs.filter(s => s !== spec);
+        // Optional: remove certification data when unchecked?
+        // delete certs[spec]; // Uncomment if we want to clean up data
       } else {
-        return { ...prev, specializations: [...specs, spec] };
+        // Add
+        newSpecs = [...specs, spec];
+        // Initialize certification entry if needed
+        if (!certs[spec]) {
+          certs[spec] = {
+            completionDate: '',
+            expirationDate: ''
+          };
+        }
       }
+      return { ...prev, specializations: newSpecs, certifications: certs };
     });
   };
 
   const addCustomSpec = () => {
     if (customSpec && !formData.specializations.includes(customSpec)) {
-      setFormData(prev => ({ ...prev, specializations: [...prev.specializations, customSpec] }));
+      setFormData(prev => ({
+        ...prev,
+        specializations: [...prev.specializations, customSpec],
+        certifications: {
+          ...prev.certifications,
+          [customSpec]: { completionDate: '', expirationDate: '' }
+        }
+      }));
       setCustomSpec("");
     }
   };
+
+  // Handle changes to certification dates
+  const handleCertificationChange = (specName, field, value) => {
+    setFormData(prev => {
+      const newCerts = { ...prev.certifications };
+      const currentCert = newCerts[specName] || {};
+
+      const updatedCert = {
+        ...currentCert,
+        [field]: value
+      };
+
+      // Auto-calculate expiration date if completionDate changes
+      if (field === 'completionDate' && value) {
+        // 1. Try to find validity in dynamic settings
+        let validityYears = validitySettings[specName];
+
+        // 2. Fallback to constants if not in dynamic settings
+        if (validityYears === undefined) {
+          for (const cat in SPECIALIZATIONS_DATA) {
+            const data = SPECIALIZATIONS_DATA[cat];
+            if (data.validityYears && data.validityYears[specName]) {
+              validityYears = data.validityYears[specName];
+              break;
+            }
+          }
+        }
+
+        // 3. Last resort default
+        if (validityYears === undefined) validityYears = 5;
+
+        if (validityYears > 0) {
+          const compDate = new Date(value);
+          const expDate = new Date(compDate);
+          expDate.setFullYear(expDate.getFullYear() + validityYears);
+
+          // Format to YYYY-MM-DD
+          updatedCert.expirationDate = expDate.toISOString().split('T')[0];
+        }
+      }
+
+      newCerts[specName] = updatedCert;
+
+      return { ...prev, certifications: newCerts };
+    });
+  };
+
 
   const closeAll = () => {
     setIsEditing(false);
@@ -516,6 +602,9 @@ export const useAdminDashboard = () => {
 
           if (altro) specs.push(...altro.split(';').map(s => s.trim()).filter(s => s));
 
+          // TODO: Initialize certifications with empty dates for imported specs?
+          // For now, we leave them undefined, they will be treated as empty.
+
           userData = {
             name: `${firstName} ${lastName}`.trim(),
             email: email.trim(),
@@ -528,6 +617,7 @@ export const useAdminDashboard = () => {
             role: ROLES.VOLUNTEER,
             // status: 'Operativo', // Will be calculated
             specializations: specs,
+            certifications: {}, // Init empty
             joinedAt: new Date().toISOString(),
             photoUrl: ''
           };
@@ -592,6 +682,7 @@ export const useAdminDashboard = () => {
     handleSave,
     toggleSpec,
     addCustomSpec,
+    handleCertificationChange,
     closeAll,
     setIsViewing,
     setIsEditing,

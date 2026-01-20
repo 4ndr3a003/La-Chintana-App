@@ -49,12 +49,12 @@
     width: 100%;
     max-width: 26rem;
     margin: 0;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-radius: 1.5rem;
+    box-shadow: 0 40px 80px -20px rgba(0, 77, 157, 0.2), 0 20px 30px -10px rgba(0, 77, 157, 0.1);
+    border-radius: 2rem;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--color-slate-100);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 

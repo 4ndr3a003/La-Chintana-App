@@ -129,8 +129,8 @@ const CommunicationsView = ({ userProfile }) => {
       <div className="comm-header mb-6">
         <div className="comm-title-row mb-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <h3 className="comm-title text-xl font-bold text-slate-800 flex items-center gap-2">
-              <MessageSquare className="text-blue-600" size={28} /> Comunicazioni
+            <h3 className="comm-title text-3xl font-extrabold text-slate-800 flex items-center gap-2">
+              <MessageSquare className="text-blue-600" size={32} /> Comunicazioni
             </h3>
             <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">{filteredMessages.length}</span>
           </div>

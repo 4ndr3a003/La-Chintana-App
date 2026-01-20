@@ -16,7 +16,7 @@ const HomeDashboard = ({ userProfile }) => {
     <div className="home-dashboard-container">
       {/* Header - Yellow Banner */}
       <header className="mb-8 pt-4 px-4 md:px-0">
-        <div className="bg-[var(--color-pc-yellow)] rounded-xl p-6 md:p-8 flex items-center gap-6 shadow-sm">
+        <div className="bg-[var(--color-pc-yellow)] p-6 md:p-8 flex items-center gap-6 premium-header-card">
           <div className="hidden md:block">
             <Avatar src={userProfile.photoUrl} name={userProfile.name} size="lg" className="border-4 border-white/30" />
           </div>
@@ -35,7 +35,7 @@ const HomeDashboard = ({ userProfile }) => {
             <div className="ml-auto">
               <Link
                 to="/direttivo"
-                className="bg-blue-600 dark:bg-slate-100 hover:bg-blue-700 text-white p-3 rounded-xl shadow-lg transition-all hover:scale-105 flex items-center justify-center"
+                className="bg-blue-600 dark:bg-slate-100 hover:bg-blue-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-105 flex items-center justify-center"
                 title="Dashboard Direttivo"
               >
                 <Gauge strokeWidth={1.5} size={32} />

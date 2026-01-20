@@ -52,6 +52,12 @@ export const SPECIALIZATIONS_DATA = {
       "Corso 12 ore",
       "Caposquadra"
     ],
+    // Default validity in years
+    validityYears: {
+      "Corso 4 ore": 5,
+      "Corso 12 ore": 5,
+      "Caposquadra": 5
+    },
     icon: <Shield size={18} className="text-emerald-600 dark:text-[var(--color-pc-green-600)]" />,
     color: "bg-[var(--color-pc-green-100)] dark:bg-emerald-900/20 text-[var(--color-pc-green-700)] dark:text-emerald-400 border-[var(--color-pc-green-200)] dark:border-emerald-800",
     titleColor: "text-emerald-700 dark:text-emerald-400"
@@ -62,6 +68,11 @@ export const SPECIALIZATIONS_DATA = {
       "Radio FIRCB",
       "Sala operativa"
     ],
+    validityYears: {
+      "Radio emercomnet": 5,
+      "Radio FIRCB": 5,
+      "Sala operativa": 5
+    },
     icon: <RadioTower size={18} className="text-blue-600 dark:text-[var(--color-pc-blue-600)]" />,
     color: "bg-[var(--color-pc-blue-100)] dark:bg-blue-900/20 text-[var(--color-pc-blue-700)] dark:text-blue-400 border-[var(--color-pc-blue-200)] dark:border-blue-800",
     titleColor: "text-blue-700 dark:text-blue-400"
@@ -74,6 +85,13 @@ export const SPECIALIZATIONS_DATA = {
       "Visita medica",
       "Manovre di disostruzione"
     ],
+    validityYears: {
+      "HACCP": 5, // TEMPORARY DEFAULT
+      "BLSD": 2,
+      "Primo soccorso": 5, // TEMPORARY DEFAULT
+      "Visita medica": 5, // TEMPORARY DEFAULT
+      "Manovre di disostruzione": 5 // TEMPORARY DEFAULT
+    },
     icon: <HeartPulse size={18} className="text-red-600 dark:text-[var(--color-pc-red-600)]" />,
     color: "bg-[var(--color-pc-red-100)] dark:bg-red-900/20 text-[var(--color-pc-red-700)] dark:text-red-400 border-[var(--color-pc-red-200)] dark:border-red-800",
     titleColor: "text-red-700 dark:text-red-400"
@@ -83,6 +101,10 @@ export const SPECIALIZATIONS_DATA = {
       "Motosega",
       "Muletto"
     ],
+    validityYears: {
+      "Motosega": 5,
+      "Muletto": 5
+    },
     icon: <HardHat size={18} className="text-orange-600 dark:text-[var(--color-pc-orange-600)]" />,
     color: "bg-[var(--color-pc-orange-100)] dark:bg-orange-900/20 text-[var(--color-pc-orange-700)] dark:text-orange-400 border-[var(--color-pc-orange-200)] dark:border-orange-800",
     titleColor: "text-orange-700 dark:text-orange-400"
@@ -94,7 +116,7 @@ export const SPECIALIZATIONS_DATA = {
       "Patente D", "Patente DE"
     ],
     icon: <Truck size={18} className="text-slate-600 dark:text-white" />,
-    color: "tag-patenti",
+    color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-100 border-slate-200 dark:border-slate-700",
     titleColor: "text-slate-700 dark:!text-white"
   }
 };

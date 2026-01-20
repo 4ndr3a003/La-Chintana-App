@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { query, collection, onSnapshot, orderBy, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { query, collection, onSnapshot, orderBy, addDoc, deleteDoc, doc, serverTimestamp, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useDirettivoDashboard = () => {
     const [stats, setStats] = useState({
@@ -12,6 +13,8 @@ export const useDirettivoDashboard = () => {
 
     const [monthlyStats, setMonthlyStats] = useState([]);
     const [planningNotes, setPlanningNotes] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [validitySettings, setValiditySettings] = useState({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,12 +28,15 @@ export const useDirettivoDashboard = () => {
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
+            const usersList = [];
 
             // Initialize 6-month trend array (current month at index 5)
             const memberTrend = Array(6).fill(0);
 
             snap.forEach(doc => {
                 const data = doc.data();
+                usersList.push({ id: doc.id, ...data });
+
                 total++;
                 if (data.status === 'Operativo') active++;
                 else inactive++;
@@ -48,6 +54,8 @@ export const useDirettivoDashboard = () => {
                     }
                 }
             });
+
+            setUsers(usersList);
 
             setStats(prev => ({
                 ...prev,
@@ -132,6 +140,29 @@ export const useDirettivoDashboard = () => {
             setPlanningNotes(notes);
         });
 
+        // 5. Fetch Validity Settings
+        const fetchSettings = async () => {
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+                const snap = await getDoc(settingsRef);
+                if (snap.exists()) {
+                    setValiditySettings(snap.data());
+                } else {
+                    // Initialize with defaults from constants if not exists
+                    const defaults = {};
+                    Object.values(SPECIALIZATIONS_DATA).forEach(cat => {
+                        if (cat.validityYears) {
+                            Object.assign(defaults, cat.validityYears);
+                        }
+                    });
+                    setValiditySettings(defaults);
+                }
+            } catch (err) {
+                console.error("Error fetching validity settings:", err);
+            }
+        };
+        fetchSettings();
+
         setLoading(false);
 
         return () => {
@@ -141,6 +172,108 @@ export const useDirettivoDashboard = () => {
             unsubNotes();
         };
     }, []);
+
+    const updateValiditySettings = async (newSettings) => {
+        try {
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+            // Ensure path exists (settings/validity might need parent doc creation if purely nested but here it's collection 'settings' not existing yet maybe? 
+            // Actually 'public/data/settings' is col/doc/subcol? No, structure is artifacts/appId/public/data. 
+            // So 'settings' is a doc ID in 'data' collection? Or 'settings' is a collection in 'data' doc?
+            // The query above used collection(db, 'artifacts', appId, 'public', 'data', 'profiles').
+            // So 'data' is a collection. 'profiles' is a document? NO.
+            // 'profiles' is a collection inside 'data' document?
+            // Wait, original query: collection(db, 'artifacts', appId, 'public', 'data', 'profiles') -> This means:
+            // Coll: artifacts -> Doc: appId -> Coll: public -> Doc: data -> Coll: profiles.
+            // So we want: Coll: artifacts -> Doc: appId -> Coll: public -> Doc: data -> Coll: settings -> Doc: validity.
+
+            await setDoc(settingsRef, newSettings, { merge: true });
+            setValiditySettings(newSettings);
+
+            // Auto-sync expirations
+            await syncExpirations(newSettings);
+
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            throw error;
+        }
+    };
+
+    const syncExpirations = async (currentSettings) => {
+        if (!users || users.length === 0) return;
+
+        try {
+            const batch = writeBatch(db);
+            let updateCount = 0;
+            const MAX_BATCH_SIZE = 450;
+            const batches = [batch];
+            let currentBatchIndex = 0;
+            let currentBatchCount = 0;
+
+            users.forEach(user => {
+                if (!user.certifications) return;
+
+                let userUpdated = false;
+                const newCerts = { ...user.certifications };
+
+                Object.entries(newCerts).forEach(([certName, certData]) => {
+                    if (certData.completionDate) {
+                        // Get validity from new settings or default to 5 if missing
+                        // NOTE: currentSettings is flat object { "Corso A": 5, ... } based on Widget logic
+                        // But SPECIALIZATIONS_DATA structure is nested. Widget flattens it effectively or builds flat object?
+                        // Widget passes `localSettings` which is { "Corso Name": years, ... }
+
+                        let validityYears = currentSettings[certName];
+
+                        // Fallback to constants if not in settings (though widget should cover all)
+                        if (validityYears === undefined) {
+                            // Try to find in constants
+                            for (const cat in SPECIALIZATIONS_DATA) {
+                                if (SPECIALIZATIONS_DATA[cat].validityYears && SPECIALIZATIONS_DATA[cat].validityYears[certName]) {
+                                    validityYears = SPECIALIZATIONS_DATA[cat].validityYears[certName];
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Default to 5 if still undefined
+                        if (validityYears === undefined) validityYears = 5;
+
+                        const compDate = new Date(certData.completionDate);
+                        const expectedExpDate = new Date(compDate);
+                        expectedExpDate.setFullYear(expectedExpDate.getFullYear() + validityYears);
+                        const expectedExpDateStr = expectedExpDate.toISOString().split('T')[0];
+
+                        if (certData.expirationDate !== expectedExpDateStr) {
+                            newCerts[certName] = { ...certData, expirationDate: expectedExpDateStr };
+                            userUpdated = true;
+                        }
+                    }
+                });
+
+                if (userUpdated) {
+                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', user.id);
+
+                    if (currentBatchCount >= MAX_BATCH_SIZE) {
+                        batches.push(writeBatch(db));
+                        currentBatchIndex++;
+                        currentBatchCount = 0;
+                    }
+
+                    batches[currentBatchIndex].update(userRef, { certifications: newCerts });
+                    currentBatchCount++;
+                    updateCount++;
+                }
+            });
+
+            if (updateCount > 0) {
+                await Promise.all(batches.map(b => b.commit()));
+                console.log(`Auto-synced ${updateCount} users.`);
+            }
+
+        } catch (error) {
+            console.error("Auto-sync failed:", error);
+        }
+    };
 
     const addNote = async (text, type) => {
         if (!text.trim()) return;
@@ -164,5 +297,5 @@ export const useDirettivoDashboard = () => {
         }
     };
 
-    return { stats, monthlyStats, planningNotes, addNote, deleteNote, loading };
+    return { stats, monthlyStats, planningNotes, addNote, deleteNote, loading, users, validitySettings, updateValiditySettings };
 };

@@ -9,7 +9,7 @@ const CommunicationCard = ({ message, userProfile, onDelete, onEdit, onClick }) 
 
   const getTheme = (topic, importance) => {
     let theme = {};
-    switch(topic) {
+    switch (topic) {
       case 'Urgente':
         theme = {
           headerBg: 'bg-red-100',
@@ -80,9 +80,9 @@ const CommunicationCard = ({ message, userProfile, onDelete, onEdit, onClick }) 
   const theme = getTheme(message.topic, message.importance);
 
   return (
-    <div 
+    <div
       onClick={onClick}
-      className={`bg-white rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-all duration-300 cursor-pointer group ${theme.borderColor} ${theme.card || 'border'}`}
+      className={`bg-white rounded-3xl overflow-hidden flex flex-col hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-300 cursor-pointer group ${theme.borderColor} ${theme.card || 'border'}`}
     >
       {/* Header Colorato */}
       <div className={`${theme.headerBg} px-4 py-3 border-b ${theme.borderColor} flex justify-between items-start gap-3`}>
@@ -91,53 +91,53 @@ const CommunicationCard = ({ message, userProfile, onDelete, onEdit, onClick }) 
           <h3 className={`text-lg font-bold ${theme.headerText} leading-tight`}>{message.title}</h3>
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
-            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap`}>
-                {message.topic}
-            </span>
+          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${theme.badge} whitespace-nowrap`}>
+            {message.topic}
+          </span>
         </div>
       </div>
 
       {/* Body */}
       <div className="p-4 flex flex-col flex-grow">
         <p className="text-slate-600 text-sm mb-4 whitespace-pre-wrap line-clamp-3">{message.content}</p>
-        
+
         <div className="mt-auto flex justify-between items-center pt-3 border-t border-slate-100">
-            <div className="flex items-center gap-3">
-                <Avatar 
-                    src={message.authorPhotoURL} 
-                    name={message.authorName} 
-                    size="xs"
-                    className="w-6 h-6"
-                />
-                <div className="text-[10px] text-slate-400 font-medium">
-                    {dateObj.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                </div>
+          <div className="flex items-center gap-3">
+            <Avatar
+              src={message.authorPhotoURL}
+              name={message.authorName}
+              size="xs"
+              className="w-6 h-6"
+            />
+            <div className="text-[10px] text-slate-400 font-medium">
+              {dateObj.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
             </div>
-            
-            {isAdmin && (
-                <div className="flex gap-1">
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(message);
-                        }}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                        title="Modifica comunicazione"
-                    >
-                        <Pencil size={16} />
-                    </button>
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(message.id);
-                        }}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                        title="Elimina comunicazione"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                </div>
-            )}
+          </div>
+
+          {isAdmin && (
+            <div className="flex gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(message);
+                }}
+                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                title="Modifica comunicazione"
+              >
+                <Pencil size={16} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(message.id);
+                }}
+                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                title="Elimina comunicazione"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ const AvailabilityWidget = ({ currentMonth, onMonthChange, events = [] }) => {
     };
 
     return (
-        <div className="bg-white rounded-3xl shadow-sm p-4 border border-[var(--color-slate-100)] flex flex-col mt-12">
+        <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-6 border border-white/60 flex flex-col mt-12">
             <h3 className="text-lg font-bold text-[var(--color-slate-900)] mb-4">Calendario</h3>
 
             {/* Calendar View */}
