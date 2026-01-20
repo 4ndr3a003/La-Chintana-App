@@ -196,15 +196,24 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
     id: commId
   };
 
-  // Filter for specific topics
+  // Filter for specific topics or visibility
   let targetFilter = null;
 
-  if (data.topic === 'Direttivo') {
+  // Constants (Mirroring Client)
+  const VISIBILITY = {
+    BOARD_ONLY: 'Solo Direttivo',
+    K9_ONLY: 'Solo Cinofili'
+  };
+
+  const isDirettivoTarget = data.topic === 'Direttivo' || data.visibility === VISIBILITY.BOARD_ONLY;
+  const isK9Target = data.topic === 'Cinofili' || data.visibility === VISIBILITY.K9_ONLY;
+
+  if (isDirettivoTarget) {
     targetFilter = (user) => {
       // STRICT FILTER: Only Board Members and President
       return user.role === 'direttivo' || user.role === 'presidente';
     };
-  } else if (data.topic === 'Cinofili') {
+  } else if (isK9Target) {
     targetFilter = (user) => {
       // Board Members AND K9 Volunteers
       const isBoard = user.role === 'direttivo' || user.role === 'presidente';

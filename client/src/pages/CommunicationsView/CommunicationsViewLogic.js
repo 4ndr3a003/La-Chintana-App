@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { query, collection, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants'; // Import constants
 import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useCommunicationsView = (userProfile) => {
@@ -16,7 +17,8 @@ export const useCommunicationsView = (userProfile) => {
     content: '',
     importance: 'Normale',
     topic: 'Generale',
-    expirationDate: ''
+    expirationDate: '',
+    visibility: EVENT_VISIBILITY.ALL // Add visibility default
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -56,22 +58,41 @@ export const useCommunicationsView = (userProfile) => {
       }
     }
 
-    // Check visibility for 'Direttivo' topic
-    const isDirettivoContent = msg.topic === 'Direttivo';
-
-    // Check visibility for 'Cinofili' topic
-    const isCinofiliContent = msg.topic === 'Cinofili';
-
-    // Check for ANY board member or president
+    // Role-based Filtering
     const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
 
-    // Check for K9 role
-    const isK9 = userProfile?.volunteerRole === 'Cinofilo';
+    // 1. Topic-based Legacy Check (for backward compatibility or explicit topic usage)
+    const isDirettivoContent = msg.topic === 'Direttivo';
+    const isCinofiliContent = msg.topic === 'Cinofili';
 
     if (isDirettivoContent && !isBoardOrPresident) {
       return false;
     }
 
+    // 2. Visibility Field Check (New Logic)
+    const visibility = msg.visibility || EVENT_VISIBILITY.ALL;
+
+    if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
+      if (!isBoardOrPresident) return false;
+    }
+
+    if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+      // Check K9 Role
+      const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
+      // Allow if Broad/President OR K9
+      if (!isK9 && !isBoardOrPresident) {
+        // Fallback: check if topic is Cinofili (already handled above but double check logic flow)
+        // If topic is Cinofili, we might have already returned false if we strictly followed previous logic?
+        // Actually, previous logic was: if Cinofili Topic AND not Board AND not K9 -> return false.
+        // So we just need to ensure we don't accidentally hide it if it passes Topic check but fails Visibility check?
+        // No, both are restrictive. If either restricts access, we hide it.
+        // Wait, Visibility K9_ONLY implies "Only K9 (and admins)".
+        return false;
+      }
+    }
+
+    // Explicit Topic 'Cinofili' check from original code (preserved)
+    const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
     if (isCinofiliContent && !isBoardOrPresident && !isK9) {
       return false;
     }
@@ -116,7 +137,7 @@ export const useCommunicationsView = (userProfile) => {
 
         // Notification is now handled by Cloud Functions
       }
-      setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '' });
+      setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '', visibility: EVENT_VISIBILITY.ALL });
       setIsCreateModalOpen(false);
       setIsEditing(false);
       setCurrentCommId(null);
@@ -131,7 +152,7 @@ export const useCommunicationsView = (userProfile) => {
   const openCreateModal = () => {
     setIsEditing(false);
     setCurrentCommId(null);
-    setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '' });
+    setNewComm({ title: '', content: '', importance: 'Normale', topic: 'Generale', expirationDate: '', visibility: EVENT_VISIBILITY.ALL });
     setIsCreateModalOpen(true);
   };
 
@@ -143,7 +164,8 @@ export const useCommunicationsView = (userProfile) => {
       content: comm.content,
       importance: comm.importance,
       topic: comm.topic,
-      expirationDate: comm.expirationDate || ''
+      expirationDate: comm.expirationDate || '',
+      visibility: comm.visibility || EVENT_VISIBILITY.ALL
     });
     setIsCreateModalOpen(true);
   };

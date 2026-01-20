@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageSquare, ChevronDown, Trash2, PlusCircle, MessageSquarePlus, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
-import { hasAdminAccess, canManageContent } from '../../utils/constants';
+import { hasAdminAccess, canManageContent, EVENT_VISIBILITY } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CommunicationCard from '../../components/communications/CommunicationCard';
@@ -107,7 +107,7 @@ const CommunicationsView = ({ userProfile }) => {
     isSubmitting
   } = useCommunicationsView(userProfile);
 
-  const topicOptions = ['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map(topic => ({
+  const topicOptions = ['Generale', 'Servizio', 'Formazione', 'Urgente', 'Altro'].map(topic => ({
     value: topic,
     label: topic,
     color: getTheme(topic).dotColor
@@ -118,6 +118,11 @@ const CommunicationsView = ({ userProfile }) => {
     { value: 'Alta', label: 'Alta', color: 'bg-red-500' },
     { value: 'Bassa', label: 'Bassa', color: 'bg-emerald-500' }
   ];
+
+  const visibilityOptions = Object.values(EVENT_VISIBILITY).map(v => ({
+    value: v,
+    label: v
+  }));
 
   return (
     <div className="comm-container">
@@ -457,6 +462,15 @@ const CommunicationsView = ({ userProfile }) => {
                       placeholder="Seleziona importanza"
                     />
                   </div>
+                </div>
+                <div>
+                  <label className="form-label">Visibilità</label>
+                  <CustomSelect
+                    options={visibilityOptions}
+                    value={newComm.visibility}
+                    onChange={val => setNewComm({ ...newComm, visibility: val })}
+                    placeholder="Seleziona visibilità"
+                  />
                 </div>
                 <div>
                   <label className="form-label">Scadenza (opzionale)</label>
