@@ -111,7 +111,6 @@ const VehicleModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     type="text"
                                     {...register('radioId')}
                                     className="form-input"
-                                    placeholder="es. C*P* AL V* 1"
                                 />
                             </div>
 
