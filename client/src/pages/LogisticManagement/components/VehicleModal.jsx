@@ -71,8 +71,8 @@ const VehicleModal = ({ isOpen, onClose, onSave, initialData }) => {
                 </div>
 
                 {/* Body */}
-                <div className="modal-body custom-scrollbar">
-                    <form id="vehicle-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="modal-body">
+                    <form id="vehicle-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Model */}
@@ -84,7 +84,6 @@ const VehicleModal = ({ isOpen, onClose, onSave, initialData }) => {
                                     type="text"
                                     {...register('model', { required: 'Il modello è obbligatorio' })}
                                     className="form-input"
-                                    placeholder="es. Land Rover Defender 90"
                                 />
                                 {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model.message}</p>}
                             </div>
@@ -106,13 +105,13 @@ const VehicleModal = ({ isOpen, onClose, onSave, initialData }) => {
                             {/* Radio ID */}
                             <div>
                                 <label className="info-label">
-                                    <Radio size={14} /> Sigla Radio
+                                    <Radio size={14} /> ID EMERCOMNET
                                 </label>
                                 <input
                                     type="text"
                                     {...register('radioId')}
                                     className="form-input"
-                                    placeholder="es. CHINTANA 1"
+                                    placeholder="es. C*P* AL V* 1"
                                 />
                             </div>
 

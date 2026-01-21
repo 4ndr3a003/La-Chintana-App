@@ -61,19 +61,25 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehicle }) => {
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                            <div className="text-slate-400 text-[10px] font-bold uppercase mb-1 flex items-center gap-1">
-                                <Radio size={12} /> Sigla Radio
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex flex-col justify-between border border-slate-100 dark:border-slate-800 relative overflow-hidden group/card hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded-lg text-blue-600 dark:text-blue-400">
+                                    <Radio size={14} />
+                                </div>
+                                <p className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-400">Sigla Radio</p>
                             </div>
-                            <div className="font-bold text-slate-700 dark:text-slate-200">
+                            <div className="font-bold text-slate-700 dark:text-slate-200 font-mono tracking-tight leading-tight break-words z-10">
                                 {vehicle.radioId || '-'}
                             </div>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                            <div className="text-slate-400 text-[10px] font-bold uppercase mb-1 flex items-center gap-1">
-                                <Gauge size={12} /> Km Attuali
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex flex-col justify-between border border-slate-100 dark:border-slate-800 relative overflow-hidden group/card hover:border-amber-200 dark:hover:border-amber-800 transition-colors">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="bg-amber-100 dark:bg-amber-900/30 p-1.5 rounded-lg text-amber-600 dark:text-amber-400">
+                                    <Gauge size={14} />
+                                </div>
+                                <p className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-400">Km Attuali</p>
                             </div>
-                            <div className="font-bold text-slate-700 dark:text-slate-200">
+                            <div className="font-bold text-slate-700 dark:text-slate-200 text-lg z-10">
                                 {vehicle.km ? vehicle.km.toLocaleString() : '-'}
                             </div>
                         </div>

@@ -27,7 +27,7 @@ const HomeDashboard = ({ userProfile }) => {
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-1">Ciao, {userProfile.name}</h1>
-            <p className="text-slate-800 dark:text-slate-100 font-medium opacity-80">Benvenuto nel portale operativo della Protezione Civile.</p>
+            <p className="text-slate-800 dark:text-slate-100 font-medium opacity-80">Benvenuto nel portale operativo della Chintana.</p>
           </div>
 
           {/* Direttivo Dashboard Button */}

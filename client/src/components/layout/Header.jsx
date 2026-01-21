@@ -52,17 +52,21 @@ const Header = ({ userProfile }) => {
   const profileButtonRef = useRef(null);
 
   const navItems = useMemo(() => {
-    const items = [
-      { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
+    if (hasAdminAccess(userProfile)) {
+      return [
+        { path: '/events', label: 'Bacheca', icon: <Calendar /> },
+        { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
+        { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
+        { path: '/admin', label: 'Volontari', icon: <Users /> },
+        { path: '/logistics', label: 'Logistica', icon: <Truck /> },
+      ];
+    }
+
+    return [
       { path: '/events', label: 'Bacheca', icon: <Calendar /> },
+      { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
       { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
     ];
-
-    if (hasAdminAccess(userProfile)) {
-      items.push({ path: '/admin', label: 'Volontari', icon: <Users /> });
-      items.push({ path: '/logistics', label: 'Logistica', icon: <Truck /> });
-    }
-    return items;
   }, [userProfile]);
 
   useEffect(() => {

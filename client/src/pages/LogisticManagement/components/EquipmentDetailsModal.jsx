@@ -67,7 +67,7 @@ const EquipmentDetailsModal = ({ isOpen, onClose, equipment }) => {
                     {/* Location */}
                     <div className="mb-6 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800">
                         <div className="text-blue-500 dark:text-blue-400 text-xs font-bold uppercase mb-2 flex items-center gap-1">
-                            <MapPin size={14} /> Ubicazione
+                            <MapPin size={14} /> Luogo
                         </div>
                         <div className="font-bold text-slate-700 dark:text-white">
                             {equipment.location || 'Posizione non specificata'}

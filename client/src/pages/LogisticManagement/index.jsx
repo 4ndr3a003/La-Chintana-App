@@ -136,7 +136,7 @@ const LogisticManagement = ({ userProfile }) => {
                                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                                 }`}
                         >
-                            <Truck size={16} /> Parco Mezzi
+                            <Truck size={16} /> Mezzi
                         </button>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ const LogisticManagement = ({ userProfile }) => {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
                             type="text"
-                            placeholder={activeTab === 'vehicles' ? "Cerca targa, modello, radio..." : "Cerca attrezzatura, codice, ubicazione..."}
+                            placeholder={activeTab === 'vehicles' ? "Cerca targa, modello, radio..." : "Cerca attrezzatura"}
                             className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -212,11 +212,10 @@ const LogisticManagement = ({ userProfile }) => {
                                                 onChange={setFilterLocation}
                                                 options={[
                                                     { value: 'all', label: 'Tutte le sedi' },
-                                                    { value: 'Sede Operativa', label: 'Sede Operativa' },
+                                                    { value: 'Sede', label: 'Sede' },
                                                     { value: 'Cementeria (Magazzino)', label: 'Cementeria' },
                                                     { value: 'Mezzo', label: 'Su Mezzo' },
                                                 ]}
-                                                placeholder="Ubicazione"
                                             />
                                         </>
                                     )}
@@ -261,11 +260,10 @@ const LogisticManagement = ({ userProfile }) => {
                                         onChange={setFilterLocation}
                                         options={[
                                             { value: 'all', label: 'Tutte le sedi' },
-                                            { value: 'Sede Operativa', label: 'Sede Operativa' },
+                                            { value: 'Sede', label: 'Sede' },
                                             { value: 'Cementeria (Magazzino)', label: 'Cementeria' },
                                             { value: 'Mezzo', label: 'Su Mezzo' },
                                         ]}
-                                        placeholder="Ubicazione"
                                     />
                                 </div>
                             </>

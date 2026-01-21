@@ -14,7 +14,7 @@ const MobileNav = ({ userProfile }) => {
   return (
     <div className="px-1 pb-3 pt-2 bg-transparent pointer-events-none w-full max-w-md mx-auto">
       <IonTabBar
-        className="rounded-2xl shadow-xl border border-white/10 h-auto min-h-[4rem] w-full pointer-events-auto backdrop-blur-xl grid grid-cols-5 p-0"
+        className={`rounded-2xl shadow-xl border border-white/10 h-auto min-h-[4rem] w-full pointer-events-auto backdrop-blur-xl grid ${showAdmin ? 'grid-cols-5' : 'grid-cols-3'} p-0`}
         style={{
           '--background': 'var(--bg-mobile-nav)',
           paddingTop: '0.25rem',
@@ -31,8 +31,6 @@ const MobileNav = ({ userProfile }) => {
           <MessageSquare size={24} className={isActive('/comms') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
           <IonLabel className={isActive('/comms') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Avvisi</IonLabel>
         </IonTabButton>
-
-
 
         <IonTabButton
           tab="events"

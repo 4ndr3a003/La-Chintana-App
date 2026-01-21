@@ -161,24 +161,28 @@ const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
                                 </div>
 
                                 {/* Specs Grid */}
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex items-center gap-3 border border-slate-100 dark:border-slate-800">
-                                        <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-xl text-blue-600 dark:text-blue-400">
-                                            <Radio size={16} />
-                                        </div>
-                                        <div>
+                                <div className="grid grid-cols-2 gap-3 mb-6">
+                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex flex-col justify-between border border-slate-100 dark:border-slate-800 relative overflow-hidden group/card hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded-lg text-blue-600 dark:text-blue-400">
+                                                <Radio size={14} />
+                                            </div>
                                             <p className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-400">Radio</p>
-                                            <p className="text-sm font-bold text-slate-700 dark:text-white">{v.radioId || '-'}</p>
                                         </div>
+                                        <p className="text-sm font-bold text-slate-700 dark:text-white font-mono tracking-tight leading-tight break-words z-10">
+                                            {v.radioId || '-'}
+                                        </p>
                                     </div>
-                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex items-center gap-3 border border-slate-100 dark:border-slate-800">
-                                        <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-xl text-amber-600 dark:text-amber-400">
-                                            <Gauge size={16} />
+                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl flex flex-col justify-between border border-slate-100 dark:border-slate-800 relative overflow-hidden group/card hover:border-amber-200 dark:hover:border-amber-800 transition-colors">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="bg-amber-100 dark:bg-amber-900/30 p-1.5 rounded-lg text-amber-600 dark:text-amber-400">
+                                                <Gauge size={14} />
+                                            </div>
+                                            <p className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-400">Km</p>
                                         </div>
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-400">Chilometri</p>
-                                            <p className="text-sm font-bold text-slate-700 dark:text-white">{v.km ? v.km.toLocaleString() : '-'}</p>
-                                        </div>
+                                        <p className="text-lg font-bold text-slate-700 dark:text-white z-10">
+                                            {v.km ? v.km.toLocaleString() : '-'}
+                                        </p>
                                     </div>
                                 </div>
 

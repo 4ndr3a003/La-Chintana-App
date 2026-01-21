@@ -450,18 +450,7 @@
     }
 }
 
-/* Stili per il modale di creazione/modifica volontario su mobile */
-@media (max-width: 767px) {
-    .edit-create-modal {
-        z-index: 150;
-        align-items: center;
-    }
-
-    .edit-create-modal .modal-content {
-        max-height: 78vh;
-        margin-bottom: 35px;
-    }
-}
+/* Stili per il modale di creazione/modifica volontario su mobile - RIMOSSI (SPOSTATI IN GLOBAL) */
 
 /* Stili per il modale di visualizzazione volontario su mobile */
 @media (max-width: 767px) {

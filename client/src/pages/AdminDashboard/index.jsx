@@ -205,7 +205,7 @@ const AdminDashboard = ({ userProfile }) => {
                   />
                 </th>
                 <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Volontario</th>
-                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Codice Emercomnet</th>
+                <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">ID Emercomnet</th>
                 <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Ruolo</th>
                 <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider">Stato</th>
                 <th className="p-4 text-xs font-bold text-slate-800 dark:text-slate-50 uppercase tracking-wider text-right">Azioni</th>
@@ -353,7 +353,7 @@ const AdminDashboard = ({ userProfile }) => {
                 </div>
               </div>
               <div className="col-span-2 bg-slate-50 p-2.5 rounded-lg flex justify-between items-center">
-                <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Codice Emercomnet</span>
+                <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">ID Emercomnet</span>
                 <span className="font-mono text-slate-700 font-bold">{user.emercomnetId || '-'}</span>
               </div>
             </div>
@@ -471,7 +471,7 @@ const AdminDashboard = ({ userProfile }) => {
                     <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                   </div>
                   <div className="info-card">
-                    <p className="info-label"><Hash size={14} /> Codice Emercomnet</p>
+                    <p className="info-label"><Hash size={14} /> ID Emercomnet</p>
                     <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.emercomnetId}>{selectedUser.emercomnetId || '-'}</p>
                   </div>
                   <div className="info-card">
@@ -573,7 +573,7 @@ const AdminDashboard = ({ userProfile }) => {
                       <input type="text" className="form-input uppercase" value={formData.cf} onChange={e => setFormData({ ...formData, cf: e.target.value })} />
                     </div>
                     <div>
-                      <label className="info-label"><Hash size={14} /> Codice Identificativo Emercomnet</label>
+                      <label className="info-label"><Hash size={14} /> ID Emercomnet</label>
                       <input type="text" className="form-input" value={formData.emercomnetId} onChange={e => setFormData({ ...formData, emercomnetId: e.target.value })} />
                     </div>
                     <div>
@@ -589,7 +589,7 @@ const AdminDashboard = ({ userProfile }) => {
                       <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                     </div>
                     {(isCreating || (isEditing && userProfile?.role === ROLES.PRESIDENT)) && (
-                      <div className="md:col-span-2">
+                      <div>
                         <label className="info-label">
                           <Lock size={14} /> {isCreating ? 'Password Iniziale' : 'Nuova Password (lascia vuoto per mantenere la corrente)'}
                         </label>

@@ -117,8 +117,8 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                 </div>
 
                 {/* Body */}
-                <div className="modal-body custom-scrollbar">
-                    <form id="equipment-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="modal-body">
+                    <form id="equipment-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Name */}
@@ -130,24 +130,26 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                                     type="text"
                                     {...register('name', { required: 'Il nome è obbligatorio' })}
                                     className="form-input"
-                                    placeholder="es. Motopompa Honda"
                                 />
                                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                             </div>
 
-                            {/* Category */}
                             <div>
                                 <label className="info-label">
                                     <Layers size={14} /> Categoria
                                 </label>
-                                <select
-                                    {...register('category')}
-                                    className="form-select"
-                                >
-                                    {CATEGORY_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
-                                </select>
+                                <Controller
+                                    name="category"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <CustomSelect
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            options={CATEGORY_OPTIONS}
+                                            placeholder="Seleziona categoria..."
+                                        />
+                                    )}
+                                />
                             </div>
 
                             {/* Quantity */}
@@ -196,13 +198,13 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
 
                             {/* Location */}
                             <div className="col-span-1 md:col-span-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                                <label className="info-label mb-2"><MapPin size={14} /> Ubicazione</label>
+                                <label className="info-label mb-2"><MapPin size={14} /> Luogo</label>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                                     <label className="cursor-pointer">
                                         <input type="radio" value="Sede" {...register('locationType')} className="peer sr-only" />
                                         <div className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20 peer-checked:border-blue-500 peer-checked:text-blue-600 dark:peer-checked:text-blue-400 transition-all hover:border-blue-300">
                                             <MapPin size={20} className="mb-2" />
-                                            <span className="text-xs font-bold">Sede Operativa</span>
+                                            <span className="text-xs font-bold">Sede</span>
                                         </div>
                                     </label>
                                     <label className="cursor-pointer">
@@ -224,23 +226,33 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                                 {locationType === 'vehicle' ? (
                                     <div className="flex items-center gap-2">
                                         <Truck size={16} className="text-slate-400" />
-                                        <select
-                                            {...register('locationDetail')}
-                                            className="form-select"
-                                        >
-                                            <option value="">Seleziona un mezzo...</option>
-                                            {vehicles && vehicles.map(v => (
-                                                <option key={v.id} value={`${v.model} (${v.plate})`}>{v.model} - {v.plate}</option>
-                                            ))}
-                                            {(!vehicles || vehicles.length === 0) && <option value="Mezzo Generico">Mezzo Generico</option>}
-                                        </select>
+                                        <div className="w-full">
+                                            <Controller
+                                                name="locationDetail"
+                                                control={control}
+                                                render={({ field }) => {
+                                                    const vehicleOptions = vehicles && vehicles.length > 0
+                                                        ? vehicles.map(v => ({ value: `${v.model} (${v.plate})`, label: `${v.model} - ${v.plate}` }))
+                                                        : [{ value: 'Mezzo Generico', label: 'Mezzo Generico' }];
+
+                                                    return (
+                                                        <CustomSelect
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            options={vehicleOptions}
+                                                            placeholder="Seleziona un mezzo..."
+                                                        />
+                                                    );
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 ) : (
                                     <input
                                         type="text"
                                         {...register('locationDetail')}
                                         className="form-input"
-                                        placeholder={locationType === 'Sede' ? "es. Scaffale 1, Armadio B..." : "es. Pallet A, Container..."}
+                                        placeholder={locationType === 'Sede' ? "es. Scaffale 1, Armadio B..." : "es. Scaffale 1, Armadio B..."}
                                     />
                                 )}
                             </div>

@@ -347,7 +347,7 @@ const CommunicationsView = ({ userProfile }) => {
       {/* View Details Modal */}
       {selectedMessage && (
         <div className="modal-overlay animate-in fade-in" onClick={() => setSelectedMessage(null)}>
-          <div className="modal-container" onClick={e => e.stopPropagation()}>
+          <div className="modal-content max-w-2xl" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Dettagli Comunicazione</h3>
               <button onClick={() => setSelectedMessage(null)} className="modal-close-btn"><X size={20} /></button>
@@ -431,8 +431,8 @@ const CommunicationsView = ({ userProfile }) => {
       )}
 
       {isCreateModalOpen && (
-        <div className="modal-overlay animate-in fade-in" onClick={() => setIsCreateModalOpen(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay animate-in fade-in edit-create-modal" onClick={() => setIsCreateModalOpen(false)}>
+          <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</h3>
               <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>

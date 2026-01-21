@@ -31,6 +31,16 @@ Il progetto è strutturato come monorepo diviso in componenti distinti:
 -   **Notifiche Push**: Sistema integrato (FCM) che notifica gli utenti su Web e Android alla creazione di nuovi eventi o comunicazioni urgenti.
 -   **Targeting**: Le notifiche vengono inviate solo agli utenti interessati (es. notifiche "Cinofili" arrivano solo ai cinofili).
 
+### 🚚 Logistica
+-   **Parco Mezzi**: Gestione completa della flotta veicoli.
+    -   Stato operativo (Operativo/In Manutenzione/Guasto).
+    -   Scadenze amministrative e manutenzioni programmate.
+-   **Magazzino & Attrezzature**: Inventario dettagliato del materiale tecnico.
+    -   Categorizzazione (Elettrico, Idraulico, DPI, Radio, ecc.).
+    -   Tracciamento ubicazione (Sede, Magazzino Cementeria o assegnato su specifico Mezzo).
+    -   Stato di funzionamento e necessità di revisione.
+-   **Ricerca e Filtri**: Funzionalità di ricerca globale e filtri avanzati per stato, categoria e posizione per rapida consultazione operativa.
+
 ## 🛠️ Installazione e Setup
 
 ### Prerequisiti
@@ -109,16 +119,3 @@ Per aggiornare la logica di backend (trigger notifiche):
 ```bash
 firebase deploy --only functions
 ```
-
-### Mobile Updates (Live)
-Per aggiornamenti di codice JS/CSS senza passare dallo store (su dispositivi Android già installati):
-```bash
-ionic deploy build --app-id="ff632d26" --channel-name="Production"
-```
-
-## 🔐 Credenziali di Test (Demo/Sviluppo)
-
-| Ruolo | Email | Password |
-| :--- | :--- | :--- |
-| **Presidente** | mantelli.alessandro@gmail.com | 1234 |
-| **Volontario** | andrea8102003@gmail.com | 1234 |

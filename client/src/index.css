@@ -21,10 +21,17 @@
 html,
 body {
   height: 100%;
+  /* iOS Height Fix */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+
   margin: 0;
   padding: 0;
   overflow: hidden;
   /* Prevent body scroll, let the app handle it */
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: var(--color-slate-50);
 }
 
 body {

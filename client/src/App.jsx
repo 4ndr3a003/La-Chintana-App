@@ -133,10 +133,14 @@ export default function App() {
   // Native Push Notifications Initialization - Runs ONCE
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
-      if (Notification.permission === 'default' || Notification.permission === 'denied') {
-        setShowNotifButton(true);
-      } else if (Notification.permission === 'granted') {
-        setupWebPush(false);
+      if ('Notification' in window) {
+        if (Notification.permission === 'default' || Notification.permission === 'denied') {
+          setShowNotifButton(true);
+        } else if (Notification.permission === 'granted') {
+          setupWebPush(false);
+        }
+      } else {
+        console.warn('Nofication API not supported in this browser.');
       }
       return;
     }
@@ -232,6 +236,8 @@ export default function App() {
   useEffect(() => {
     if (Capacitor.isNativePlatform()) return;
 
+    if (Capacitor.isNativePlatform() || !messaging) return;
+
     const unsubscribe = onMessage(messaging, (payload) => {
       if (document.visibilityState === 'visible') {
         console.log('Message received. ', payload);
@@ -263,6 +269,12 @@ export default function App() {
     try {
       if (isInteractive) {
         showToast('Recupero token notifiche...', '', 'info');
+      }
+
+      if (!messaging) {
+        console.warn('Messaging non supportato.');
+        if (isInteractive) showToast('Notifiche non supportate da questo browser.', 'Attenzione', 'warning');
+        return;
       }
 
       const vapidKey = "BDHXmbMSKgKB13bobTKEwjpdpvAfRunVaAu3vAvkvtmSo1hjwYsWd1-TKm_zZjHg7k9-DwfrCX7G1F5f0A72bvk";
@@ -355,7 +367,9 @@ export default function App() {
         }
 
         // 2. Delete from Messaging
-        await deleteToken(messaging);
+        if (messaging) {
+          await deleteToken(messaging);
+        }
         setFcmToken(null);
         showToast('Notifiche disattivate.', 'Successo', 'success');
       }

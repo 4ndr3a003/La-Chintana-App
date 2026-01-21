@@ -98,7 +98,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
         {/* User Info */}
         <div className="flex-1 text-center md:text-left mt-2">
           <h2 className="text-2xl font-bold text-[var(--color-slate-900)] mb-1">{userProfile.name}</h2>
-          <p className="text-[var(--color-slate-500)] font-medium mb-1">Codice Identificativo Emercomnet: <span className="font-bold text-[var(--color-slate-700)]">{userProfile.emercomnetId || '-'}</span></p>
+          <p className="text-[var(--color-slate-500)] font-medium mb-1">ID Emercomnet: <span className="font-bold text-[var(--color-slate-700)]">{userProfile.emercomnetId || '-'}</span></p>
           <p className={`font-bold ${status === 'Non Operativo' ? 'text-[var(--color-pc-red)]' : 'text-[var(--color-pc-green)]'}`}>
             Stato: {status}
           </p>
