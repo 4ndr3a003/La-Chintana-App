@@ -177,6 +177,120 @@ body {
 }
 
 /* Force white text to ALWAYS be white */
+/* Force white text to ALWAYS be white */
 .text-white {
   color: #ffffff !important;
+}
+
+/* --- SHARED MODAL STYLES (Extracted from AdminDashboard) --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+.modal-content {
+  background-color: var(--color-slate-50);
+  border-radius: 1.5rem;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .modal-content {
+    max-height: 75vh;
+  }
+}
+
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-pc-yellow-600);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-pc-yellow);
+  /* #facc15 */
+  color: var(--color-slate-800);
+}
+
+.modal-header h3 {
+  color: var(--color-slate-800);
+}
+
+.modal-header .modal-close-btn {
+  color: var(--color-slate-800);
+  opacity: 0.8;
+  padding: 0.25rem;
+  border-radius: 9999px;
+}
+
+.modal-header .modal-close-btn:hover {
+  background-color: var(--color-pc-yellow-600);
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.info-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-slate-400);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.625rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.625rem;
+  background-color: var(--color-slate-50);
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Mobile Modal Specifics for Spacing */
+@media (max-width: 767px) {
+  .edit-create-modal {
+    z-index: 150;
+    align-items: center;
+    padding-top: 80px;
+    /* Push modal down to clear App Header */
+  }
+
+  /* Target modal-overlay that has the class edit-create-modal */
+  .modal-overlay.edit-create-modal .modal-content {
+    max-height: 75vh;
+    /* Slightly reduced to account for top padding */
+    margin-bottom: 35px;
+  }
 }

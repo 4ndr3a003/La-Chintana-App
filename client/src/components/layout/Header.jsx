@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck } from 'lucide-react';
 import logo from '../../assets/logo_chintanta.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -60,6 +60,7 @@ const Header = ({ userProfile }) => {
 
     if (hasAdminAccess(userProfile)) {
       items.push({ path: '/admin', label: 'Volontari', icon: <Users /> });
+      items.push({ path: '/logistics', label: 'Logistica', icon: <Truck /> });
     }
     return items;
   }, [userProfile]);

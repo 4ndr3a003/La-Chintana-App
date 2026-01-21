@@ -11,6 +11,7 @@ import UserProfileView from '../pages/UserProfileView';
 import AdminDashboard from '../pages/AdminDashboard';
 import DirettivoDashboard from '../pages/DirettivoDashboard';
 import Settings from '../pages/Settings';
+import LogisticManagement from '../pages/LogisticManagement';
 import { hasAdminAccess } from '../utils/constants';
 
 const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode }) => {
@@ -64,6 +65,16 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications,
             <Route path="/admin" element={
                 <ProtectedRoute userProfile={userProfile}>
                     <AdminDashboard userProfile={userProfile} />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/logistics" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    {hasAdminAccess(userProfile) ? (
+                        <LogisticManagement userProfile={userProfile} />
+                    ) : (
+                        <Navigate to="/" replace />
+                    )}
                 </ProtectedRoute>
             } />
 
