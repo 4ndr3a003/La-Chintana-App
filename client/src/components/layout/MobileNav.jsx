@@ -32,6 +32,20 @@ const MobileNav = ({ userProfile }) => {
           <IonLabel className={isActive('/comms') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Avvisi</IonLabel>
         </IonTabButton>
 
+        {/* For non-admin users, Home comes second (center position) */}
+        {!showAdmin && (
+          <IonTabButton
+            tab="home"
+            onClick={() => navigate('/')}
+            selected={isActive('/')}
+            className="mobile-tab-btn"
+            style={{ '--background': 'transparent', '--padding-start': '0', '--padding-end': '0', width: '100%' }}
+          >
+            <House strokeWidth={1.5} size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+            <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Home</IonLabel>
+          </IonTabButton>
+        )}
+
         <IonTabButton
           tab="events"
           onClick={() => navigate('/events')}
@@ -43,16 +57,19 @@ const MobileNav = ({ userProfile }) => {
           <IonLabel className={isActive('/events') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Eventi</IonLabel>
         </IonTabButton>
 
-        <IonTabButton
-          tab="home"
-          onClick={() => navigate('/')}
-          selected={isActive('/')}
-          className="mobile-tab-btn"
-          style={{ '--background': 'transparent', '--padding-start': '0', '--padding-end': '0', width: '100%' }}
-        >
-          <House strokeWidth={1.5} size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
-          <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Home</IonLabel>
-        </IonTabButton>
+        {/* For admin users, Home comes third (center position) */}
+        {showAdmin && (
+          <IonTabButton
+            tab="home"
+            onClick={() => navigate('/')}
+            selected={isActive('/')}
+            className="mobile-tab-btn"
+            style={{ '--background': 'transparent', '--padding-start': '0', '--padding-end': '0', width: '100%' }}
+          >
+            <House strokeWidth={1.5} size={24} className={isActive('/') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
+            <IonLabel className={isActive('/') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Home</IonLabel>
+          </IonTabButton>
+        )}
 
         {showAdmin && (
           <IonTabButton

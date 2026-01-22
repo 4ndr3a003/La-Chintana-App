@@ -51,15 +51,21 @@ const EventsDashboard = ({ userProfile }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.state?.selectedEventId && filteredEvents.length > 0) {
-      const eventToSelect = filteredEvents.find(e => e.id === location.state.selectedEventId);
+    // Support both location.state.selectedEventId and URL query parameter ?eventId=
+    const searchParams = new URLSearchParams(location.search);
+    const eventIdFromQuery = searchParams.get('eventId');
+    const eventIdFromState = location.state?.selectedEventId;
+    const targetEventId = eventIdFromQuery || eventIdFromState;
+
+    if (targetEventId && filteredEvents.length > 0) {
+      const eventToSelect = filteredEvents.find(e => e.id === targetEventId);
       if (eventToSelect) {
         setSelectedEvent(eventToSelect);
-        // Clear the state so it doesn't reopen on re-renders
+        // Clear the state/query so it doesn't reopen on re-renders
         navigate(location.pathname, { replace: true, state: {} });
       }
     }
-  }, [location.state, filteredEvents, setSelectedEvent, navigate, location.pathname]);
+  }, [location.state, location.search, filteredEvents, setSelectedEvent, navigate, location.pathname]);
 
   const eventTypeOptions = Object.entries(EVENT_TYPES).map(([type, data]) => {
     let colorClass = '';
