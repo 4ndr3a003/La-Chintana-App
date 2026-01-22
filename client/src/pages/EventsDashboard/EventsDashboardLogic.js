@@ -15,8 +15,6 @@ export const useEventsDashboard = (userProfile) => {
   const [filterParticipation, setFilterParticipation] = useState('Tutti');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchDate, setSearchDate] = useState('');
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEventId, setCurrentEventId] = useState(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -63,9 +61,9 @@ export const useEventsDashboard = (userProfile) => {
   // Sync selectedEvent with real-time updates
   useEffect(() => {
     if (selectedEvent) {
-      const updatedEvent = upcomingEvents.find(e => e.id === selectedEvent.id) || 
-                           pastEvents.find(e => e.id === selectedEvent.id);
-      
+      const updatedEvent = upcomingEvents.find(e => e.id === selectedEvent.id) ||
+        pastEvents.find(e => e.id === selectedEvent.id);
+
       if (updatedEvent && updatedEvent !== selectedEvent) {
         setSelectedEvent(updatedEvent);
       }
@@ -206,27 +204,14 @@ export const useEventsDashboard = (userProfile) => {
     } catch (err) { console.error(err); alert("Errore salvataggio evento"); }
   };
 
-  const handleDeleteEvent = (eventId) => {
-    setEventToDelete(eventId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDeleteEvent = async () => {
-    if (!eventToDelete) return;
+  const deleteEvent = async (eventId) => {
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventToDelete));
-      if (selectedEvent?.id === eventToDelete) setSelectedEvent(null);
-      setIsDeleteModalOpen(false);
-      setEventToDelete(null);
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId));
+      if (selectedEvent?.id === eventId) setSelectedEvent(null);
     } catch (error) {
       console.error(error);
-      alert("Errore durante l'eliminazione.");
+      throw error;
     }
-  };
-
-  const cancelDeleteEvent = () => {
-    setIsDeleteModalOpen(false);
-    setEventToDelete(null);
   };
 
   const toggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
@@ -286,10 +271,9 @@ export const useEventsDashboard = (userProfile) => {
     setNewEvent,
     toggleParticipation,
     handleCreateEvent,
-    handleDeleteEvent,
-    confirmDeleteEvent,
-    cancelDeleteEvent,
-    isDeleteModalOpen,
+    toggleParticipation,
+    handleCreateEvent,
+    deleteEvent,
     openCreateModal,
     openEditModal,
     isEditing,

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
-import { db, appId } from '../../services/firebase';
+import { db, appId, storage, auth } from '../../services/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 
 export const useAdminDashboard = () => {
@@ -11,6 +12,14 @@ export const useAdminDashboard = () => {
   const [isViewing, setIsViewing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+
+  // Image Upload State
+  const [uploading, setUploading] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [crop, setCrop] = useState({ unit: '%', width: 50, aspect: 1 });
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
 
   // Bulk Actions State
   const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -32,6 +41,7 @@ export const useAdminDashboard = () => {
   const [formData, setFormData] = useState({});
   const [customSpec, setCustomSpec] = useState("");
   const [validitySettings, setValiditySettings] = useState({});
+  const imgRef = useRef(null);
 
   useEffect(() => {
     // 1. Fetch Users
@@ -189,7 +199,7 @@ export const useAdminDashboard = () => {
       // Keep existing fields if editing
       ...(isEditing ? {} : {
         joinedAt: new Date().toISOString(),
-        password: formData.password, // Only save password on create (simplified)
+        password: (formData.password && formData.password.trim() !== '') ? formData.password : "1234",
         photoUrl: ''
       })
     };
@@ -619,7 +629,8 @@ export const useAdminDashboard = () => {
             specializations: specs,
             certifications: {}, // Init empty
             joinedAt: new Date().toISOString(),
-            photoUrl: ''
+            photoUrl: '',
+            password: "1234"
           };
 
           // Apply status rules
@@ -666,6 +677,94 @@ export const useAdminDashboard = () => {
     reader.readAsText(file);
   };
 
+  const handlePhotoUpload = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener('load', () => setImageSrc(reader.result?.toString() || ''));
+      reader.readAsDataURL(file);
+      setIsImageModalOpen(true);
+    }
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setImageSrc(null);
+    setCompletedCrop(null);
+  };
+
+  const uploadCroppedImage = async () => {
+    if (!completedCrop || !imgRef.current) {
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setNotification({ isOpen: true, title: 'Errore', message: "Utente non autenticato.", type: 'error' });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const canvas = document.createElement('canvas');
+      const image = imgRef.current;
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+      canvas.width = completedCrop.width * scaleX;
+      canvas.height = completedCrop.height * scaleY;
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(
+        image,
+        completedCrop.x * scaleX,
+        completedCrop.y * scaleY,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setUploading(false);
+          return;
+        }
+
+        try {
+          // Use a temp path or specific path. Since we are editing a specific user (or creating), 
+          // we might not have the ID yet if creating.
+          // If creating, we can upload to a temp location or use Date.now() as ID placeholder?
+          // BUT, we want to update formData. 
+          // Strategy: Upload to `avatars/temp/${Date.now()}` or similar, get URL, putting in formData.
+
+          const filename = `avatar_${Date.now()}.jpg`;
+          const storageRef = ref(storage, `avatars/uploads/${filename}`);
+
+          await uploadBytes(storageRef, blob);
+          const url = await getDownloadURL(storageRef);
+
+          setFormData(prev => ({ ...prev, photoUrl: url }));
+          closeImageModal();
+          setNotification({ isOpen: true, title: 'Foto Caricata', message: "La foto è stata caricata. Ricordati di salvare il profilo.", type: 'success' });
+
+        } catch (error) {
+          console.error("Error upload:", error);
+          setNotification({ isOpen: true, title: 'Errore', message: "Errore caricamento foto.", type: 'error' });
+        } finally {
+          setUploading(false);
+        }
+      }, 'image/jpeg');
+
+    } catch (error) {
+      console.error("Error cropping:", error);
+      setUploading(false);
+      closeImageModal();
+    }
+  };
+
   return {
     users,
     selectedUser,
@@ -691,6 +790,7 @@ export const useAdminDashboard = () => {
     handleDeleteUser,
     confirmDeleteUser,
     cancelDeleteUser,
+    userToDelete,
     selectedUserIds,
     toggleUserSelection,
     toggleAllUsers,
@@ -710,6 +810,19 @@ export const useAdminDashboard = () => {
     handleExportCSV,
     handleImportCSV,
     notification,
-    closeNotification
+    closeNotification,
+    // Image Upload Exports
+    imageSrc,
+    crop,
+    setCrop,
+    completedCrop,
+    setCompletedCrop,
+    isImageModalOpen,
+    setIsImageModalOpen,
+    imgRef,
+    uploading,
+    handlePhotoUpload,
+    uploadCroppedImage,
+    closeImageModal
   };
 };

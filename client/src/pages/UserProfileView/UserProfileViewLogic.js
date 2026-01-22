@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { db, storage, appId, auth } from '../../services/firebase';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
@@ -144,6 +145,73 @@ export const useUserProfileView = (userProfile) => {
 
   const status = calculateStatus();
 
+  // Logic Cambio Password
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordFeedback, setPasswordFeedback] = useState({ type: '', message: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const handlePasswordChangeInput = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordFeedback({ type: '', message: '' });
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordFeedback({ type: 'error', message: 'Le nuove password non coincidono.' });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordFeedback({ type: 'error', message: 'La password deve essere di almeno 6 caratteri.' });
+      return;
+    }
+
+    setPasswordLoading(true);
+    const user = auth.currentUser;
+
+    if (!user) {
+      setPasswordFeedback({ type: 'error', message: 'Utente non autenticato.' });
+      setPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const credential = EmailAuthProvider.credential(user.email, passwordForm.currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, passwordForm.newPassword);
+
+      setPasswordFeedback({ type: 'success', message: 'Password aggiornata con successo!' });
+      // Close modal after a delay or immediately? User might want to see success message.
+      // Let's keep it open with success message or close and show toast.
+      // For now, simple behavior: clear form, delay close, or just show success message in modal.
+      // The Plan said: "Handle success/error states".
+      // I'll leave the modal open so they can see the "Success" message, maybe they close it manually.
+      // Or I can wipe the form.
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setIsPasswordModalOpen(false), 2000);
+
+    } catch (error) {
+      console.error("Error changing password:", error);
+      let msg = "Errore durante l'aggiornamento della password.";
+      if (error.code === 'auth/wrong-password') {
+        msg = "La password attuale non è corretta.";
+      } else if (error.code === 'auth/requires-recent-login') {
+        msg = "Per sicurezza, esegui nuovamente il login prima di cambiare la password.";
+      }
+      setPasswordFeedback({ type: 'error', message: msg });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   return {
     uploading,
     handlePhotoUpload,
@@ -159,6 +227,13 @@ export const useUserProfileView = (userProfile) => {
     setIsModalOpen,
     imgRef,
     uploadCroppedImage,
-
+    // Password Logic exports
+    isPasswordModalOpen,
+    setIsPasswordModalOpen,
+    passwordForm,
+    handlePasswordChangeInput,
+    handlePasswordSubmit,
+    passwordFeedback,
+    passwordLoading
   };
 };

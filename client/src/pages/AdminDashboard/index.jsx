@@ -1,5 +1,7 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera } from 'lucide-react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
@@ -32,6 +34,7 @@ const AdminDashboard = ({ userProfile }) => {
     handleDeleteUser,
     confirmDeleteUser,
     cancelDeleteUser,
+    userToDelete,
     selectedUserIds,
     toggleUserSelection,
     toggleAllUsers,
@@ -52,7 +55,19 @@ const AdminDashboard = ({ userProfile }) => {
     handleImportCSV,
     notification,
     closeNotification,
-    handleCertificationChange
+    handleCertificationChange,
+    // Image Upload
+    imageSrc,
+    crop,
+    setCrop,
+    setCompletedCrop,
+    isImageModalOpen,
+    setIsImageModalOpen,
+    imgRef,
+    uploading,
+    handlePhotoUpload,
+    uploadCroppedImage,
+    closeImageModal
   } = useAdminDashboard();
 
   const formatName = (fullName) => {
@@ -243,17 +258,19 @@ const AdminDashboard = ({ userProfile }) => {
                     </span>
                   </td>
                   <td className="p-4">
-                    {user.volunteerRole ? (
-                      <Badge text={user.volunteerRole} color="amber" size="sm" />
-                    ) : user.boardRole ? (
-                      <Badge text={user.boardRole} color="purple" size="sm" />
-                    ) : (
-                      <Badge
-                        text={ROLE_LABELS[user.role]}
-                        color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
-                        size="sm"
-                      />
-                    )}
+                    <div className="flex flex-col gap-1">
+                      {user.role === ROLES.PRESIDENT ? (
+                        <Badge text={ROLE_LABELS[user.role]} color="yellow" size="sm" />
+                      ) : user.role === ROLES.BOARD ? (
+                        <Badge text={user.boardRole || ROLE_LABELS[user.role]} color="purple" size="sm" />
+                      ) : user.role === ROLES.VOLUNTEER && !user.volunteerRole ? (
+                        <Badge text={ROLE_LABELS[user.role]} color="blue" size="sm" />
+                      ) : null}
+
+                      {user.volunteerRole && (
+                        <Badge text={user.volunteerRole} color="amber" size="sm" />
+                      )}
+                    </div>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
@@ -331,17 +348,19 @@ const AdminDashboard = ({ userProfile }) => {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="bg-slate-50 p-2.5 rounded-lg">
                 <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Ruolo</span>
-                {user.volunteerRole ? (
-                  <Badge text={user.volunteerRole} color="amber" size="sm" />
-                ) : user.boardRole ? (
-                  <Badge text={user.boardRole} color="purple" size="sm" />
-                ) : (
-                  <Badge
-                    text={ROLE_LABELS[user.role]}
-                    color={user.role === ROLES.PRESIDENT ? 'yellow' : user.role === ROLES.BOARD ? 'purple' : 'blue'}
-                    size="sm"
-                  />
-                )}
+                <div className="flex flex-col gap-1 items-start">
+                  {user.role === ROLES.PRESIDENT ? (
+                    <Badge text={ROLE_LABELS[user.role]} color="yellow" size="sm" />
+                  ) : user.role === ROLES.BOARD ? (
+                    <Badge text={user.boardRole || ROLE_LABELS[user.role]} color="purple" size="sm" />
+                  ) : user.role === ROLES.VOLUNTEER && !user.volunteerRole ? (
+                    <Badge text={ROLE_LABELS[user.role]} color="blue" size="sm" />
+                  ) : null}
+
+                  {user.volunteerRole && (
+                    <Badge text={user.volunteerRole} color="amber" size="sm" />
+                  )}
+                </div>
               </div>
               <div className="bg-slate-50 p-2.5 rounded-lg">
                 <span className="text-xs text-slate-400 block mb-1.5 font-medium uppercase tracking-wider">Stato</span>
@@ -408,13 +427,19 @@ const AdminDashboard = ({ userProfile }) => {
               <div className="modal-profile-header">
                 <Avatar src={selectedUser.photoUrl} name={selectedUser.name} size="xl" className="mb-3 shadow-md" />
                 <h2 className="modal-profile-name">{selectedUser.name}</h2>
-                {selectedUser.volunteerRole ? (
-                  <Badge text={selectedUser.volunteerRole} color="amber" className="mt-1" />
-                ) : selectedUser.boardRole ? (
-                  <Badge text={selectedUser.boardRole} color="purple" className="mt-1" />
-                ) : (
-                  <Badge text={ROLE_LABELS[selectedUser.role]} color={selectedUser.role === ROLES.PRESIDENT ? 'yellow' : selectedUser.role === ROLES.BOARD ? 'purple' : 'blue'} className="mt-1" />
-                )}
+                <div className="flex flex-col items-center gap-1 mt-1">
+                  {selectedUser.role === ROLES.PRESIDENT ? (
+                    <Badge text={ROLE_LABELS[selectedUser.role]} color="yellow" />
+                  ) : selectedUser.role === ROLES.BOARD ? (
+                    <Badge text={selectedUser.boardRole || ROLE_LABELS[selectedUser.role]} color="purple" />
+                  ) : selectedUser.role === ROLES.VOLUNTEER && !selectedUser.volunteerRole ? (
+                    <Badge text={ROLE_LABELS[selectedUser.role]} color="blue" />
+                  ) : null}
+
+                  {selectedUser.volunteerRole && (
+                    <Badge text={selectedUser.volunteerRole} color="amber" />
+                  )}
+                </div>
               </div>
 
               {/* Expiration Alerts */}
@@ -539,12 +564,35 @@ const AdminDashboard = ({ userProfile }) => {
         <div className="modal-overlay animate-in fade-in edit-create-modal" onClick={closeAll}>
           <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-bold text-slate-800">{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</h3>
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                {isCreating ? <UserRoundPlus size={24} className="text-blue-600" /> : <User size={24} className="text-blue-600" />}
+                <span>{isCreating ? 'Nuovo Volontario' : 'Modifica Profilo'}</span>
+              </h3>
               <button onClick={closeAll} className="modal-close-btn"><X size={20} /></button>
             </div>
 
             <div className="modal-body">
               <form onSubmit={handleSave} className="space-y-8">
+
+                {/* PHOTO UPLOAD SECTION IN EDIT MODAL - MOVED TO TOP */}
+                <section className="flex flex-col items-center justify-center py-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                  <p className="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">Foto Profilo</p>
+                  <div className="relative group">
+                    <Avatar src={formData.photoUrl} name={formData.firstName} size="xl" className="shadow-md" />
+                    <label
+                      className="absolute bottom-0 right-0 p-2 rounded-full cursor-pointer bg-slate-900 text-white hover:bg-slate-700 transition-all shadow-md active:scale-95"
+                      title="Aggiorna Foto"
+                    >
+                      <Camera size={16} />
+                      <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} />
+                    </label>
+                    {uploading && (
+                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                  </div>
+                </section>
 
                 {/* DATI PERSONALI */}
                 <section>
@@ -595,7 +643,7 @@ const AdminDashboard = ({ userProfile }) => {
                         </label>
                         <input
                           type="text"
-                          required={isCreating}
+                          required={false}
                           className="form-input"
                           value={formData.password || ''}
                           onChange={e => setFormData({ ...formData, password: e.target.value })}
@@ -605,6 +653,7 @@ const AdminDashboard = ({ userProfile }) => {
                     )}
                   </div>
                 </section>
+
 
                 {/* RUOLO & ABILITAZIONI */}
                 <section>
@@ -794,8 +843,57 @@ const AdminDashboard = ({ userProfile }) => {
         onClose={cancelDeleteUser}
         onConfirm={confirmDeleteUser}
         title="Elimina Volontario"
-        message={selectedUser ? `Stai per eliminare il profilo di ${selectedUser.name}. Questa azione è irreversibile. Sei sicuro di voler procedere?` : ''}
+        message={userToDelete ? `Stai per eliminare il profilo di ${userToDelete.name}. Questa azione è irreversibile. Sei sicuro di voler procedere?` : ''}
       />
+
+      {/* Crop Modal */}
+      {isImageModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4"
+          onClick={closeImageModal}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold mb-4 text-slate-800">Ritaglia Immagine</h3>
+            <div className="max-h-[60vh] overflow-y-auto">
+              <ReactCrop
+                crop={crop}
+                onChange={c => setCrop(c)}
+                onComplete={c => setCompletedCrop(c)}
+                aspect={1}
+                circularCrop
+              >
+                <img ref={imgRef} src={imageSrc} style={{ maxHeight: '70vh' }} alt="Upload" />
+              </ReactCrop>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={closeImageModal}
+                className="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition-colors"
+                disabled={uploading}
+              >
+                Annulla
+              </button>
+              <button
+                onClick={uploadCroppedImage}
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Caricamento...
+                  </>
+                ) : (
+                  'Salva'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

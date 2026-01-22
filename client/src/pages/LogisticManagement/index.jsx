@@ -9,6 +9,7 @@ import VehicleDetailsModal from './components/VehicleDetailsModal';
 import EquipmentTab from './components/EquipmentTab';
 import EquipmentModal from './components/EquipmentModal';
 import EquipmentDetailsModal from './components/EquipmentDetailsModal';
+import DeleteConfirmationModal from '../../components/ui/DeleteConfirmationModal';
 
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -59,6 +60,36 @@ const LogisticManagement = ({ userProfile }) => {
         isFiltersOpen,
         toggleFilters
     } = useLogisticManagement(userProfile);
+
+    // Modal Delete State
+    const [deleteModal, setDeleteModal] = React.useState({
+        isOpen: false,
+        type: null, // 'vehicle' | 'equipment'
+        id: null
+    });
+    const [isDeleting, setIsDeleting] = React.useState(false);
+
+    const openDeleteModal = (type, id) => {
+        setDeleteModal({ isOpen: true, type, id });
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteModal.id || !deleteModal.type) return;
+
+        setIsDeleting(true);
+        try {
+            if (deleteModal.type === 'vehicle') {
+                await handleDeleteVehicle(deleteModal.id);
+            } else {
+                await handleDeleteEquipment(deleteModal.id);
+            }
+            setDeleteModal({ isOpen: false, type: null, id: null });
+        } catch (error) {
+            console.error("Error deleting:", error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     // Filter Logic Implementation in View (or could be moved to logic hook, but view is fine for display logic)
     const displayedVehicles = useMemo(() => {
@@ -323,7 +354,7 @@ const LogisticManagement = ({ userProfile }) => {
                         // I'll keep it as is for now to avoid breaking changes, `displayedVehicles` already accounts for search so the second filter will just match 100%.
                         onEdit={(item) => { setEditingItem(item); setIsVehicleModalOpen(true); }}
                         onView={(item) => { setViewingItem(item); }}
-                        onDelete={handleDeleteVehicle}
+                        onDelete={(id) => openDeleteModal('vehicle', id)}
                     />
                 ) : (
                     <EquipmentTab
@@ -331,7 +362,7 @@ const LogisticManagement = ({ userProfile }) => {
                         searchTerm={searchTerm}
                         onEdit={(item) => { setEditingItem(item); setIsEquipmentModalOpen(true); }}
                         onView={(item) => { setViewingItem(item); }}
-                        onDelete={handleDeleteEquipment}
+                        onDelete={(id) => openDeleteModal('equipment', id)}
                     />
                 )}
             </div>
@@ -375,6 +406,17 @@ const LogisticManagement = ({ userProfile }) => {
                 isOpen={!!viewingItem && activeTab === 'equipment'}
                 onClose={() => setViewingItem(null)}
                 equipment={viewingItem}
+            />
+
+            <DeleteConfirmationModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+                onConfirm={handleConfirmDelete}
+                isDeleting={isDeleting}
+                title={deleteModal.type === 'vehicle' ? "Elimina Mezzo" : "Elimina Attrezzatura"}
+                message={deleteModal.type === 'vehicle'
+                    ? "Sei sicuro di voler eliminare questo mezzo? L'azione è irreversibile."
+                    : "Sei sicuro di voler eliminare questa attrezzatura? L'azione è irreversibile."}
             />
         </div >
     );

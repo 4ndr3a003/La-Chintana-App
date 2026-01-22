@@ -54,8 +54,8 @@ const Header = ({ userProfile }) => {
   const navItems = useMemo(() => {
     if (hasAdminAccess(userProfile)) {
       return [
-        { path: '/events', label: 'Bacheca', icon: <Calendar /> },
         { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
+        { path: '/events', label: 'Eventi', icon: <Calendar /> },
         { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
         { path: '/admin', label: 'Volontari', icon: <Users /> },
         { path: '/logistics', label: 'Logistica', icon: <Truck /> },
@@ -63,7 +63,7 @@ const Header = ({ userProfile }) => {
     }
 
     return [
-      { path: '/events', label: 'Bacheca', icon: <Calendar /> },
+      { path: '/events', label: 'Eventi', icon: <Calendar /> },
       { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
       { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
     ];

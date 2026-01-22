@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, CheckCircle } from 'lucide-react';
 import { EVENT_VISIBILITY } from '../../utils/constants';
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event, userProfile }) => {
     const dateObj = new Date(event.date);
+    const isParticipating = userProfile && event.participants?.includes(userProfile.id);
 
     // Determine theme based on type (matching EventsDashboard logic)
     const getTheme = (type) => {
@@ -86,6 +87,12 @@ const EventCard = ({ event }) => {
                                         : 'bg-slate-100 text-slate-700 border-slate-200'
                                     }`}>
                                     {event.visibility}
+                                </span>
+                            )}
+                            {isParticipating && (
+                                <span className="flex items-center gap-1 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-green-600 text-white border border-green-700 whitespace-nowrap h-fit shrink-0 shadow-sm shadow-green-200">
+                                    <CheckCircle size={10} strokeWidth={3} />
+                                    Iscritto
                                 </span>
                             )}
                         </div>

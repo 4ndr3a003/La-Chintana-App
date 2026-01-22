@@ -75,7 +75,6 @@ export const useLogisticManagement = (userProfile) => {
   };
 
   const handleDeleteVehicle = async (id) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo mezzo?")) return;
     try {
       await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', id));
     } catch (error) {
@@ -101,7 +100,6 @@ export const useLogisticManagement = (userProfile) => {
   };
 
   const handleDeleteEquipment = async (id) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questa attrezzatura?")) return;
     try {
       await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'equipment', id));
     } catch (error) {

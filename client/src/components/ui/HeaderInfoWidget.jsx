@@ -116,7 +116,7 @@ const HeaderInfoWidget = ({ userProfile }) => {
     }
 
     return (
-        <div className="header-info-widget flex items-center gap-2 md:gap-3 flex-wrap justify-center md:justify-start">
+        <div className="header-info-widget flex items-center gap-2 md:gap-3 flex-wrap justify-center md:justify-end">
             {/* Mini Weather Card */}
             {weather && (
                 <div className="flex items-center gap-1.5 md:gap-2 bg-white/90 backdrop-blur-md px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl md:rounded-2xl shadow-lg shadow-black/5 border border-white/50">

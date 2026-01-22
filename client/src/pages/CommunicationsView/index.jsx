@@ -434,7 +434,10 @@ const CommunicationsView = ({ userProfile }) => {
         <div className="modal-overlay animate-in fade-in edit-create-modal" onClick={() => setIsCreateModalOpen(false)}>
           <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="modal-title">{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</h3>
+              <h3 className="modal-title flex items-center gap-2">
+                {isEditing ? <MessageSquare size={24} className="text-blue-600" /> : <MessageSquarePlus size={24} className="text-blue-600" />}
+                <span>{isEditing ? 'Modifica Comunicazione' : 'Nuova Comunicazione'}</span>
+              </h3>
               <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
             </div>
             <div className="modal-body">

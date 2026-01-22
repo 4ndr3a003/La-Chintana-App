@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle } from 'lucide-react';
+import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle, Lock } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -22,7 +22,13 @@ const UserProfileView = ({ userProfile, onLogout }) => {
     setIsModalOpen,
     imgRef,
     uploadCroppedImage,
-
+    isPasswordModalOpen,
+    setIsPasswordModalOpen,
+    passwordForm,
+    handlePasswordChangeInput,
+    handlePasswordSubmit,
+    passwordFeedback,
+    passwordLoading
   } = useUserProfileView(userProfile);
 
   // Helper to format dates
@@ -37,7 +43,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center z-50 p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <div
@@ -62,6 +68,83 @@ const UserProfileView = ({ userProfile, onLogout }) => {
                 {uploading ? 'Caricamento...' : 'Salva'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Modal */}
+      {isPasswordModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+          onClick={() => setIsPasswordModalOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold mb-4 text-slate-800">Modifica Password</h3>
+
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Password Attuale</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={passwordForm.currentPassword}
+                    onChange={handlePasswordChangeInput}
+                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Inserisci password attuale"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Nuova Password</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passwordForm.newPassword}
+                    onChange={handlePasswordChangeInput}
+                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Minimo 6 caratteri"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Conferma Nuova Password</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordForm.confirmPassword}
+                    onChange={handlePasswordChangeInput}
+                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ripeti nuova password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              {passwordFeedback.message && (
+                <div className={`p-3 rounded-lg text-sm ${passwordFeedback.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
+                  {passwordFeedback.message}
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button type="button" onClick={() => setIsPasswordModalOpen(false)} className="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition-colors">Annulla</button>
+                <button type="submit" className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50" disabled={passwordLoading}>
+                  {passwordLoading ? 'Salvataggio...' : 'Aggiorna Password'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -231,6 +314,9 @@ const UserProfileView = ({ userProfile, onLogout }) => {
       </div>
 
       <div className="flex flex-col gap-3">
+        <button onClick={() => setIsPasswordModalOpen(true)} className="w-full py-4 rounded-xl bg-[var(--color-slate-100)] text-[var(--color-slate-700)] font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-slate-200)] transition-all shadow-sm">
+          <Lock size={20} /> Modifica Password
+        </button>
 
         <button onClick={onLogout} className="w-full py-4 rounded-xl bg-[var(--color-pc-red-100)] text-[var(--color-pc-red-700)] font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-pc-red-200)] transition-all shadow-sm">
           <LogOut size={20} /> Esci dal Profilo

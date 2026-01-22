@@ -8,6 +8,7 @@ import CalendarGrid from '../../components/events/CalendarGrid';
 import EventCard from '../../components/events/EventCard';
 import { useEventsDashboard } from './EventsDashboardLogic';
 import CustomSelect from '../../components/ui/CustomSelect';
+import DeleteConfirmationModal from '../../components/ui/DeleteConfirmationModal';
 import './EventsDashboard.css';
 
 const EventsDashboard = ({ userProfile }) => {
@@ -33,10 +34,7 @@ const EventsDashboard = ({ userProfile }) => {
     setNewEvent,
     toggleParticipation,
     handleCreateEvent,
-    handleDeleteEvent,
-    confirmDeleteEvent,
-    cancelDeleteEvent,
-    isDeleteModalOpen,
+    deleteEvent,
     openCreateModal,
     openEditModal,
     isEditing,
@@ -49,6 +47,31 @@ const EventsDashboard = ({ userProfile }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Delete Modal State
+  const [deleteModal, setDeleteModal] = React.useState({
+    isOpen: false,
+    eventId: null
+  });
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const openDeleteModal = (eventId) => {
+    setDeleteModal({ isOpen: true, eventId });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.eventId) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteEvent(deleteModal.eventId);
+      setDeleteModal({ isOpen: false, eventId: null });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     // Support both location.state.selectedEventId and URL query parameter ?eventId=
@@ -282,7 +305,7 @@ const EventsDashboard = ({ userProfile }) => {
                     allProfiles={allProfiles}
                     onToggleParticipation={toggleParticipation}
                     onClick={() => setSelectedEvent(event)}
-                    onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                    onDelete={canManageContent(userProfile) ? () => openDeleteModal(event.id) : undefined}
                     onEdit={canManageContent(userProfile) ? openEditModal : undefined}
                   />
                 ))}
@@ -308,7 +331,7 @@ const EventsDashboard = ({ userProfile }) => {
                   allProfiles={allProfiles}
                   onToggleParticipation={toggleParticipation}
                   onClick={() => setSelectedEvent(event)}
-                  onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                  onDelete={canManageContent(userProfile) ? () => openDeleteModal(event.id) : undefined}
                   onEdit={canManageContent(userProfile) ? openEditModal : undefined}
                 />
               ))}
@@ -334,7 +357,7 @@ const EventsDashboard = ({ userProfile }) => {
                 onToggleParticipation={toggleParticipation}
                 showParticipants={true}
                 isModal={true}
-                onDelete={canManageContent(userProfile) ? handleDeleteEvent : undefined}
+                onDelete={canManageContent(userProfile) ? () => openDeleteModal(selectedEvent.id) : undefined}
                 onEdit={canManageContent(userProfile) ? openEditModal : undefined}
               />
             </div>
@@ -353,44 +376,24 @@ const EventsDashboard = ({ userProfile }) => {
         )
       }
 
-      {
-        isDeleteModalOpen && (
-          <div className="modal-overlay animate-in fade-in" style={{ zIndex: 110 }} onClick={cancelDeleteEvent}>
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 border border-slate-100 dark:border-slate-200" onClick={(e) => e.stopPropagation()}>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                  <AlertTriangle className="text-amber-600" size={24} />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800 mb-2">Elimina Evento</h3>
-                <p className="text-sm text-slate-500 mb-6">
-                  Sei sicuro di voler eliminare questo evento? Questa azione non può essere annullata.
-                </p>
-                <div className="flex gap-3 w-full">
-                  <button
-                    onClick={cancelDeleteEvent}
-                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                  >
-                    Annulla
-                  </button>
-                  <button
-                    onClick={confirmDeleteEvent}
-                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
-                  >
-                    Elimina
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
+        title="Elimina Evento"
+        message="Sei sicuro di voler eliminare questo evento? Questa azione non può essere annullata."
+      />
 
       {
         isCreateModalOpen && (
           <div className="modal-overlay animate-in fade-in" onClick={() => setIsCreateModalOpen(false)}>
             <div className="modal-container" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3 className="modal-title">{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</h3>
+                <h3 className="modal-title flex items-center gap-2">
+                  {isEditing ? <Calendar size={24} className="text-blue-600" /> : <CalendarPlus size={24} className="text-blue-600" />}
+                  <span>{isEditing ? 'Modifica Evento' : 'Nuovo Evento'}</span>
+                </h3>
                 <button onClick={() => setIsCreateModalOpen(false)} className="modal-close-btn"><X size={20} /></button>
               </div>
               <div className="modal-body">
