@@ -7,6 +7,41 @@ export default {
   theme: {
     extend: {
       colors: {
+        // M3 Semantic Colors - Extended for Expressive
+        primary: '#0d2b54',
+        'on-primary': '#ffffff',
+        'primary-container': '#dbe5f1', // Lighter blue for containers
+        'on-primary-container': '#0d2b54',
+
+        secondary: '#ffde03',
+        'on-secondary': '#000000',
+        'secondary-container': '#ffde03',
+        'on-secondary-container': '#000000',
+
+        tertiary: '#5c6bc0', // Adding tertiary for accents logic
+        'on-tertiary': '#ffffff',
+        'tertiary-container': '#e0e0ff',
+        'on-tertiary-container': '#1a237e',
+
+        surface: '#fdfbff',
+        'surface-dim': '#ded8e1',
+        'surface-bright': '#fdfbff',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f7f2fa',
+        'surface-container': '#f3edf7',
+        'surface-container-high': '#ece6f0',
+        'surface-container-highest': '#e6e0e9',
+
+        'on-surface': '#1b1b1f',
+        'on-surface-variant': '#44474f',
+        'outline': '#74777f',
+        'outline-variant': '#c4c6cf',
+
+        error: '#ba1a1a',
+        'on-error': '#ffffff',
+        'error-container': '#ffdad6',
+        'on-error-container': '#410002',
+
         slate: {
           50: 'var(--color-slate-50)',
           100: 'var(--color-slate-100)',
@@ -79,6 +114,12 @@ export default {
           800: 'var(--color-pc-red-800)',
           900: 'var(--color-pc-red-900)',
         },
+      },
+      borderRadius: {
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '28px',
       },
     },
   },
