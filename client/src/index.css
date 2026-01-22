@@ -136,8 +136,8 @@ body {
 
 .animate-pulse-red {
   animation: pulse-red 2s infinite;
-  border-radius: 0.75rem;
-  /* Match rounded-xl */
+  border-radius: 1.5rem;
+  /* Match rounded-3xl from EventCard */
 }
 
 /* Profile Button Styles */

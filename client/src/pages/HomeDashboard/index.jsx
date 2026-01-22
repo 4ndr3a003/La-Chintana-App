@@ -7,6 +7,7 @@ import EventCard from '../../components/ui/EventCard';
 import CommunicationItem from '../../components/ui/CommunicationItem';
 import AvailabilityWidget from '../../components/ui/AvailabilityWidget';
 import Avatar from '../../components/ui/Avatar';
+import HeaderInfoWidget from '../../components/ui/HeaderInfoWidget';
 import './HomeDashboard.css';
 
 const HomeDashboard = ({ userProfile }) => {
@@ -17,31 +18,39 @@ const HomeDashboard = ({ userProfile }) => {
     <div className="home-dashboard-container">
       {/* Header - Yellow Banner */}
       <header className="mb-4 md:mb-8 pt-0 md:pt-4 px-4 md:px-0">
-        <div className="bg-[var(--color-pc-yellow)] p-3 md:p-8 flex items-center gap-6 premium-header-card">
-          <div className="hidden md:block">
-            <Avatar src={userProfile.photoUrl} name={userProfile.name} size="lg" className="border-4 border-white/30" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-0.5 md:mb-1">
-              <span className="bg-blue-500 dark:bg-slate-100 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </span>
+        <div className="bg-[var(--color-pc-yellow)] p-4 md:p-6 premium-header-card">
+          {/* Top Row: Avatar, Greeting, Admin Button */}
+          <div className={`flex items-center justify-between w-full mb-3`}>
+            <div className={`flex items-center gap-4 ${!hasAdminAccess(userProfile) ? 'w-full justify-center' : ''}`}>
+              <div className="hidden md:block">
+                <Avatar src={userProfile.photoUrl} name={userProfile.name} size="lg" className="border-4 border-white/30" />
+              </div>
+              <div className={`${!hasAdminAccess(userProfile) ? 'text-center' : ''}`}>
+                <div className={`flex items-center gap-2 mb-0.5 ${!hasAdminAccess(userProfile) ? 'justify-center' : ''}`}>
+                  <span className="bg-blue-600 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </span>
+                </div>
+                <h1 className="text-xl md:text-2xl font-extrabold text-slate-900">Ciao, {userProfile.name}</h1>
+              </div>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-0.5 md:mb-1">Ciao, {userProfile.name}</h1>
-          </div>
 
-          {/* Direttivo Dashboard Button */}
-          {hasAdminAccess(userProfile) && (
-            <div className="ml-auto">
+            {/* Direttivo Dashboard Button */}
+            {hasAdminAccess(userProfile) && (
               <Link
                 to="/direttivo"
-                className="bg-blue-600 dark:bg-slate-100 hover:bg-blue-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-105 flex items-center justify-center"
+                className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 md:p-3 rounded-xl shadow-lg transition-all hover:scale-105 flex items-center justify-center shrink-0"
                 title="Dashboard Direttivo"
               >
-                <Gauge strokeWidth={1.5} size={32} />
+                <Gauge strokeWidth={1.5} size={24} className="md:w-8 md:h-8" />
               </Link>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Bottom Row: Info Widgets */}
+          <div className="flex justify-center md:justify-start">
+            <HeaderInfoWidget userProfile={userProfile} />
+          </div>
         </div>
       </header>
 
