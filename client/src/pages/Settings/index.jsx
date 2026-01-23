@@ -4,7 +4,7 @@ import { db, appId } from '../../services/firebase';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { ROLES, IS_HIDDEN_FIELD } from '../../utils/constants';
 
-const Settings = ({ userProfile, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode }) => {
+const Settings = ({ userProfile, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode, uppercaseMode, toggleUppercaseMode }) => {
 
   const handleSwitchToProfile = async (targetEmail, isHiddenCreate = false) => {
     if (!window.confirm("Sei sicuro di voler cambiare account? Verrai disconnesso dall'account attuale.")) {
@@ -102,6 +102,36 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
             >
               <span
                 className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${isNotificationsEnabled ? 'translate-x-6' : 'translate-x-0'}`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Accessibility Section */}
+        <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-slate-900">Accessibilità</h3>
+          </div>
+
+          <div className="flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-slate-50 dark:bg-[var(--color-slate-50)] rounded-2xl border border-slate-100 dark:border-slate-200 gap-4 transition-colors duration-300">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 ${uppercaseMode ? 'bg-purple-100 text-purple-600' : 'bg-slate-200 text-slate-500'}`}>
+                <span className="text-xl font-bold">Aa</span>
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-800 truncate">Testo Maiuscolo</h4>
+                <p className="text-sm text-slate-500 truncate">
+                  {uppercaseMode ? 'Attivato' : 'Disattivato'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={toggleUppercaseMode}
+              className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ml-auto md:ml-0 ${uppercaseMode ? 'bg-[var(--color-pc-green)]' : 'bg-slate-300'}`}
+            >
+              <span
+                className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${uppercaseMode ? 'translate-x-6' : 'translate-x-0'}`}
               />
             </button>
           </div>

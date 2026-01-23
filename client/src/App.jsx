@@ -72,6 +72,25 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Uppercase Mode Logic
+  const [uppercaseMode, setUppercaseMode] = useState(() => {
+    return localStorage.getItem('uppercaseMode') === 'true';
+  });
+
+  const toggleUppercaseMode = () => {
+    setUppercaseMode(prev => !prev);
+  };
+
+  useEffect(() => {
+    if (uppercaseMode) {
+      document.documentElement.classList.add('uppercase-mode');
+      localStorage.setItem('uppercaseMode', 'true');
+    } else {
+      document.documentElement.classList.remove('uppercase-mode');
+      localStorage.setItem('uppercaseMode', 'false');
+    }
+  }, [uppercaseMode]);
+
   // Auth Initialization
   useEffect(() => {
     const initAuth = async () => {
@@ -423,6 +442,8 @@ export default function App() {
               isNotificationsEnabled={!!fcmToken}
               toggleDarkMode={toggleDarkMode}
               darkMode={darkMode}
+              uppercaseMode={uppercaseMode}
+              toggleUppercaseMode={toggleUppercaseMode}
             />
             {/* Spacer for bottom nav on mobile */}
             {userProfile && location.pathname !== '/login' && (

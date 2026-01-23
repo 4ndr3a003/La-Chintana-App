@@ -18,6 +18,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.uppercase-mode body {
+  text-transform: uppercase !important;
+}
+
+/* Prevent transforming icons that might use ligatures or specific symbol fonts */
+html.uppercase-mode .material-icons,
+html.uppercase-mode .material-symbols-outlined,
+html.uppercase-mode ion-icon,
+html.uppercase-mode [class*="lucide"] {
+  text-transform: none !important;
+}
+
 html,
 body {
   height: 100%;

@@ -14,7 +14,7 @@ import Settings from '../pages/Settings';
 import LogisticManagement from '../pages/LogisticManagement';
 import { hasAdminAccess } from '../utils/constants';
 
-const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode }) => {
+const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode, uppercaseMode, toggleUppercaseMode }) => {
     return (
         <Routes>
             <Route path="/login" element={
@@ -58,6 +58,8 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications,
                         isNotificationsEnabled={isNotificationsEnabled}
                         toggleDarkMode={toggleDarkMode}
                         darkMode={darkMode}
+                        uppercaseMode={uppercaseMode}
+                        toggleUppercaseMode={toggleUppercaseMode}
                     />
                 </ProtectedRoute>
             } />
