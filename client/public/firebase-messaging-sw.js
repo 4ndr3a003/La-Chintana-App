@@ -48,7 +48,7 @@ messaging.onBackgroundMessage((payload) => {
 });
 
 self.addEventListener('notificationclick', function (event) {
-  console.log('[firebase-messaging-sw.js] Notification click received.');
+  console.log('[firebase-messaging-sw.js] Notification click received. Notification data:', event.notification.data);
 
   event.notification.close();
 
@@ -59,7 +59,7 @@ self.addEventListener('notificationclick', function (event) {
   // Ensure we have a full URL (important for matching client.url)
   const urlToOpen = new URL(connectionString, self.location.origin).href;
 
-  console.log('[firebase-messaging-sw.js] Attempting to open:', urlToOpen);
+  console.log('[firebase-messaging-sw.js] Attempting to open custom URL:', urlToOpen);
 
   event.waitUntil(
     clients.matchAll({

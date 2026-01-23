@@ -66,9 +66,6 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
           body: body,
           icon: DEFAULT_ICON, // URL for Web
           badge: DEFAULT_BADGE, // URL for Web
-        },
-        fcm_options: {
-          link: BASE_URL
         }
       },
       android: {
