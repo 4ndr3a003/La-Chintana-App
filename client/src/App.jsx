@@ -52,6 +52,7 @@ export default function App() {
   // PWA Install Logic
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -60,6 +61,7 @@ export default function App() {
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
       setIsInstallable(true);
+      setShowInstallModal(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -85,6 +87,7 @@ export default function App() {
     // We've used the prompt, and can't use it again, discard it
     setDeferredPrompt(null);
     setIsInstallable(false);
+    setShowInstallModal(false);
   };
 
   // Dark Mode Logic
@@ -490,35 +493,55 @@ export default function App() {
           </div>
         </div>
 
-        {/* Floating Actions Container */}
-        {((showNotifButton && !loading && userProfile) || (isInstallable && !loading && userProfile)) && (
-          <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-3 items-end">
+        {/* Notification Permission Button (Floating) */}
+        {showNotifButton && !loading && userProfile && (
+          <div className="fixed bottom-24 right-4 z-50">
+            <IonButton
+              shape="round"
+              color="warning"
+              onClick={enableWebNotifications}
+              className="shadow-lg"
+            >
+              <IonIcon slot="start" icon={notificationsOutline} />
+              Attiva Notifiche
+            </IonButton>
+          </div>
+        )}
 
-            {/* Install App Button */}
-            {isInstallable && (
-              <IonButton
-                shape="round"
-                color="primary"
-                onClick={installApp}
-                className="shadow-lg"
-              >
-                <IonIcon slot="start" icon={downloadOutline} />
-                Installa App
-              </IonButton>
-            )}
+        {/* Install App Modal */}
+        {isInstallable && showInstallModal && !loading && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-slate-100 dark:border-slate-700 transform transition-all scale-100">
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
+                  <IonIcon icon={downloadOutline} className="w-8 h-8" />
+                </div>
 
-            {/* Notification Permission Button */}
-            {showNotifButton && (
-              <IonButton
-                shape="round"
-                color="warning"
-                onClick={enableWebNotifications}
-                className="shadow-lg"
-              >
-                <IonIcon slot="start" icon={notificationsOutline} />
-                Attiva Notifiche
-              </IonButton>
-            )}
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                    Installa Applicazione
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                    Installa l'app per un'esperienza più fluida, accesso rapido e utilizzo offline.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 w-full mt-2">
+                  <button
+                    onClick={() => setShowInstallModal(false)}
+                    className="flex-1 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-300 font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  >
+                    Più tardi
+                  </button>
+                  <button
+                    onClick={installApp}
+                    className="flex-1 px-4 py-3 rounded-xl text-white font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
+                  >
+                    Installa
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
