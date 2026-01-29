@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { IonApp, IonButton, IonIcon } from '@ionic/react';
-import { notificationsOutline } from 'ionicons/icons';
+import { notificationsOutline, downloadOutline } from 'ionicons/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -47,6 +47,44 @@ export default function App() {
 
   const hideToast = () => {
     setToastInfo(prev => ({ ...prev, isOpen: false }));
+  };
+
+  // PWA Install Logic
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const installApp = async () => {
+    if (!deferredPrompt) {
+      console.log('Deferred prompt not available');
+      return;
+    }
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+
+    // We've used the prompt, and can't use it again, discard it
+    setDeferredPrompt(null);
+    setIsInstallable(false);
   };
 
   // Dark Mode Logic
@@ -452,18 +490,35 @@ export default function App() {
           </div>
         </div>
 
-        {/* Notification Permission Button (Floating) */}
-        {showNotifButton && !loading && userProfile && (
-          <div className="fixed bottom-24 right-4 z-50">
-            <IonButton
-              shape="round"
-              color="warning"
-              onClick={enableWebNotifications}
-              className="shadow-lg"
-            >
-              <IonIcon slot="start" icon={notificationsOutline} />
-              Attiva Notifiche
-            </IonButton>
+        {/* Floating Actions Container */}
+        {((showNotifButton && !loading && userProfile) || (isInstallable && !loading && userProfile)) && (
+          <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-3 items-end">
+
+            {/* Install App Button */}
+            {isInstallable && (
+              <IonButton
+                shape="round"
+                color="primary"
+                onClick={installApp}
+                className="shadow-lg"
+              >
+                <IonIcon slot="start" icon={downloadOutline} />
+                Installa App
+              </IonButton>
+            )}
+
+            {/* Notification Permission Button */}
+            {showNotifButton && (
+              <IonButton
+                shape="round"
+                color="warning"
+                onClick={enableWebNotifications}
+                className="shadow-lg"
+              >
+                <IonIcon slot="start" icon={notificationsOutline} />
+                Attiva Notifiche
+              </IonButton>
+            )}
           </div>
         )}
 

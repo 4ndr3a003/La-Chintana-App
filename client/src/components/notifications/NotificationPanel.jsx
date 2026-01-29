@@ -3,12 +3,16 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { MessageSquare, Calendar, Bell, X, ExternalLink } from 'lucide-react';
+import { MessageSquare, Calendar, Bell, X, ExternalLink, Trash2 } from 'lucide-react';
 import { EVENT_TYPES } from '../../utils/constants';
 
 const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dismissedNotifications, setDismissedNotifications] = useState(() => {
+        const saved = localStorage.getItem('dismissed_notifications');
+        return saved ? JSON.parse(saved) : [];
+    });
     const navigate = useNavigate();
     const panelRef = useRef(null);
 
@@ -109,6 +113,9 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
 
             // Filter logic (same as dashboards)
             const visibleEvents = currentEvents.filter(event => {
+                // 0. Check Dismissed
+                if (dismissedNotifications.includes(event.id)) return false;
+
                 const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
 
                 // 1. Check strict 'Direttivo' type
@@ -129,6 +136,9 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
             });
 
             const visibleComms = currentComms.filter(msg => {
+                // 0. Check Dismissed
+                if (dismissedNotifications.includes(msg.id)) return false;
+
                 // Check expiration
                 if (msg.expirationDate) {
                     const expDate = new Date(msg.expirationDate);
@@ -163,7 +173,7 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
             unsubEvents();
             unsubComms();
         };
-    }, [isOpen, userProfile]);
+    }, [isOpen, userProfile, dismissedNotifications]);
 
     const handleItemClick = (item) => {
         onClose();
@@ -172,6 +182,13 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
         } else {
             navigate('/comms', { state: { selectedCommId: item.id } });
         }
+    };
+
+    const handleDismiss = (e, item) => {
+        e.stopPropagation(); // Prevent item click
+        const newDismissed = [...dismissedNotifications, item.id];
+        setDismissedNotifications(newDismissed);
+        localStorage.setItem('dismissed_notifications', JSON.stringify(newDismissed));
     };
 
     // Helper to get Icon and Color based on type/topic
@@ -234,13 +251,13 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
                             <div
                                 key={`${item.itemType}-${item.id}`}
                                 onClick={() => handleItemClick(item)}
-                                className="p-4 hover:bg-slate-50 transition-colors cursor-pointer group"
+                                className="p-4 hover:bg-slate-50 transition-colors cursor-pointer group relative"
                             >
                                 <div className="flex gap-3">
                                     <div className={`flex-none w-10 h-10 rounded-full flex items-center justify-center ${getItemStyle(item)}`}>
                                         {item.itemType === 'event' ? <Calendar size={18} /> : <MessageSquare size={18} />}
                                     </div>
-                                    <div className="flex-grow min-w-0">
+                                    <div className="flex-grow min-w-0 pr-6"> {/* Added padding-right to avoid overlap with delete btn */}
                                         <div className="flex justify-between items-start mb-0.5">
                                             <p className="text-xs font-bold uppercase text-slate-400">
                                                 {item.itemType === 'event' ? 'Evento' : 'Comunicazione'}
@@ -256,6 +273,15 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
                                             {item.type === 'event' ? (item.description || "Nessuna descrizione") : item.content}
                                         </p>
                                     </div>
+
+                                    {/* Delete Button - Always visible on mobile, hover on desktop */}
+                                    <button
+                                        onClick={(e) => handleDismiss(e, item)}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                        title="Rimuovi notifica"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
                                 </div>
                             </div>
                         ))}

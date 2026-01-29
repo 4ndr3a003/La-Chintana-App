@@ -48,46 +48,51 @@ messaging.onBackgroundMessage((payload) => {
 });
 
 self.addEventListener('notificationclick', function (event) {
-  console.log('[firebase-messaging-sw.js] Notification click received. Notification data:', event.notification.data);
-
+  console.log('[firebase-messaging-sw.js] Notification click received. Action:', event.action);
   event.notification.close();
 
-  // 1. Construct the absolute URL to open
-  //    Default to root if no URL provided in data
-  const connectionString = event.notification.data?.url || '/';
+  // 1. Determine URL to open
+  let urlToOpen = new URL(self.location.origin).href; // Default to root
+  if (event.notification.data && event.notification.data.url) {
+    // Construct absolute URL from relative path
+    urlToOpen = new URL(event.notification.data.url, self.location.origin).href;
+  }
 
-  // Ensure we have a full URL (important for matching client.url)
-  const urlToOpen = new URL(connectionString, self.location.origin).href;
+  console.log('[firebase-messaging-sw.js] Target URL:', urlToOpen);
 
-  console.log('[firebase-messaging-sw.js] Attempting to open custom URL:', urlToOpen);
+  const promiseChain = clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  }).then((windowClients) => {
+    // 2. Search for existing window
+    let matchingClient = null;
+    for (let i = 0; i < windowClients.length; i++) {
+      const client = windowClients[i];
+      if (client.url.startsWith(self.location.origin)) {
+        matchingClient = client;
+        break;
+      }
+    }
 
-  event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then(function (clientList) {
-      // 2. Check if there is already a window/tab open with the app
-      for (let i = 0; i < clientList.length; i++) {
-        const client = clientList[i];
-
-        // Check if the client matches our origin
-        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
-          console.log('[firebase-messaging-sw.js] Found existing client, focusing:', client.url);
-          return client.focus().then((focusedClient) => {
-            // After focusing, navigate if it's a different URL
-            if (focusedClient.url !== urlToOpen) {
-              return focusedClient.navigate(urlToOpen);
-            }
-            return focusedClient;
-          });
+    if (matchingClient) {
+      console.log('[firebase-messaging-sw.js] Found existing client, attempting focus.');
+      return matchingClient.focus().then((focusedClient) => {
+        // Optional: Navigate to specific URL if needed
+        // Using 'navigate' on a focused client updates the page
+        if (urlToOpen && focusedClient.url !== urlToOpen) {
+          return focusedClient.navigate(urlToOpen);
         }
-      }
-
-      // 3. If no window is open, open a new one
-      if (clients.openWindow) {
-        console.log('[firebase-messaging-sw.js] No existing client found, opening new window.');
+        return focusedClient;
+      }).catch(err => {
+        console.warn('[firebase-messaging-sw.js] Focus failed, trying openWindow.', err);
         return clients.openWindow(urlToOpen);
-      }
-    })
-  );
+      });
+    }
+
+    // 3. No client found, open new window
+    console.log('[firebase-messaging-sw.js] No client found, opening new window.');
+    return clients.openWindow(urlToOpen);
+  });
+
+  event.waitUntil(promiseChain);
 });

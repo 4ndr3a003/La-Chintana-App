@@ -196,11 +196,11 @@ export const useAdminDashboard = () => {
       city: formData.city || '',
       emercomnetId: formData.emercomnetId || '',
       status: formData.status, // Pass current form status to helper
+      photoUrl: formData.photoUrl || '',
       // Keep existing fields if editing
       ...(isEditing ? {} : {
         joinedAt: new Date().toISOString(),
-        password: (formData.password && formData.password.trim() !== '') ? formData.password : "1234",
-        photoUrl: ''
+        password: (formData.password && formData.password.trim() !== '') ? formData.password : "1234"
       })
     };
 
@@ -694,7 +694,13 @@ export const useAdminDashboard = () => {
   };
 
   const uploadCroppedImage = async () => {
-    if (!completedCrop || !imgRef.current) {
+    // 1. Check refs and crop state
+    // Fallback to 'crop' if 'completedCrop' is not set (e.g. user didn't interact)
+    const activeCrop = completedCrop || crop;
+
+    if (!activeCrop || !imgRef.current) {
+      console.error("Missing crop or image ref:", { activeCrop, imgRef: !!imgRef.current });
+      setNotification({ isOpen: true, title: 'Attenzione', message: "Impossibile ritagliare: immagine o area di ritaglio non valide. Prova a muovere leggermente la selezione.", type: 'warning' });
       return;
     }
 
@@ -709,59 +715,109 @@ export const useAdminDashboard = () => {
     try {
       const canvas = document.createElement('canvas');
       const image = imgRef.current;
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
-      canvas.width = completedCrop.width * scaleX;
-      canvas.height = completedCrop.height * scaleY;
+
+      // Validate image loaded
+      if (!image.naturalWidth || !image.naturalHeight) {
+        throw new Error("Immagine non caricata correttamente (dimensioni 0).");
+      }
+
+      const naturalWidth = image.naturalWidth;
+      const naturalHeight = image.naturalHeight;
+      const displayedWidth = image.width;
+      const displayedHeight = image.height;
+
+      console.log("Image Dims:", { naturalWidth, naturalHeight, displayedWidth, displayedHeight });
+
+      // Initialize pixelCrop from activeCrop
+      let pixelCrop = { ...activeCrop };
+
+      // Ensure we have a valid crop object with width/height
+      if (!pixelCrop.width || !pixelCrop.height) {
+        // Try to use a default center crop if width/height are missing/zero
+        console.warn("Invalid crop dimensions, defaulting to 50% center crop");
+        pixelCrop = {
+          unit: '%',
+          x: 25,
+          y: 25,
+          width: 50,
+          height: 50
+        };
+      }
+
+      // Handle Percentage Crop conversion
+      if (pixelCrop.unit === '%') {
+        pixelCrop.x = (pixelCrop.x / 100) * naturalWidth;
+        pixelCrop.y = (pixelCrop.y / 100) * naturalHeight;
+        pixelCrop.width = (pixelCrop.width / 100) * naturalWidth;
+        pixelCrop.height = (pixelCrop.height / 100) * naturalHeight;
+      } else {
+        // Handle Pixel Crop (scaled from displayed to natural)
+        // If crop was done on a scaled image, we need to scale up to natural size
+        const scaleX = naturalWidth / displayedWidth;
+        const scaleY = naturalHeight / displayedHeight;
+
+        pixelCrop.x = pixelCrop.x * scaleX;
+        pixelCrop.y = pixelCrop.y * scaleY;
+        pixelCrop.width = pixelCrop.width * scaleX;
+        pixelCrop.height = pixelCrop.height * scaleY;
+      }
+
+      // Prevent 0-dimension canvas issues
+      if (pixelCrop.width <= 0 || pixelCrop.height <= 0) {
+        console.error("Invalid crop dimensions", pixelCrop);
+        setUploading(false);
+        return;
+      }
+
+      canvas.width = pixelCrop.width;
+      canvas.height = pixelCrop.height;
       const ctx = canvas.getContext('2d');
 
       ctx.drawImage(
         image,
-        completedCrop.x * scaleX,
-        completedCrop.y * scaleY,
-        completedCrop.width * scaleX,
-        completedCrop.height * scaleY,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
         0,
         0,
-        canvas.width,
-        canvas.height
+        pixelCrop.width,
+        pixelCrop.height
       );
 
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          setUploading(false);
-          return;
-        }
+      // Wrap canvas.toBlob in a Promise
+      const blob = await new Promise((resolve, reject) => {
+        canvas.toBlob((b) => {
+          if (!b) reject(new Error("Canvas to Blob failed"));
+          resolve(b);
+        }, 'image/jpeg', 0.8);
+      });
 
-        try {
-          // Use a temp path or specific path. Since we are editing a specific user (or creating), 
-          // we might not have the ID yet if creating.
-          // If creating, we can upload to a temp location or use Date.now() as ID placeholder?
-          // BUT, we want to update formData. 
-          // Strategy: Upload to `avatars/temp/${Date.now()}` or similar, get URL, putting in formData.
+      console.log("Blob created successfully, size:", blob.size);
 
-          const filename = `avatar_${Date.now()}.jpg`;
-          const storageRef = ref(storage, `avatars/uploads/${filename}`);
+      const filename = `avatars/uploads/avatar_${Date.now()}.jpg`; // Fixed path syntax
+      const storageRef = ref(storage, filename);
 
-          await uploadBytes(storageRef, blob);
-          const url = await getDownloadURL(storageRef);
+      console.log("Uploading to:", filename);
+      await uploadBytes(storageRef, blob);
+      console.log("Upload complete");
 
-          setFormData(prev => ({ ...prev, photoUrl: url }));
-          closeImageModal();
-          setNotification({ isOpen: true, title: 'Foto Caricata', message: "La foto è stata caricata. Ricordati di salvare il profilo.", type: 'success' });
+      const url = await getDownloadURL(storageRef);
+      console.log("Download URL obtained:", url);
 
-        } catch (error) {
-          console.error("Error upload:", error);
-          setNotification({ isOpen: true, title: 'Errore', message: "Errore caricamento foto.", type: 'error' });
-        } finally {
-          setUploading(false);
-        }
-      }, 'image/jpeg');
+      setFormData(prev => {
+        console.log("Updating formData with new photoUrl:", url);
+        return { ...prev, photoUrl: url };
+      });
+
+      closeImageModal();
+      setNotification({ isOpen: true, title: 'Foto Caricata', message: "Fatto! Ora clicca 'Salva Modifiche' per confermare.", type: 'success' });
 
     } catch (error) {
-      console.error("Error cropping:", error);
+      console.error("Error upload/crop:", error);
+      setNotification({ isOpen: true, title: 'Errore', message: "Errore caricamento su server: " + error.message, type: 'error' });
+    } finally {
       setUploading(false);
-      closeImageModal();
     }
   };
 

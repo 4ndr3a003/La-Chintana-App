@@ -8,15 +8,33 @@ const Avatar = ({ src, name, size = 'md', className = '' }) => {
     lg: 'w-20 h-20 text-base',
     xl: 'w-28 h-28 text-xl'
   };
-  
-  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=f1f5f9&color=475569&bold=true`;
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const [imageError, setImageError] = React.useState(false);
+
+  if (!src || imageError) {
+    return (
+      <div
+        className={`rounded-full flex items-center justify-center font-bold bg-slate-200 text-slate-600 border border-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 ${sizes[size]} ${className}`}
+        title={name}
+      >
+        {getInitials(name)}
+      </div>
+    );
+  }
 
   return (
-    <img 
-      src={src || fallbackUrl} 
-      alt={name} 
+    <img
+      src={src}
+      alt={name}
       className={`rounded-full object-cover border border-slate-100 bg-slate-50 ${sizes[size]} ${className}`}
-      onError={(e) => { e.target.src = fallbackUrl; }}
+      onError={() => setImageError(true)}
     />
   );
 };

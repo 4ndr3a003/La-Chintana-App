@@ -578,7 +578,7 @@ const AdminDashboard = ({ userProfile }) => {
                 <section className="flex flex-col items-center justify-center py-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
                   <p className="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">Foto Profilo</p>
                   <div className="relative group">
-                    <Avatar src={formData.photoUrl} name={formData.firstName} size="xl" className="shadow-md" />
+                    <Avatar src={formData.photoUrl} name={`${formData.firstName} ${formData.lastName}`} size="xl" className="shadow-md" />
                     <label
                       className="absolute bottom-0 right-0 p-2 rounded-full cursor-pointer bg-slate-900 text-white hover:bg-slate-700 transition-all shadow-md active:scale-95"
                       title="Aggiorna Foto"
@@ -849,7 +849,7 @@ const AdminDashboard = ({ userProfile }) => {
       {/* Crop Modal */}
       {isImageModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-[200] p-4"
           onClick={closeImageModal}
         >
           <div

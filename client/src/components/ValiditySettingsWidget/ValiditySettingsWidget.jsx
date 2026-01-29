@@ -66,6 +66,7 @@ const ValiditySettingsWidget = ({ settings, onUpdate, loading, headless = false 
                     // We only show items that are listed in SPECIALIZATIONS_DATA items.
 
                     if (!data.items) return null;
+                    if (category === 'Patenti di Guida') return null;
 
                     return (
                         <div key={category} className="settings-category">

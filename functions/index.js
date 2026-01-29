@@ -54,6 +54,8 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
     // For web badge, we use the white transparent icon we just copied to public
     const DEFAULT_BADGE = `${BASE_URL}/ic_stat_icon.png`;
 
+    const destUrl = data.url ? `${BASE_URL}${data.url}` : BASE_URL;
+
     const message = {
       notification: {
         title: title,
@@ -66,7 +68,14 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
           body: body,
           icon: DEFAULT_ICON, // URL for Web
           badge: DEFAULT_BADGE, // URL for Web
-        }
+          actions: [
+            { action: 'open_app', title: 'Apri App' }
+          ]
+        },
+        fcm_options: {
+          link: destUrl
+        },
+        data: data
       },
       android: {
         notification: {
