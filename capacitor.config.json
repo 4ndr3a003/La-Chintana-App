@@ -1,6 +1,6 @@
 {
   "appId": "com.lachintana.app",
-  "appName": "La Chintana",
+  "appName": "La Chintana Fenix",
   "webDir": "client/dist",
   "plugins": {
     "PushNotifications": {

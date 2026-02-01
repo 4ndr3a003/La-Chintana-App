@@ -118,7 +118,7 @@ const AppLayout = () => {
                     >
                         <Menu className="w-6 h-6" />
                     </button>
-                    <span className="font-semibold text-slate-800">La Chintana</span>
+                    <span className="font-semibold text-slate-800">La Chintana Fenix</span>
                     <div className="w-8" /> {/* Spacer for balance */}
                 </header>
 

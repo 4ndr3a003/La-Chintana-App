@@ -33,7 +33,7 @@ const HomeDashboard = ({ userProfile }) => {
                 </div>
                 <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 leading-tight">Ciao, {userProfile.name}</h1>
                 <p className="text-slate-600 font-medium text-xs md:text-sm hidden md:block mt-0.5 opacity-80">
-                  Benvenuto nel portale operativo della Chintana
+                  Benvenuto nel portale operativo de "La Chintana Fenix"
                 </p>
               </div>
             </div>

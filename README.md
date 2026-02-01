@@ -1,6 +1,6 @@
-# 🛡️ La Chintana - Portale Protezione Civile
+# 🛡️ La Chintana Fenix - Portale Protezione Civile
 
-Applicazione gestionale moderna per il coordinamento dei volontari della Protezione Civile "La Chintana". Il sistema unifica la gestione operativa, le comunicazioni e le attività di volontariato in un'unica piattaforma accessibile via Web e App Mobile (Android).
+Applicazione gestionale moderna per il coordinamento dei volontari della Protezione Civile "La Chintana Fenix". Il sistema unifica la gestione operativa, le comunicazioni e le attività di volontariato in un'unica piattaforma accessibile via Web e App Mobile (Android).
 
 ## 🏗️ Architettura del Progetto
 

@@ -71,8 +71,8 @@ app.post('/api/send-notification', async (req, res) => {
 
     // [CUSTOMIZATION] Add Icon/Badge
     const BASE_URL = 'https://chintana-events-handler.firebaseapp.com';
-    const DEFAULT_ICON = `${BASE_URL}/logo_chintana.png`;
-    const DEFAULT_BADGE = `${BASE_URL}/logo_chintana.png`;
+    const DEFAULT_ICON = `${BASE_URL}/logo_chintana_fenix.png`;
+    const DEFAULT_BADGE = `${BASE_URL}/logo_chintana_fenix.png`;
 
     const message = {
       notification: {

@@ -50,7 +50,7 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
 
     // [CUSTOMIZATION] Add Icon/Badge
     const BASE_URL = 'https://chintana-events-handler.firebaseapp.com';
-    const DEFAULT_ICON = `${BASE_URL}/logo_chintana.png`;
+    const DEFAULT_ICON = `${BASE_URL}/logo_chintana_fenix.png`;
     // For web badge, we use the white transparent icon we just copied to public
     const DEFAULT_BADGE = `${BASE_URL}/ic_stat_icon.png`;
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
 import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck } from 'lucide-react';
-import logo from '../../assets/logo_chintanta.png';
+import logo from '../../assets/logo_chintana_fenix.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
 import ProfileMenu from './ProfileMenu';
@@ -117,7 +117,7 @@ const Header = ({ userProfile }) => {
               <div className="flex items-center gap-2 md:gap-3.5">
                 <img src={logo} alt="Logo" className="h-12 w-auto drop-shadow-sm" />
                 <div className="leading-none text-left block">
-                  <h1 className="text-base sm:text-lg font-black tracking-tighter text-white">LA CHINTANA</h1>
+                  <h1 className="text-base sm:text-lg font-black tracking-tighter text-white">LA CHINTANA FENIX</h1>
                   <p className="text-[0.5625rem] sm:text-[0.625rem] text-yellow-400 font-bold uppercase tracking-widest leading-tight">Protezione Civile</p>
                 </div>
               </div>

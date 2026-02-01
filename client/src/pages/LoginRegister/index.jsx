@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight, AlertCircle, Mail, Lock } from 'lucide-react';
-import logo from '../../assets/logo_chintanta.png';
+import logo from '../../assets/logo_chintana_fenix.png';
 import { useLoginRegister } from './LoginRegisterLogic';
 import './LoginRegister.css';
 
@@ -41,7 +41,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
 
           <div className="space-y-2 uppercase tracking-widest">
             <h1 className="text-4xl lg:text-5xl font-extrabold text-white">
-              La Chintana
+              La Chintana Fenix
             </h1>
             <p className="text-sm lg:text-base font-semibold text-blue-200 tracking-[0.2em]">
               Portale Operativo Volontari
@@ -66,7 +66,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
           {/* Mobile Title - Pushed down to clear the logo overlap */}
           <div className="md:hidden text-center mb-8 mt-12 space-y-1">
             <h1 className="text-3xl font-extrabold text-[#0d2b54] tracking-tighter leading-tight">
-              LA CHINTANA
+              LA CHINTANA FENIX
             </h1>
             <p className="text-[0.7rem] font-bold text-blue-900/50 tracking-[0.2em] uppercase">
               Portale Operativo Volontari

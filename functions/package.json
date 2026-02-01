@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "description": "Cloud Functions for La Chintana App",
+  "description": "Cloud Functions for La Chintana Fenix App",
   "scripts": {
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
