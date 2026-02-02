@@ -8,10 +8,10 @@ export default {
     extend: {
       colors: {
         // M3 Semantic Colors - Extended for Expressive
-        primary: '#0d2b54',
+        primary: '#002e5c',
         'on-primary': '#ffffff',
         'primary-container': '#dbe5f1', // Lighter blue for containers
-        'on-primary-container': '#0d2b54',
+        'on-primary-container': '#002e5c',
 
         secondary: '#ffde03',
         'on-secondary': '#000000',

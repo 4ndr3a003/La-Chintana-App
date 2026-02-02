@@ -14,7 +14,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
   } = useLoginRegister(onLoginSuccess);
 
   return (
-    <div className="flex min-h-screen w-full font-sans bg-[#0d2b54] relative overflow-hidden md:overflow-auto">
+    <div className="flex min-h-screen w-full font-sans bg-[#002e5c] relative overflow-hidden md:overflow-auto">
 
       {/* BACKGROUND PATTERN (Visible on Mobile & Desktop Left) */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -65,7 +65,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
 
           {/* Mobile Title - Pushed down to clear the logo overlap */}
           <div className="md:hidden text-center mb-8 mt-12 space-y-1">
-            <h1 className="text-3xl font-extrabold text-[#0d2b54] tracking-tighter leading-tight">
+            <h1 className="text-3xl font-extrabold text-[#002e5c] tracking-tighter leading-tight">
               LA CHINTANA FENIX
             </h1>
             <p className="text-[0.7rem] font-bold text-blue-900/50 tracking-[0.2em] uppercase">
@@ -75,7 +75,7 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
 
           {/* Desktop-only greeting */}
           <div className="hidden md:block mb-10">
-            <h2 className="text-3xl font-bold text-[#0d2b54] mb-2">Benvenuto</h2>
+            <h2 className="text-3xl font-bold text-[#002e5c] mb-2">Benvenuto</h2>
             <p className="text-slate-500">Accedi al portale operativo.</p>
           </div>
 
@@ -83,40 +83,40 @@ const LoginRegisterView = ({ onLoginSuccess }) => {
 
             {/* Input Group: Email */}
             <div className="relative group">
-              <div className="absolute top-0 inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0d2b54] transition-colors">
+              <div className="absolute top-0 inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#002e5c] transition-colors">
                 <Mail className="w-5 h-5" />
               </div>
               <input
                 type="email"
                 required
                 placeholder=" "
-                className="peer block w-full rounded-full border border-slate-300 bg-white py-4 pl-12 pr-6 text-slate-800 focus:border-[#0d2b54] focus:ring-1 focus:ring-[#0d2b54] transition-all outline-none"
+                className="peer block w-full rounded-full border border-slate-300 bg-white py-4 pl-12 pr-6 text-slate-800 focus:border-[#002e5c] focus:ring-1 focus:ring-[#002e5c] transition-all outline-none"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
               />
               <label className="absolute -top-2.5 left-6 bg-white px-2 text-sm font-medium text-slate-500 transition-all 
                                  peer-placeholder-shown:top-4 peer-placeholder-shown:left-12 peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-400
-                                 peer-focus:-top-2.5 peer-focus:left-6 peer-focus:bg-white peer-focus:text-[#0d2b54] peer-focus:text-xs">
+                                 peer-focus:-top-2.5 peer-focus:left-6 peer-focus:bg-white peer-focus:text-[#002e5c] peer-focus:text-xs">
                 Email
               </label>
             </div>
 
             {/* Input Group: Password */}
             <div className="relative group">
-              <div className="absolute top-0 inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0d2b54] transition-colors">
+              <div className="absolute top-0 inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#002e5c] transition-colors">
                 <Lock className="w-5 h-5" />
               </div>
               <input
                 type="password"
                 required
                 placeholder=" "
-                className="peer block w-full rounded-full border border-slate-300 bg-white py-4 pl-12 pr-6 text-slate-800 focus:border-[#0d2b54] focus:ring-1 focus:ring-[#0d2b54] transition-all outline-none"
+                className="peer block w-full rounded-full border border-slate-300 bg-white py-4 pl-12 pr-6 text-slate-800 focus:border-[#002e5c] focus:ring-1 focus:ring-[#002e5c] transition-all outline-none"
                 value={formData.password}
                 onChange={e => setFormData({ ...formData, password: e.target.value })}
               />
               <label className="absolute -top-2.5 left-6 bg-white px-2 text-sm font-medium text-slate-500 transition-all 
                                  peer-placeholder-shown:top-4 peer-placeholder-shown:left-12 peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-400
-                                 peer-focus:-top-2.5 peer-focus:left-6 peer-focus:bg-white peer-focus:text-[#0d2b54] peer-focus:text-xs">
+                                 peer-focus:-top-2.5 peer-focus:left-6 peer-focus:bg-white peer-focus:text-[#002e5c] peer-focus:text-xs">
                 Password
               </label>
             </div>

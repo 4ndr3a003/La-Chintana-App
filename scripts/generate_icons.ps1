@@ -19,15 +19,21 @@ function Resize-ImageWithPadding {
         [string]$SourceFile,
         [string]$DestFile,
         [int]$TargetSize,
-        [float]$ScaleFactor = 1.0
+        [float]$ScaleFactor = 0.9,
+        [string]$HexColor = "#002e5c"
     )
 
     $sourceImage = [System.Drawing.Image]::FromFile($SourceFile)
     
-    # Create a new bitmap with white background
+    # Create a new bitmap with background color
     $bitmap = New-Object System.Drawing.Bitmap($TargetSize, $TargetSize)
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-    $graphics.Clear([System.Drawing.Color]::White)
+    
+    # Parse hex color
+    $colorConverter = New-Object System.Drawing.ColorConverter
+    $bgColor = $colorConverter.ConvertFromString($HexColor)
+    
+    $graphics.Clear($bgColor)
     $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
     $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
