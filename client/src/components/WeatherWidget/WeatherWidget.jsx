@@ -46,54 +46,63 @@ const WeatherWidget = () => {
 
         const fetchArpaAlerts = async () => {
             try {
-                // Fetch Arpa Piemonte CAP Feed
-                // Note: Using a CORS interaction here might be blocked in some browsers if the server doesn't support it.
-                // If it fails, we catch the error.
-                // In production, might need a proxy.
-                const response = await fetch('https://www.arpa.piemonte.it/export/xmlcap/allerta.xml');
+                // Fetch Arpa Piemonte Widget HTML via Proxy
+                // Using the specific code for Morano sul Po: 006109
+                const response = await fetch('/api/arpa_widget/006109');
 
-                if (!response.ok) throw new Error('Arpa feed unavailable');
+                if (!response.ok) throw new Error('Arpa widget unavailable');
 
                 const text = await response.text();
                 const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(text, "text/xml");
+                const doc = parser.parseFromString(text, "text/html");
 
-                // Parse CAP alerts
-                const infoElements = xmlDoc.getElementsByTagName('info');
                 const newAlerts = [];
 
-                for (let i = 0; i < infoElements.length; i++) {
-                    const info = infoElements[i];
-                    // Look for area that might cover Morano or generic Piemonte
-                    // CAP structure is complex, for simplicity we grab 'headline' and 'severity' 
-                    // if it seems relevant (often 'area' tag contains zone codes).
-                    // Morano is in zone I (Scribo until proven otherwise, usually zone F, G, H, I vary).
-                    // For now, we capture ALL active warnings for the region to be safe.
+                // Helper to map color classes to severity and colors
+                const getSeverityFromClass = (className) => {
+                    if (className.includes('td_all_3')) return { level: 'Extreme', color: 'text-red-600', label: 'Allerta Rossa' };
+                    if (className.includes('td_all_2')) return { level: 'Severe', color: 'text-orange-500', label: 'Allerta Arancione' };
+                    if (className.includes('td_all_1')) return { level: 'Moderate', color: 'text-yellow-500', label: 'Allerta Gialla' };
+                    // td_all_0 is Green, td_all_4 is White
+                    return null;
+                };
 
-                    const severity = info.getElementsByTagName('severity')[0]?.textContent;
-                    const headline = info.getElementsByTagName('headline')[0]?.textContent;
-                    const description = info.getElementsByTagName('description')[0]?.textContent;
-                    const effective = info.getElementsByTagName('effective')[0]?.textContent;
-                    const expires = info.getElementsByTagName('expires')[0]?.textContent;
+                // Parse the specific table rows we identified in the widget HTML
+                // The table contains rows like: <th>Idrogeologico</th> <td class="td_all_0">VERDE</td>
+                const rows = doc.querySelectorAll('table.allerta tbody tr');
 
-                    // Filter only significant alerts
-                    if (severity && ['Severe', 'Extreme', 'Moderate'].includes(severity)) {
+                rows.forEach((row, index) => {
+                    const th = row.querySelector('th');
+                    if (!th) return;
+
+                    const riskType = th.textContent.trim();
+                    // Skip header rows or irrelevant rows
+                    if (!['Idrogeologico', 'Idraulico', 'Temporali', 'Neve', 'Valanghe'].includes(riskType)) return;
+
+                    // The status is usually in the first td
+                    const td = row.querySelector('td');
+                    if (!td) return;
+
+                    const className = td.className || '';
+                    const statusText = td.textContent.trim();
+                    const severityInfo = getSeverityFromClass(className);
+
+                    if (severityInfo) {
                         newAlerts.push({
-                            id: i,
-                            title: headline || 'Allerta Meteo',
-                            severity: severity, // Extreme, Severe, Moderate, Minor, Unknown
-                            desc: description,
-                            time: `${new Date(effective).getHours()}:00 - ${new Date(expires).getHours()}:00`
+                            id: index,
+                            title: severityInfo.label,
+                            severity: severityInfo.level,
+                            desc: `${riskType}: ${statusText}`,
+                            time: 'Oggi/Domani' // Widget usually shows 24/48h view, simplifying for now
                         });
                     }
-                }
+                });
 
                 setAlerts(newAlerts);
                 setLoadingAlerts(false);
 
             } catch (err) {
-                console.warn("Arpa Alert fetch failed (likely CORS or Net error):", err);
-                // Fallback or empty state
+                console.warn("Arpa Widget fetch failed:", err);
                 setLoadingAlerts(false);
             }
         };
@@ -199,7 +208,7 @@ const WeatherWidget = () => {
                     <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                         Allerte Arpa Piemonte
                     </h4>
-                    <a href="https://www.arpa.piemonte.it/rischi_naturali" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                    <a href="https://www.arpa.piemonte.it/rischi_naturali/widget/comuni/006109" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
                         <ExternalLink size={14} />
                     </a>
                 </div>
@@ -212,7 +221,7 @@ const WeatherWidget = () => {
                             <AlertTriangle className={`alert-icon ${alert.severity === 'Severe' || alert.severity === 'Extreme' ? 'text-red-500' : 'text-yellow-500'}`} size={20} />
                             <div className="alert-content">
                                 <div className="alert-title">{alert.title}</div>
-                                <div className="text-xs text-slate-600 mb-1">{alert.desc}</div>
+                                <div className="text-xs text-slate-600 mb-1 font-medium">{alert.desc}</div>
                                 <div className="alert-time">{alert.time}</div>
                             </div>
                         </div>
