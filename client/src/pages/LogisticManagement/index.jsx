@@ -54,6 +54,8 @@ const LogisticManagement = ({ userProfile }) => {
         handleDeleteVehicle,
         handleSaveEquipment,
         handleDeleteEquipment,
+        handleUploadVehicleDocument,
+        handleDeleteVehicleDocument,
         filterLocation,
         setFilterLocation,
         isFiltersOpen,
@@ -391,6 +393,8 @@ const LogisticManagement = ({ userProfile }) => {
                 isOpen={!!viewingItem && activeTab === 'vehicles'}
                 onClose={() => setViewingItem(null)}
                 vehicle={viewingItem}
+                onUploadDocument={handleUploadVehicleDocument}
+                onDeleteDocument={handleDeleteVehicleDocument}
             />
 
             <EquipmentModal

@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
-import { Edit2, Trash2, AlertTriangle, Calendar, Radio, Gauge, Truck, MoreVertical, ShieldCheck, ShieldAlert, Wrench, Circle } from 'lucide-react';
+import { Edit2, Trash2, AlertTriangle, Calendar, Radio, Gauge, Truck, MoreVertical, ShieldCheck, ShieldAlert, Wrench, Circle, FileText } from 'lucide-react';
 
 const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
 
@@ -235,6 +235,13 @@ const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
 
                                 {/* Footer Actions */}
                                 <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                                    <button
+                                        onClick={() => onView(v)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow active:scale-95 border border-transparent"
+                                    >
+                                        <FileText size={16} />
+                                        <span>Dettagli</span>
+                                    </button>
                                     <button
                                         onClick={() => onEdit(v)}
                                         className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow active:scale-95 border border-transparent hover:border-slate-200 dark:border-slate-700 dark:hover:border-slate-600"

@@ -1,7 +1,43 @@
-import React from 'react';
-import { X, Truck, Calendar, Radio, Gauge, MapPin, AlertTriangle, ShieldCheck, Wrench } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, Truck, Calendar, Radio, Gauge, MapPin, AlertTriangle, ShieldCheck, Wrench, FileText, Upload, Trash2, Loader2, Download } from 'lucide-react';
+import DeleteConfirmationModal from '../../../components/ui/DeleteConfirmationModal';
 
-const VehicleDetailsModal = ({ isOpen, onClose, vehicle }) => {
+const VehicleDetailsModal = ({ isOpen, onClose, vehicle, onUploadDocument, onDeleteDocument }) => {
+    const [isUploading, setIsUploading] = useState(false);
+    const [docToDelete, setDocToDelete] = useState(null); // Document object or null
+    const [isDeleting, setIsDeleting] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        
+        try {
+            setIsUploading(true);
+            await onUploadDocument(vehicle.id, file);
+        } catch (error) {
+            console.error("Upload error", error);
+            alert('Errore caricamento documento');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+    
+    const confirmDelete = async () => {
+        if (!docToDelete) return;
+        try {
+            setIsDeleting(true);
+            await onDeleteDocument(vehicle.id, docToDelete.id);
+        } catch (error) {
+            console.error("Delete error", error);
+            alert("Errore durante l'eliminazione del documento");
+        } finally {
+            setIsDeleting(false);
+            setDocToDelete(null);
+        }
+    };
+
     if (!isOpen || !vehicle) return null;
 
     const checkExpiry = (dateStr) => {
@@ -122,6 +158,77 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehicle }) => {
                         </div>
                     </div>
 
+                    {/* Documents */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                <FileText size={16} className="text-blue-500" />
+                                Documenti Allegati
+                            </h3>
+                            <div>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    className="hidden" 
+                                    onChange={handleFileChange} 
+                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                />
+                                <button 
+                                    disabled={isUploading}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-400 p-1.5 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold disabled:opacity-50"
+                                >
+                                    {isUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                    <span>Carica</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            {vehicle.documents && vehicle.documents.length > 0 ? (
+                                vehicle.documents.map((doc) => (
+                                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="bg-white dark:bg-slate-900 p-2 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 shrink-0">
+                                                <FileText size={16} className="text-slate-500" />
+                                            </div>
+                                            <div className="overflow-hidden">
+                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate" title={doc.name}>
+                                                    {doc.name}
+                                                </p>
+                                                <p className="text-[10px] text-slate-400">
+                                                    {new Date(doc.uploadedAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 ml-2 shrink-0">
+                                            <a 
+                                                href={doc.url} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                                title="Scarica/Visualizza"
+                                            >
+                                                <Download size={16} />
+                                            </a>
+                                            <button 
+                                                onClick={() => setDocToDelete(doc)}
+                                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                title="Elimina"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 border-dashed">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">Nessun documento allegato</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Notes */}
                     {vehicle.notes && (
                         <div className="text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl italic">
@@ -130,6 +237,15 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehicle }) => {
                     )}
                 </div>
             </div>
+            
+            <DeleteConfirmationModal
+                isOpen={!!docToDelete}
+                onClose={() => !isDeleting && setDocToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Elimina Documento"
+                message={`Sei sicuro di voler eliminare il documento "${docToDelete?.name}"? Questa azione non può essere annullata.`}
+                isDeleting={isDeleting}
+            />
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { db, appId } from '../../services/firebase';
+import { db, storage, appId } from '../../services/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 export const useLogisticManagement = (userProfile) => {
   const [activeTab, setActiveTab] = useState('equipment'); // 'vehicles' | 'equipment'
@@ -38,6 +39,15 @@ export const useLogisticManagement = (userProfile) => {
       const vList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setVehicles(vList);
       setLoading(false);
+      
+      // Update viewing item to keep UI reactive for documents sync
+      setViewingItem(prev => {
+        if (prev) {
+          const updated = vList.find(v => v.id === prev.id);
+          if (updated) return updated;
+        }
+        return prev;
+      });
     }, (err) => {
       console.error("Error fetching vehicles", err);
       setLoading(false);
@@ -47,6 +57,15 @@ export const useLogisticManagement = (userProfile) => {
     const unsubEquipment = onSnapshot(eQuery, (snapshot) => {
       const eList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setEquipment(eList);
+      
+      // Update viewing item for equipment as well
+      setViewingItem(prev => {
+        if (prev) {
+          const updated = eList.find(e => e.id === prev.id);
+          if (updated) return updated;
+        }
+        return prev;
+      });
     }, (err) => {
       console.error("Error fetching equipment", err);
     });
@@ -107,6 +126,62 @@ export const useLogisticManagement = (userProfile) => {
     }
   };
 
+  // Upload Vehicle Document
+  const handleUploadVehicleDocument = async (vehicleId, file) => {
+    if (!file || !vehicleId) return null;
+    
+    try {
+      const fileName = `vehicle_${vehicleId}_${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `avatars/uploads/${fileName}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      
+      const newDoc = {
+        id: fileName, // Use filename as unique ID
+        name: file.name,
+        url: url,
+        uploadedAt: new Date().toISOString(),
+        type: file.type
+      };
+
+      // update firestore
+      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', vehicleId);
+      const vehicleData = vehicles.find(v => v.id === vehicleId);
+      const currentDocs = vehicleData?.documents || [];
+      
+      await updateDoc(vehicleRef, {
+        documents: [...currentDocs, newDoc]
+      });
+
+      return newDoc;
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      throw error;
+    }
+  };
+
+  // Delete Vehicle Document
+  const handleDeleteVehicleDocument = async (vehicleId, documentId) => {
+    if (!vehicleId || !documentId) return;
+
+    try {
+      const storageRef = ref(storage, `avatars/uploads/${documentId}`);
+      await deleteObject(storageRef);
+
+      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', vehicleId);
+      const vehicleData = vehicles.find(v => v.id === vehicleId);
+      const currentDocs = vehicleData?.documents || [];
+      const updatedDocs = currentDocs.filter(d => d.id !== documentId);
+
+      await updateDoc(vehicleRef, {
+        documents: updatedDocs
+      });
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      throw error;
+    }
+  };
+
   // KPI Logic
   const kpiData = {
     vehiclesOperational: vehicles.filter(v => v.status === 'Operativo').length,
@@ -154,6 +229,8 @@ export const useLogisticManagement = (userProfile) => {
     handleDeleteVehicle,
     handleSaveEquipment,
     handleDeleteEquipment,
+    handleUploadVehicleDocument,
+    handleDeleteVehicleDocument,
     kpiData
   };
 };
