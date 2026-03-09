@@ -12,7 +12,7 @@ const STATUS_OPTIONS = [
 ];
 
 const VehicleModal = ({ isOpen, onClose, onSave, initialData }) => {
-    const { register, handleSubmit, reset, watch, control, formState: { errors } } = useForm({
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
         defaultValues: {
             model: '',
             plate: '',

@@ -54,7 +54,6 @@ const LogisticManagement = ({ userProfile }) => {
         handleDeleteVehicle,
         handleSaveEquipment,
         handleDeleteEquipment,
-        kpiData,
         filterLocation,
         setFilterLocation,
         isFiltersOpen,

@@ -9,12 +9,32 @@ const ExpirationWidget = ({ users, headless = false }) => {
         const items = [];
 
         users.forEach(user => {
-            if (!user.certifications) return;
+            // Check Certifications
+            if (user.certifications) {
+                Object.entries(user.certifications).forEach(([certName, dates]) => {
+                    if (!dates.expirationDate) return;
 
-            Object.entries(user.certifications).forEach(([certName, dates]) => {
-                if (!dates.expirationDate) return;
+                    const expDate = new Date(dates.expirationDate);
+                    const diffTime = expDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                const expDate = new Date(dates.expirationDate);
+                    if (diffDays <= warningThreshold) {
+                        items.push({
+                            userId: user.id,
+                            userName: user.name,
+                            certName,
+                            expirationDate: expDate,
+                            daysLeft: diffDays,
+                            status: diffDays < 0 ? 'expired' : 'warning'
+                        });
+                    }
+                });
+            }
+
+            // Check Documents
+            const checkDoc = (docName, dateStr) => {
+                if (!dateStr) return;
+                const expDate = new Date(dateStr);
                 const diffTime = expDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -22,13 +42,17 @@ const ExpirationWidget = ({ users, headless = false }) => {
                     items.push({
                         userId: user.id,
                         userName: user.name,
-                        certName,
+                        certName: docName,
                         expirationDate: expDate,
                         daysLeft: diffDays,
                         status: diffDays < 0 ? 'expired' : 'warning'
                     });
                 }
-            });
+            };
+
+            checkDoc("Carta d'Identità", user.idCardExp);
+            checkDoc("Patente", user.driverLicenseExp);
+            checkDoc("Passaporto", user.passportExp);
         });
 
         // Sort by expiration date (most urgent first)

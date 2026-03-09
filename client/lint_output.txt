@@ -1,0 +1,154 @@
+
+> protezione-civile@0.0.0 lint
+> eslint .
+
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\public\firebase-messaging-sw.js
+   1:1   error  'importScripts' is not defined  no-undef
+   2:1   error  'importScripts' is not defined  no-undef
+  13:1   error  'firebase' is not defined       no-undef
+  15:19  error  'firebase' is not defined       no-undef
+  63:24  error  'clients' is not defined        no-undef
+  88:16  error  'clients' is not defined        no-undef
+  94:12  error  'clients' is not defined        no-undef
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\App.jsx
+  326:6  warning  React Hook useEffect has a missing dependency: 'navigate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\WeatherWidget\WeatherWidget.jsx
+  112:8  warning  React Hook useEffect has missing dependencies: 'MORANO_COORDS.lat' and 'MORANO_COORDS.lon'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\events\CalendarGrid.jsx
+   4:33  error  'userProfile' is defined but never used                                                   no-unused-vars
+  56:17  error  'cellDate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\layout\Header.jsx
+  11:49  error    'to' is defined but never used                                                                               no-unused-vars
+  99:6   warning  React Hook useEffect has a missing dependency: 'isActive'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\notifications\NotificationPanel.jsx
+  70:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  68 |         if (!isOpen) return;
+  69 |
+> 70 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  71 |
+  72 |         // Queries for Events and Communications
+  73 |         const eventsQuery = query(  react-hooks/set-state-in-effect
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\ui\HeaderInfoWidget.jsx
+  63:8  warning  React Hook useEffect has missing dependencies: 'MORANO_COORDS.lat' and 'MORANO_COORDS.lon'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\components\ui\NotificationToast.jsx
+  19:21  error    Error: Cannot access variable before it is declared
+
+`handleClose` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  17 |             if (duration > 0) {
+  18 |                 const timer = setTimeout(() => {
+> 19 |                     handleClose();
+     |                     ^^^^^^^^^^^ `handleClose` accessed before it is declared
+  20 |                 }, duration);
+  21 |                 return () => clearTimeout(timer);
+  22 |             }
+
+  24 |     }, [isOpen, duration]);
+  25 |
+> 26 |     const handleClose = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 27 |         setIsVisible(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 28 |         setTimeout(() => {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 29 |             onClose();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 30 |         }, 300); // Wait for exit animation
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |     };
+     | ^^^^^^^ `handleClose` is declared here
+  32 |
+  33 |     if (!isOpen) return null;
+  34 |  react-hooks/immutability
+  24:8   warning  React Hook useEffect has a missing dependency: 'handleClose'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\AdminDashboard\AdminDashboardLogic.js
+  2:76  error  'writeBatch' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\AdminDashboard\index.jsx
+   56:5    error  'notification' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+   57:5    error  'closeNotification' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+   65:5    error  'setIsImageModalOpen' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  447:122  error  '_' is defined but never used                                                                        no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\CommunicationsView\index.jsx
+  3:10  error  'hasAdminAccess' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\DirettivoDashboard\index.jsx
+  18:31  error  'userProfile' is defined but never used                                                    no-unused-vars
+  45:11  error  'maxEvents' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\EventsDashboard\EventsDashboardLogic.js
+   68:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  66 |
+  67 |       if (updatedEvent && updatedEvent !== selectedEvent) {
+> 68 |         setSelectedEvent(updatedEvent);
+     |         ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  69 |       }
+  70 |     }
+  71 |   }, [upcomingEvents, pastEvents, selectedEvent]);  react-hooks/set-state-in-effect
+  274:5  error  Duplicate key 'toggleParticipation'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-dupe-keys
+  275:5  error  Duplicate key 'handleCreateEvent'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-dupe-keys
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\EventsDashboard\index.jsx
+    4:10  error  'hasAdminAccess' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   93:68  error  'data' is defined but never used                                                       no-unused-vars
+  254:19  error  Unexpected lexical declaration in case block                                           no-case-declarations
+  255:19  error  Unexpected lexical declaration in case block                                           no-case-declarations
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\HomeDashboard\HomeDashboardLogic.js
+  161:6  warning  React Hook useEffect has missing dependencies: 'userProfile?.role' and 'userProfile?.volunteerRole'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\LogisticManagement\LogisticManagementLogic.js
+   3:69  error  'query' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                 no-unused-vars
+   3:76  error  'where' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                 no-unused-vars
+   3:83  error  'orderBy' is defined but never used. Allowed unused vars must match /^[A-Z_]/u               no-unused-vars
+  30:11  error  'vehiclesRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\LogisticManagement\components\EquipmentModal.jsx
+  38:26  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+  36 |     });
+  37 |
+> 38 |     const locationType = watch('locationType');
+     |                          ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  39 |
+  40 |     useEffect(() => {
+  41 |         if (isOpen) {  react-hooks/incompatible-library
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\LogisticManagement\components\VehicleModal.jsx
+  15:44  error  'watch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\LogisticManagement\components\VehiclesTab.jsx
+  62:23  error  'hasWarning' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\andre\Desktop\GITHUB Project\La-Chintana-App\client\src\pages\LogisticManagement\index.jsx
+  57:9  error  'kpiData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Ô£û 41 problems (34 errors, 7 warnings)
+

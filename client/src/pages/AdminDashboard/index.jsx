@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera, FileText, Globe, Activity, Briefcase } from 'lucide-react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
@@ -496,12 +496,56 @@ const AdminDashboard = ({ userProfile }) => {
                     <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar">{selectedUser.birthDate ? new Date(selectedUser.birthDate).toLocaleDateString('it-IT') : '-'}</p>
                   </div>
                   <div className="info-card">
+                    <p className="info-label"><MapPin size={14} /> Luogo di Nascita</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.birthPlace}>{selectedUser.birthPlace || '-'}</p>
+                  </div>
+                  <div className="info-card">
                     <p className="info-label"><Hash size={14} /> ID Emercomnet</p>
                     <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.emercomnetId}>{selectedUser.emercomnetId || '-'}</p>
                   </div>
                   <div className="info-card">
                     <p className="info-label"><Home size={14} /> Residenza</p>
                     <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.city}>{selectedUser.city || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label"><MapPin size={14} /> Indirizzo</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.address}>{selectedUser.address || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label"><Activity size={14} /> Gruppo Sanguigno</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.bloodGroup}>{selectedUser.bloodGroup || '-'}</p>
+                  </div>
+                  <div className="info-card">
+                    <p className="info-label"><Globe size={14} /> Lingue Parlate</p>
+                    <p className="info-value whitespace-nowrap overflow-x-auto no-scrollbar" title={selectedUser.spokenLanguages}>{selectedUser.spokenLanguages || '-'}</p>
+                  </div>
+                  <div className="info-card md:col-span-2">
+                    <p className="info-label"><Briefcase size={14} /> Info Datore Lavoro</p>
+                    <p className="info-value whitespace-pre-wrap" title={selectedUser.employerNotes}>{selectedUser.employerNotes || '-'}</p>
+                  </div>
+                </div>
+
+                {/* Additional ID Cards Section */}
+                <div className="mt-4">
+                  <h4 className="specs-section-title mb-3">
+                    <FileText size={14} /> Documenti d'Identità
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="info-label mb-1">C. Identità</p>
+                      <p className="font-medium text-sm text-slate-800">{selectedUser.idCard || '-'}</p>
+                      <p className="text-xs text-slate-500 mt-1">Scad: {selectedUser.idCardExp ? new Date(selectedUser.idCardExp).toLocaleDateString('it-IT') : '-'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="info-label mb-1">Patente</p>
+                      <p className="font-medium text-sm text-slate-800">{selectedUser.driverLicense || '-'}</p>
+                      <p className="text-xs text-slate-500 mt-1">Scad: {selectedUser.driverLicenseExp ? new Date(selectedUser.driverLicenseExp).toLocaleDateString('it-IT') : '-'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <p className="info-label mb-1">Passaporto</p>
+                      <p className="font-medium text-sm text-slate-800">{selectedUser.passport || '-'}</p>
+                      <p className="text-xs text-slate-500 mt-1">Scad: {selectedUser.passportExp ? new Date(selectedUser.passportExp).toLocaleDateString('it-IT') : '-'}</p>
+                    </div>
                   </div>
                 </div>
 
@@ -629,6 +673,10 @@ const AdminDashboard = ({ userProfile }) => {
                       <input type="text" className="form-input" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
                     </div>
                     <div>
+                      <label className="info-label"><MapPin size={14} /> Indirizzo</label>
+                      <input type="text" className="form-input" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
+                    </div>
+                    <div>
                       <label className="info-label"><Phone size={14} /> Telefono</label>
                       <input type="tel" className="form-input" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                     </div>
@@ -651,6 +699,60 @@ const AdminDashboard = ({ userProfile }) => {
                         />
                       </div>
                     )}
+                  </div>
+                </section>
+
+                {/* DOCUMENTI D'IDENTITA */}
+                <section>
+                  <h4 className="form-section-title mt-6">
+                    <FileText size={16} className="text-indigo-500" /> Documenti d'Identità
+                  </h4>
+                  <div className="form-grid">
+                    <div>
+                      <label className="info-label">ID Carta d'Identità</label>
+                      <input type="text" className="form-input" value={formData.idCard} onChange={e => setFormData({ ...formData, idCard: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Scadenza C.I.</label>
+                      <input type="date" className="form-input" value={formData.idCardExp} onChange={e => setFormData({ ...formData, idCardExp: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">ID Patente</label>
+                      <input type="text" className="form-input" value={formData.driverLicense} onChange={e => setFormData({ ...formData, driverLicense: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Scadenza Patente</label>
+                      <input type="date" className="form-input" value={formData.driverLicenseExp} onChange={e => setFormData({ ...formData, driverLicenseExp: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">ID Passaporto</label>
+                      <input type="text" className="form-input" value={formData.passport} onChange={e => setFormData({ ...formData, passport: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label">Scadenza Passaporto</label>
+                      <input type="date" className="form-input" value={formData.passportExp} onChange={e => setFormData({ ...formData, passportExp: e.target.value })} />
+                    </div>
+                  </div>
+                </section>
+
+                {/* ULTERIORI INFORMAZIONI */}
+                <section>
+                  <h4 className="form-section-title mt-6">
+                    <Activity size={16} className="text-rose-500" /> Ulteriori Informazioni
+                  </h4>
+                  <div className="form-grid">
+                    <div>
+                      <label className="info-label"><Activity size={14} /> Gruppo Sanguigno</label>
+                      <input type="text" className="form-input outline-rose-500" placeholder="es. A+, 0-" value={formData.bloodGroup} onChange={e => setFormData({ ...formData, bloodGroup: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="info-label"><Globe size={14} /> Lingue Parlate</label>
+                      <input type="text" className="form-input" placeholder="es. Inglese, Spagnolo" value={formData.spokenLanguages} onChange={e => setFormData({ ...formData, spokenLanguages: e.target.value })} />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="info-label"><Briefcase size={14} /> Dati Datore di Lavoro / Note</label>
+                      <textarea className="form-input min-h-[80px]" value={formData.employerNotes} onChange={e => setFormData({ ...formData, employerNotes: e.target.value })} />
+                    </div>
                   </div>
                 </section>
 

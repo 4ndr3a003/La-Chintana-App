@@ -59,7 +59,6 @@ const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
             {filteredVehicles.map(v => {
                 const insCheck = checkExpiry(v.insuranceExpiry);
                 const revCheck = checkExpiry(v.revisionExpiry);
-                const hasWarning = insCheck.status !== 'ok' || revCheck.status !== 'ok';
 
                 return (
                     <div

@@ -100,6 +100,20 @@ export const useAdminDashboard = () => {
       specializations: user.specializations || [],
       certifications: user.certifications || {}, // Load certifications
       emercomnetId: user.emercomnetId || '',
+      birthPlace: user.birthPlace || '',
+      birthProvince: user.birthProvince || '',
+      city: user.city || '',
+      address: user.address || '',
+      idCard: user.idCard || '',
+      idCardExp: user.idCardExp || '',
+      driverLicense: user.driverLicense || '',
+      driverLicenseNumber: user.driverLicenseNumber || '',
+      driverLicenseExp: user.driverLicenseExp || '',
+      passport: user.passport || '',
+      passportExp: user.passportExp || '',
+      bloodGroup: user.bloodGroup || '',
+      spokenLanguages: user.spokenLanguages || '',
+      employerNotes: user.employerNotes || '',
       status: user.status || 'Operativo',
       boardRole: user.boardRole || '',
       volunteerRole: user.volunteerRole || '',
@@ -119,7 +133,19 @@ export const useAdminDashboard = () => {
       cf: '',
       birthDate: '',
       birthPlace: '',
+      birthProvince: '',
       city: '',
+      address: '',
+      idCard: '',
+      idCardExp: '',
+      driverLicense: '',
+      driverLicenseNumber: '',
+      driverLicenseExp: '',
+      passport: '',
+      passportExp: '',
+      bloodGroup: '',
+      spokenLanguages: '',
+      employerNotes: '',
       emercomnetId: '',
       status: 'Operativo',
       role: ROLES.VOLUNTEER,
@@ -193,7 +219,19 @@ export const useAdminDashboard = () => {
       cf: formData.cf || '',
       birthDate: formData.birthDate || '',
       birthPlace: formData.birthPlace || '',
+      birthProvince: formData.birthProvince || '',
       city: formData.city || '',
+      address: formData.address || '',
+      idCard: formData.idCard || '',
+      idCardExp: formData.idCardExp || '',
+      driverLicense: formData.driverLicense || '',
+      driverLicenseNumber: formData.driverLicenseNumber || '',
+      driverLicenseExp: formData.driverLicenseExp || '',
+      passport: formData.passport || '',
+      passportExp: formData.passportExp || '',
+      bloodGroup: formData.bloodGroup || '',
+      spokenLanguages: formData.spokenLanguages || '',
+      employerNotes: formData.employerNotes || '',
       emercomnetId: formData.emercomnetId || '',
       status: formData.status, // Pass current form status to helper
       photoUrl: formData.photoUrl || '',
@@ -398,11 +436,14 @@ export const useAdminDashboard = () => {
 
   const handleExportCSV = () => {
     const headers = [
-      "COGNOME", "NOME", "CODICE EMERCOMNET", "DATA DI NASCITA", "LUOGO DI NASCITA",
+      "COGNOME", "NOME", "LUOGO DI NASCITA", "PROVINCIA", "DATA DI NASCITA",
       "CODICE FISCALE", "NUMERO DI TELEFONO", "E-MAIL", "COMUNE DI RESIDENZA",
+      "INDIRIZZO", "CARTA IDENTITA", "scadenza (CI)", "PATENTE", "numero (Patente)", "scadenza (Patente)",
+      "PASSAPORTO", "scadenza (Passaporto)", "GRUPPO SANGUIGNO", "LINGUE",
       "4 ORE", "12 ORE", "Caposquadra", "HACCP", "Radio C2 EMERCOMNET", "Radio FIRCB",
-      "Sala Operativa EMERCOMNET", "Patenti", "Motosega", "Muletto", "BLSD",
-      "Manovre di disostruzione", "Primo Soccorso", "Visita Medica", "Altro"
+      "Sala Operativa EMERCOMNET", "Motosega", "Muletto", "Pilota droni", "BLSD",
+      "Manovre di disostruzione", "Corso operatore 118", "Primo Soccorso", "Visita Medica", "Corso figurante", "Corso Addestratore", "Altro",
+      "CODICE EMERCOMNET", "DATI DATORE DI LAVORO"
     ];
 
     // Helper to check spec
@@ -411,7 +452,7 @@ export const useAdminDashboard = () => {
     // Helper to get patents
     const getPatents = (specs) => {
       if (!specs) return "";
-      return specs.filter(s => s.startsWith("Patente")).map(s => s.replace("Patente ", "")).join(", ");
+      return specs.filter(s => s.startsWith("Patente")).map(s => s.replace("Patente ", "")).join(" / ");
     };
 
     // Helper to get others
@@ -419,7 +460,8 @@ export const useAdminDashboard = () => {
       "Corso 4 ore", "Corso 12 ore", "Caposquadra",
       "Radio emercomnet", "Radio FIRCB", "Sala operativa",
       "HACCP", "BLSD", "Primo soccorso", "Visita medica",
-      "Motosega", "Muletto", "Manovre di disostruzione"
+      "Motosega", "Muletto", "Pilota droni", "Manovre di disostruzione",
+      "Corso operatore 118", "Corso figurante", "Corso Addestratore"
     ];
 
     const getOthers = (specs) => {
@@ -444,13 +486,23 @@ export const useAdminDashboard = () => {
         const row = [
           lastName, // COGNOME
           firstName, // NOME
-          user.emercomnetId || "",
-          user.birthDate ? new Date(user.birthDate).toLocaleDateString('it-IT') : "",
-          user.birthPlace || "",
-          user.cf || "",
-          user.phone || "",
-          user.email || "",
-          user.city || "",
+          user.birthPlace || "", // LUOGO DI NASCITA
+          user.birthProvince || "", // PROVINCIA
+          user.birthDate ? new Date(user.birthDate).toLocaleDateString('it-IT') : "", // DATA DI NASCITA
+          user.cf || "", // CODICE FISCALE
+          user.phone || "", // NUMERO DI TELEFONO
+          user.email || "", // E-MAIL
+          user.city || "", // COMUNE DI RESIDENZA
+          user.address || "", // INDIRIZZO
+          user.idCard || "", // CARTA IDENTITÀ
+          user.idCardExp ? new Date(user.idCardExp).toLocaleDateString('it-IT') : "", // scadenza (CI)
+          getPatents(specs) || user.driverLicense || "", // PATENTE
+          user.driverLicenseNumber || "", // numero (Patente)
+          user.driverLicenseExp ? new Date(user.driverLicenseExp).toLocaleDateString('it-IT') : "", // scadenza (Patente)
+          user.passport || "", // PASSAPORTO
+          user.passportExp ? new Date(user.passportExp).toLocaleDateString('it-IT') : "", // scadenza (Passaporto)
+          user.bloodGroup || "", // GRUPPO SANGUIGNO
+          user.spokenLanguages || "", // LINGUE
           hasSpec(specs, "Corso 4 ore"),
           hasSpec(specs, "Corso 12 ore"),
           hasSpec(specs, "Caposquadra"),
@@ -458,14 +510,19 @@ export const useAdminDashboard = () => {
           hasSpec(specs, "Radio emercomnet"),
           hasSpec(specs, "Radio FIRCB"),
           hasSpec(specs, "Sala operativa"),
-          getPatents(specs),
           hasSpec(specs, "Motosega"),
           hasSpec(specs, "Muletto"),
+          hasSpec(specs, "Pilota droni"),
           hasSpec(specs, "BLSD"),
           hasSpec(specs, "Manovre di disostruzione"),
+          hasSpec(specs, "Corso operatore 118"),
           hasSpec(specs, "Primo soccorso"),
           hasSpec(specs, "Visita medica"),
-          getOthers(specs)
+          hasSpec(specs, "Corso figurante"),
+          hasSpec(specs, "Corso Addestratore"),
+          getOthers(specs),
+          user.emercomnetId || "", // CODICE EMERCOMNET
+          user.employerNotes || "" // DATI DATORE DI LAVORO
         ].map(field => {
           // Handle null/undefined
           if (field === null || field === undefined) return "";
@@ -556,15 +613,14 @@ export const useAdminDashboard = () => {
       let errors = [];
 
       for (const row of dataRows) {
-        // COGNOME;NOME;CODICE EMERCOMNET;DATA DI NASCITA;LUOGO DI NASCITA;CODICE FISCALE;NUMERO DI TELEFONO;E-MAIL;COMUNE DI RESIDENZA;4 ORE;12 ORE;Caposquadra;HACCP;Radio C2 EMERCOMNET;Radio FIRCB;Sala Operativa EMERCOMNET;Patenti;Motosega;Muletto;BLSD;Manovre di disostruzione;Primo Soccorso;Visita Medica;Altro
-
         let userData = {};
 
-        // Try to match the new format (24 columns)
+        // Nuovo formato: 39 colonne
         // Relaxed check: at least enough columns to reach Email (index 7)
         if (row.length >= 8) {
-          const [lastName, firstName, emercomnetId, birthDateRaw, birthPlace, cf, phone, email, city,
-            c4, c12, caposquadra, haccp, radioE, radioF, salaOp, patenti, motosega, muletto, blsd, manovre, primoSoc, visitaMed, altro] = row;
+          const [lastName, firstName, birthPlace, birthProvince, birthDateRaw, cf, phone, email, city,
+            address, idCard, idCardExpRaw, driverLicense, driverLicenseNumber, driverLicenseExpRaw, passport, passportExpRaw, bloodGroup, spokenLanguages,
+            c4, c12, caposquadra, haccp, radioE, radioF, salaOp, motosega, muletto, droni, blsd, manovre, operatore118, primoSoc, visitaMed, figurante, addestratore, altro, emercomnetId, employerNotes] = row;
 
           if (!email || !email.includes('@')) {
             errors.push(`Email mancante o non valida per: ${firstName} ${lastName}`);
@@ -572,16 +628,19 @@ export const useAdminDashboard = () => {
           }
 
           // Parse date from DD.MM.YYYY or DD/MM/YYYY to YYYY-MM-DD
-          let birthDate = "";
-          if (birthDateRaw) {
-            const parts = birthDateRaw.replace(/\./g, '/').split('/');
+          const parseDate = (dateRaw) => {
+            if (!dateRaw) return "";
+            const parts = dateRaw.replace(/\./g, '/').split('/');
             if (parts.length === 3) {
-              // Assume DD/MM/YYYY
-              birthDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            } else {
-              birthDate = birthDateRaw;
+              return `${parts[2]}-${parts[1]}-${parts[0]}`;
             }
-          }
+            return dateRaw;
+          };
+
+          const birthDate = parseDate(birthDateRaw);
+          const idCardExp = parseDate(idCardExpRaw);
+          const driverLicenseExp = parseDate(driverLicenseExpRaw);
+          const passportExp = parseDate(passportExpRaw);
 
           const specs = [];
           if (c4 && c4.toUpperCase().trim() === 'X') specs.push("Corso 4 ore");
@@ -593,13 +652,17 @@ export const useAdminDashboard = () => {
           if (salaOp && salaOp.toUpperCase().trim() === 'X') specs.push("Sala operativa");
           if (motosega && motosega.toUpperCase().trim() === 'X') specs.push("Motosega");
           if (muletto && muletto.toUpperCase().trim() === 'X') specs.push("Muletto");
+          if (droni && droni.toUpperCase().trim() === 'X') specs.push("Pilota droni");
           if (blsd && blsd.toUpperCase().trim() === 'X') specs.push("BLSD");
           if (manovre && manovre.toUpperCase().trim() === 'X') specs.push("Manovre di disostruzione");
+          if (operatore118 && operatore118.toUpperCase().trim() === 'X') specs.push("Corso operatore 118");
           if (primoSoc && primoSoc.toUpperCase().trim() === 'X') specs.push("Primo soccorso");
           if (visitaMed && visitaMed.toUpperCase().trim() === 'X') specs.push("Visita medica");
+          if (figurante && figurante.toUpperCase().trim() === 'X') specs.push("Corso figurante");
+          if (addestratore && addestratore.toUpperCase().trim() === 'X') specs.push("Corso Addestratore");
 
-          if (patenti) {
-            const pList = patenti.split(/[,;]/).map(s => s.trim()).filter(s => s);
+          if (driverLicense) {
+            const pList = driverLicense.split(/[\/,;]/).map(s => s.trim()).filter(s => s);
             pList.forEach(p => {
               // If it's just "B", convert to "Patente B"
               if (!p.toLowerCase().startsWith("patente")) {
@@ -622,7 +685,19 @@ export const useAdminDashboard = () => {
             cf: cf ? cf.trim().toUpperCase() : '',
             birthDate: birthDate,
             birthPlace: birthPlace ? birthPlace.trim() : '',
+            birthProvince: birthProvince ? birthProvince.trim() : '',
             city: city ? city.trim() : '',
+            address: address ? address.trim() : '',
+            idCard: idCard ? idCard.trim() : '',
+            idCardExp: idCardExp,
+            driverLicense: driverLicense ? driverLicense.trim() : '',
+            driverLicenseNumber: driverLicenseNumber ? driverLicenseNumber.trim() : '',
+            driverLicenseExp: driverLicenseExp,
+            passport: passport ? passport.trim() : '',
+            passportExp: passportExp,
+            bloodGroup: bloodGroup ? bloodGroup.trim() : '',
+            spokenLanguages: spokenLanguages ? spokenLanguages.trim() : '',
+            employerNotes: employerNotes ? employerNotes.trim() : '',
             emercomnetId: emercomnetId ? emercomnetId.trim() : '',
             role: ROLES.VOLUNTEER,
             // status: 'Operativo', // Will be calculated

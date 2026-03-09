@@ -85,14 +85,16 @@ export const SPECIALIZATIONS_DATA = {
       "BLSD",
       "Primo soccorso",
       "Visita medica",
-      "Manovre di disostruzione"
+      "Manovre di disostruzione",
+      "Corso operatore 118"
     ],
     validityYears: {
       "HACCP": 5, // TEMPORARY DEFAULT
       "BLSD": 2,
       "Primo soccorso": 5, // TEMPORARY DEFAULT
       "Visita medica": 5, // TEMPORARY DEFAULT
-      "Manovre di disostruzione": 5 // TEMPORARY DEFAULT
+      "Manovre di disostruzione": 5, // TEMPORARY DEFAULT
+      "Corso operatore 118": 5
     },
     icon: <HeartPulse size={18} className="text-red-600 dark:text-[var(--color-pc-red-600)]" />,
     color: "bg-[var(--color-pc-red-100)] dark:bg-red-900/20 text-[var(--color-pc-red-700)] dark:text-red-400 border-[var(--color-pc-red-200)] dark:border-red-800",
@@ -101,15 +103,30 @@ export const SPECIALIZATIONS_DATA = {
   "Operatività": {
     items: [
       "Motosega",
-      "Muletto"
+      "Muletto",
+      "Pilota droni"
     ],
     validityYears: {
       "Motosega": 5,
-      "Muletto": 5
+      "Muletto": 5,
+      "Pilota droni": 5
     },
     icon: <HardHat size={18} className="text-orange-600 dark:text-[var(--color-pc-orange-600)]" />,
     color: "bg-[var(--color-pc-orange-100)] dark:bg-orange-900/20 text-[var(--color-pc-orange-700)] dark:text-orange-400 border-[var(--color-pc-orange-200)] dark:border-orange-800",
     titleColor: "text-orange-700 dark:text-orange-400"
+  },
+  "Unità Cinofila": {
+    items: [
+      "Corso figurante",
+      "Corso Addestratore"
+    ],
+    validityYears: {
+      "Corso figurante": 5,
+      "Corso Addestratore": 5
+    },
+    icon: <PawPrint size={18} className="text-purple-600 dark:text-purple-400" />,
+    color: "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+    titleColor: "text-purple-700 dark:text-purple-400"
   },
   "Patenti di Guida": {
     items: [

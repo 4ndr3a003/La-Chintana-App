@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle, Lock } from 'lucide-react';
+import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle, Lock, FileText, Globe, Activity, Briefcase } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -190,13 +190,35 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 
       {/* Expiration Alerts */}
       {(() => {
-        const expiringCerts = userProfile.certifications ? Object.entries(userProfile.certifications).filter(([_, cert]) => {
-          if (!cert.expirationDate) return false;
-          const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
-          return days <= 30;
-        }) : [];
+        const expiringItems = [];
 
-        if (expiringCerts.length > 0) {
+        // Check Certifications
+        if (userProfile.certifications) {
+            Object.entries(userProfile.certifications).forEach(([name, cert]) => {
+                if (cert.expirationDate) {
+                    const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
+                    if (days <= 30) {
+                        expiringItems.push({ name, expirationDate: cert.expirationDate, days });
+                    }
+                }
+            });
+        }
+
+        // Check Documents
+        const checkDoc = (name, dateStr) => {
+            if (dateStr) {
+                const days = Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24));
+                if (days <= 30) {
+                    expiringItems.push({ name, expirationDate: dateStr, days });
+                }
+            }
+        };
+
+        checkDoc("Carta d'Identità", userProfile.idCardExp);
+        checkDoc("Patente", userProfile.driverLicenseExp);
+        checkDoc("Passaporto", userProfile.passportExp);
+
+        if (expiringItems.length > 0) {
           return (
             <div className="bg-amber-50 rounded-xl shadow-sm p-4 mb-6 border border-amber-200 relative animate-in slide-in-from-top-2 fade-in">
               <div className="flex items-center gap-2 mb-3 text-amber-800 font-bold text-lg">
@@ -204,14 +226,13 @@ const UserProfileView = ({ userProfile, onLogout }) => {
                 <h3>Attenzione: Scadenze Rilevate</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {expiringCerts.map(([name, cert]) => {
-                  const days = Math.ceil((new Date(cert.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
-                  const isExpired = days < 0;
+                {expiringItems.map((item, idx) => {
+                  const isExpired = item.days < 0;
                   return (
-                    <div key={name} className="flex items-center justify-between text-sm bg-white p-3 rounded-lg border border-amber-100 shadow-sm">
-                      <span className="font-medium text-slate-700">{name}</span>
+                    <div key={`${item.name}-${idx}`} className="flex items-center justify-between text-sm bg-white p-3 rounded-lg border border-amber-100 shadow-sm">
+                      <span className="font-medium text-slate-700">{item.name}</span>
                       <span className={`text-xs font-bold px-2 py-1 rounded-md ${isExpired ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {isExpired ? `Scaduto da ${Math.abs(days)} gg` : `Scade tra ${days} gg`}
+                        {isExpired ? `Scaduto da ${Math.abs(item.days)} gg` : `Scade tra ${item.days} gg`}
                       </span>
                     </div>
                   );
@@ -247,6 +268,10 @@ const UserProfileView = ({ userProfile, onLogout }) => {
               <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Home size={14} /> Residenza</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.city || '-'}</p>
             </div>
+            <div className="md:col-span-2">
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><MapPin size={14} /> Indirizzo</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.address || '-'}</p>
+            </div>
           </div>
         </div>
 
@@ -263,6 +288,58 @@ const UserProfileView = ({ userProfile, onLogout }) => {
             <div>
               <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Phone size={14} /> Telefono</p>
               <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.phone || '-'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row: ID Documents and Further Info */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Documenti d'Identità */}
+        <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-8 border border-white/60 dark:border-slate-200 relative">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-xl font-bold text-[var(--color-slate-900)] flex items-center gap-2">
+              <FileText size={20} className="text-indigo-500" /> Documenti d'Identità
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-4">
+            <div>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1">Carta d'Identità</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-base">{userProfile.idCard || '-'}</p>
+              <p className="text-xs text-[var(--color-slate-400)] mt-1">Scad: {formatDate(userProfile.idCardExp)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1">Patente</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-base">{userProfile.driverLicense || '-'}</p>
+              <p className="text-xs text-[var(--color-slate-400)] mt-1">Scad: {formatDate(userProfile.driverLicenseExp)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1">Passaporto</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-base">{userProfile.passport || '-'}</p>
+              <p className="text-xs text-[var(--color-slate-400)] mt-1">Scad: {formatDate(userProfile.passportExp)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Ulteriori Informazioni */}
+        <div className="bg-white rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-8 border border-white/60 dark:border-slate-200 relative">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-xl font-bold text-[var(--color-slate-900)] flex items-center gap-2">
+              <Activity size={20} className="text-rose-500" /> Ulteriori Informazioni
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-4">
+            <div>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Activity size={14} /> Gruppo Sanguigno</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-lg">{userProfile.bloodGroup || '-'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Globe size={14} /> Lingue Parlate</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-lg break-words">{userProfile.spokenLanguages || '-'}</p>
+            </div>
+            <div className="md:col-span-2">
+              <p className="text-sm text-[var(--color-slate-400)] mb-1 flex items-center gap-1"><Briefcase size={14} /> Dati Datore di Lavoro / Note</p>
+              <p className="font-semibold text-[var(--color-slate-800)] text-base whitespace-pre-wrap">{userProfile.employerNotes || '-'}</p>
             </div>
           </div>
         </div>
