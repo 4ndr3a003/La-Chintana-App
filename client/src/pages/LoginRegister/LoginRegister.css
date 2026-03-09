@@ -51,7 +51,7 @@
     margin: 0;
     box-shadow: 0 40px 80px -20px rgba(0, 77, 157, 0.2), 0 20px 30px -10px rgba(0, 77, 157, 0.1);
     border-radius: 2rem;
-    overflow: hidden;
+    /* overflow: hidden; Removed to prevent absolute logo from being cropped */
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.5);
