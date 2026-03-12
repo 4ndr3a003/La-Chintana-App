@@ -137,35 +137,37 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
           </div>
         </div>
 
-        {/* Dark Mode Section */}
-        <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-slate-900">Aspetto</h3>
-          </div>
-
-          <div className="flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-slate-50 dark:bg-[var(--color-slate-50)] rounded-2xl border border-slate-100 dark:border-slate-200 gap-4 transition-colors duration-300">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 ${darkMode ? 'bg-indigo-900/50 text-indigo-400' : 'bg-orange-100 text-orange-500'}`}>
-                {darkMode ? <Moon size={24} /> : <Sun size={24} />}
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-800 truncate">Tema Scuro</h4>
-                <p className="text-sm text-slate-500 truncate">
-                  {darkMode ? 'Attivato' : 'Disattivato'}
-                </p>
-              </div>
+        {/* Dark Mode Section - Only for Dev Admin */}
+        {userProfile?.email === 'dev.admin@lachintana.it' && (
+          <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-900">Aspetto</h3>
             </div>
 
-            <button
-              onClick={toggleDarkMode}
-              className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ml-auto md:ml-0 ${darkMode ? 'bg-[var(--color-pc-green)]' : 'bg-slate-300'}`}
-            >
-              <span
-                className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`}
-              />
-            </button>
+            <div className="flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-slate-50 dark:bg-[var(--color-slate-50)] rounded-2xl border border-slate-100 dark:border-slate-200 gap-4 transition-colors duration-300">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors duration-300 ${darkMode ? 'bg-indigo-900/50 text-indigo-400' : 'bg-orange-100 text-orange-500'}`}>
+                  {darkMode ? <Moon size={24} /> : <Sun size={24} />}
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-slate-800 truncate">Tema Scuro</h4>
+                  <p className="text-sm text-slate-500 truncate">
+                    {darkMode ? 'Attivato' : 'Disattivato'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={toggleDarkMode}
+                className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ml-auto md:ml-0 ${darkMode ? 'bg-[var(--color-pc-green)]' : 'bg-slate-300'}`}
+              >
+                <span
+                  className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${darkMode ? 'translate-x-6' : 'translate-x-0'}`}
+                />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Debug Section - Only visible on Native App */}
         {window.Capacitor?.isNativePlatform() && (
