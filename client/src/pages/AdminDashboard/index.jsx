@@ -53,6 +53,7 @@ const AdminDashboard = ({ userProfile }) => {
     toggleFilters,
     handleExportCSV,
     handleImportCSV,
+    isImportingCSV,
     notification,
     closeNotification,
     handleCertificationChange,
@@ -118,6 +119,16 @@ const AdminDashboard = ({ userProfile }) => {
 
   return (
     <div className="admin-dashboard-container">
+      {/* CSV Import Loading Overlay */}
+      {isImportingCSV && (
+        <div className="modal-overlay animate-in fade-in" style={{ zIndex: 9999 }}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 max-w-sm mx-4">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Importazione in corso...</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center">Caricamento e aggiornamento dei dati dei volontari dal file CSV.</p>
+          </div>
+        </div>
+      )}
       <div className="admin-dashboard-header">
         <h3 className="dashboard-title">
           <Users className="text-blue-600" size={28} /> Gestione Volontari

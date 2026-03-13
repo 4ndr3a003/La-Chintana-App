@@ -25,6 +25,9 @@ export const useAdminDashboard = () => {
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
 
+  // CSV Import Loading State
+  const [isImportingCSV, setIsImportingCSV] = useState(false);
+
   // Notification State
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const closeNotification = () => setNotification(prev => ({ ...prev, isOpen: false }));
@@ -553,6 +556,8 @@ export const useAdminDashboard = () => {
     const file = event.target.files[0];
     if (!file) return;
 
+    setIsImportingCSV(true);
+
     const reader = new FileReader();
     reader.onload = async (e) => {
       const text = e.target.result;
@@ -609,7 +614,7 @@ export const useAdminDashboard = () => {
       const dataRows = rows.slice(1);
 
       let importedCount = 0;
-      let skippedCount = 0;
+      let updatedCount = 0;
       let errors = [];
 
       for (const row of dataRows) {
@@ -675,9 +680,6 @@ export const useAdminDashboard = () => {
 
           if (altro) specs.push(...altro.split(';').map(s => s.trim()).filter(s => s));
 
-          // TODO: Initialize certifications with empty dates for imported specs?
-          // For now, we leave them undefined, they will be treated as empty.
-
           userData = {
             name: `${firstName} ${lastName}`.trim(),
             email: email.trim(),
@@ -699,47 +701,85 @@ export const useAdminDashboard = () => {
             spokenLanguages: spokenLanguages ? spokenLanguages.trim() : '',
             employerNotes: employerNotes ? employerNotes.trim() : '',
             emercomnetId: emercomnetId ? emercomnetId.trim() : '',
-            role: ROLES.VOLUNTEER,
-            // status: 'Operativo', // Will be calculated
             specializations: specs,
-            certifications: {}, // Init empty
-            joinedAt: new Date().toISOString(),
-            photoUrl: '',
-            password: "1234"
           };
-
-          // Apply status rules
-          userData.status = calculateStatus(userData);
 
         } else {
           errors.push(`Formato riga non valido (colonne insufficienti): ${row.slice(0, 2).join(' ')}`);
           continue;
         }
 
-        // Check for duplicates
-        const isDuplicate = users.some(u =>
+        // Check if volunteer already exists (by email or CF)
+        const existingUser = users.find(u =>
           (u.email && u.email.toLowerCase() === userData.email.toLowerCase()) ||
           (u.cf && userData.cf && u.cf.toUpperCase() === userData.cf.toUpperCase())
         );
 
-        if (isDuplicate) {
-          skippedCount++;
-          continue;
-        }
+        if (existingUser) {
+          // Build an object with only changed fields
+          const updatedFields = {};
+          const fieldsToCompare = [
+            'name', 'email', 'phone', 'cf', 'birthDate', 'birthPlace', 'birthProvince',
+            'city', 'address', 'idCard', 'idCardExp', 'driverLicense', 'driverLicenseNumber',
+            'driverLicenseExp', 'passport', 'passportExp', 'bloodGroup', 'spokenLanguages',
+            'employerNotes', 'emercomnetId'
+          ];
 
-        try {
-          await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'), userData);
-          importedCount++;
-        } catch (error) {
-          console.error("Error importing user:", userData.email, error);
-          errors.push(`Errore DB per ${userData.email}: ${error.message}`);
+          for (const field of fieldsToCompare) {
+            const newVal = userData[field] || '';
+            const oldVal = existingUser[field] || '';
+            if (newVal !== oldVal) {
+              updatedFields[field] = userData[field];
+            }
+          }
+
+          // Compare specializations (order-independent)
+          const oldSpecs = [...(existingUser.specializations || [])].sort();
+          const newSpecs = [...(userData.specializations || [])].sort();
+          if (JSON.stringify(oldSpecs) !== JSON.stringify(newSpecs)) {
+            updatedFields.specializations = userData.specializations;
+          }
+
+          // Recalculate status if specializations or birthDate changed
+          if (updatedFields.specializations || updatedFields.birthDate) {
+            const mergedData = { ...existingUser, ...updatedFields };
+            updatedFields.status = calculateStatus(mergedData, existingUser);
+          }
+
+          if (Object.keys(updatedFields).length > 0) {
+            try {
+              const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', existingUser.id);
+              await updateDoc(userRef, updatedFields);
+              updatedCount++;
+            } catch (error) {
+              console.error("Error updating user:", userData.email, error);
+              errors.push(`Errore aggiornamento per ${userData.email}: ${error.message}`);
+            }
+          }
+          // If no fields changed, just skip silently
+        } else {
+          // New volunteer — add with defaults
+          userData.role = ROLES.VOLUNTEER;
+          userData.certifications = {};
+          userData.joinedAt = new Date().toISOString();
+          userData.photoUrl = '';
+          userData.password = "1234";
+          userData.status = calculateStatus(userData);
+
+          try {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'), userData);
+            importedCount++;
+          } catch (error) {
+            console.error("Error importing user:", userData.email, error);
+            errors.push(`Errore DB per ${userData.email}: ${error.message}`);
+          }
         }
       }
 
       let message = `Importazione completata: ${importedCount} volontari aggiunti.`;
-      if (skippedCount > 0) message += `\n${skippedCount} duplicati ignorati.`;
+      if (updatedCount > 0) message += `\n${updatedCount} volontari aggiornati.`;
       if (errors.length > 0) {
-        message += `\n\nATTENZIONE: ${errors.length} righe non importate:\n` + errors.slice(0, 10).join('\n');
+        message += `\n\nATTENZIONE: ${errors.length} righe con errori:\n` + errors.slice(0, 10).join('\n');
         if (errors.length > 10) message += `\n...e altri ${errors.length - 10} errori.`;
       }
       setNotification({
@@ -748,8 +788,10 @@ export const useAdminDashboard = () => {
         message: message,
         type: errors.length > 0 ? 'warning' : 'success'
       });
+      setIsImportingCSV(false);
     };
     reader.readAsText(file);
+    event.target.value = ''; // Reset input so same file can be re-imported
   };
 
   const handlePhotoUpload = (e) => {
@@ -940,6 +982,7 @@ export const useAdminDashboard = () => {
     toggleFilters,
     handleExportCSV,
     handleImportCSV,
+    isImportingCSV,
     notification,
     closeNotification,
     // Image Upload Exports
