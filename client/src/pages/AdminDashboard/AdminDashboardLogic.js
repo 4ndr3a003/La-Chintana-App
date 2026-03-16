@@ -55,13 +55,14 @@ export const useAdminDashboard = (showToast) => {
 
       // Ordina per cognome
       usersList.sort((a, b) => {
-        const getLastName = (fullName) => {
-          if (!fullName) return '';
-          const parts = fullName.trim().split(/\s+/);
-          // Consideriamo cognome tutto ciò che segue il primo nome
+        const getLastName = (user) => {
+          // Usa il campo lastName se disponibile, altrimenti fallback al split
+          if (user.lastName) return user.lastName.toLowerCase();
+          if (!user.name) return '';
+          const parts = user.name.trim().split(/\s+/);
           return parts.length > 1 ? parts.slice(1).join(' ').toLowerCase() : parts[0].toLowerCase();
         };
-        return getLastName(a.name).localeCompare(getLastName(b.name));
+        return getLastName(a).localeCompare(getLastName(b));
       });
 
       setUsers(usersList);
@@ -93,8 +94,16 @@ export const useAdminDashboard = (showToast) => {
   });
 
   const openEdit = (user) => {
-    const [firstName, ...lastNameParts] = user.name ? user.name.split(' ') : ['', ''];
-    const lastName = lastNameParts.join(' ');
+    // Usa i campi separati se disponibili, altrimenti fallback al split del nome
+    let firstName, lastName;
+    if (user.firstName !== undefined && user.lastName !== undefined) {
+      firstName = user.firstName;
+      lastName = user.lastName;
+    } else {
+      const [first, ...lastParts] = user.name ? user.name.split(' ') : ['', ''];
+      firstName = first;
+      lastName = lastParts.join(' ');
+    }
 
     setFormData({
       ...user,
@@ -211,6 +220,8 @@ export const useAdminDashboard = (showToast) => {
 
     let userData = {
       name: fullName,
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
       email: formData.email,
       role: formData.role,
       // role: formData.role, // Removed duplicate
@@ -475,13 +486,18 @@ export const useAdminDashboard = (showToast) => {
     const csvContent = [
       headers.join(";"),
       ...users.map(user => {
-        // Split name
-        const parts = (user.name || "").trim().split(/\s+/);
+        // Usa i campi separati se disponibili, altrimenti fallback al split
         let firstName = "";
         let lastName = "";
-        if (parts.length > 0) {
-          firstName = parts[0] || "";
-          lastName = parts.slice(1).join(" ") || "";
+        if (user.firstName !== undefined && user.lastName !== undefined) {
+          firstName = user.firstName || "";
+          lastName = user.lastName || "";
+        } else {
+          const parts = (user.name || "").trim().split(/\s+/);
+          if (parts.length > 0) {
+            firstName = parts[0] || "";
+            lastName = parts.slice(1).join(" ") || "";
+          }
         }
 
         const specs = user.specializations || [];
@@ -690,6 +706,8 @@ export const useAdminDashboard = (showToast) => {
 
           userData = {
             name: `${firstName} ${lastName}`.trim(),
+            firstName: firstName ? firstName.trim() : '',
+            lastName: lastName ? lastName.trim() : '',
             email: email.trim(),
             phone: phone ? phone.trim() : '',
             cf: cf ? cf.trim().toUpperCase() : '',

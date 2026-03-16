@@ -150,11 +150,11 @@ const CommunicationsView = ({ userProfile }) => {
           </div>
 
           {/* Mobile Filter Toggle */}
-          <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+          <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm h-[46px]">
             <button
               onClick={toggleFilters}
-              className={`p-3 transition-all ${isFiltersOpen 
-                ? 'bg-slate-800 text-white shadow-md' 
+              className={`w-[48px] transition-all flex items-center justify-center ${isFiltersOpen 
+                ? 'bg-[#004d9d] dark:bg-[#facc15] text-white dark:text-slate-900 shadow-inner' 
                 : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               <SlidersHorizontal size={20} />

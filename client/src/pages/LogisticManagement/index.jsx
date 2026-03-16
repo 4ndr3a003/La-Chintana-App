@@ -337,8 +337,8 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                         />
                     </div>
 
-                    {/* Mobile Download Button */}
-                    <div className="lg:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                    {/* Mobile Download/Filter Button Group */}
+                    <div className="lg:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm h-[46px] divide-x divide-slate-200 dark:divide-slate-700">
                         <input
                             type="file"
                             accept=".csv"
@@ -348,14 +348,14 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                         />
                         <label
                             htmlFor="csv-upload-mobile"
-                            className="p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center justify-center"
+                            className="w-[48px] bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center justify-center"
                             title="Importa CSV"
                         >
                             <Upload size={20} />
                         </label>
                         <button
                             onClick={handleDownloadCSV}
-                            className="p-3 bg-white dark:bg-slate-800 text-blue-600 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors"
+                            className="w-[48px] bg-white dark:bg-slate-800 text-blue-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
                             title="Esporta CSV"
                         >
                             <Download size={20} />
@@ -363,8 +363,8 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                         {/* Mobile Filter Toggle */}
                         <button
                             onClick={toggleFilters}
-                            className={`p-3 transition-all ${isFiltersOpen
-                                ? 'bg-slate-800 text-white shadow-md'
+                            className={`w-[48px] transition-all flex items-center justify-center ${isFiltersOpen
+                                ? 'bg-[#004d9d] dark:bg-[#facc15] text-white dark:text-slate-900 shadow-inner'
                                 : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                         >
                             <SlidersHorizontal size={20} />

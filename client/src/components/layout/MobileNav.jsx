@@ -93,7 +93,7 @@ const MobileNav = ({ userProfile }) => {
             style={{ '--background': 'transparent', '--padding-start': '0', '--padding-end': '0', width: '100%' }}
           >
             <Truck size={24} className={isActive('/logistics') ? "text-yellow-400 scale-110 transition-all duration-200" : "text-blue-200 dark:text-slate-400 transition-all duration-200"} />
-            <IonLabel className={isActive('/logistics') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Attrezzature</IonLabel>
+            <IonLabel className={isActive('/logistics') ? "text-yellow-400 font-bold text-[0.625rem] sm:text-xs mt-1 transition-all duration-200" : "text-blue-200 dark:text-slate-400 font-medium text-[0.625rem] sm:text-xs mt-1 transition-all duration-200"}>Logistica</IonLabel>
           </IonTabButton>
         )}
       </IonTabBar>

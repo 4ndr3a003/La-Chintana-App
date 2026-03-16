@@ -71,7 +71,13 @@ const AdminDashboard = ({ userProfile, showToast }) => {
     closeImageModal
   } = useAdminDashboard(showToast);
 
-  const formatName = (fullName) => {
+  const formatName = (user) => {
+    // Usa i campi separati se disponibili per supportare nomi composti
+    if (user.firstName && user.lastName) {
+      return `${user.lastName} ${user.firstName}`;
+    }
+    // Fallback per utenti senza campi separati
+    const fullName = typeof user === 'string' ? user : user?.name;
     if (!fullName) return '';
     const parts = fullName.trim().split(/\s+/);
     if (parts.length < 2) return fullName;
@@ -192,7 +198,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
           </div>
 
           {/* Mobile Actions & Filter Toggle */}
-          <div className="lg:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+          <div className="lg:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm h-[46px] divide-x divide-slate-200 dark:divide-slate-700">
             {canManageVolunteers(userProfile) && (
               <>
                 <input
@@ -204,7 +210,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
                 />
                 <label
                   htmlFor="csv-upload-mobile-header"
-                  className="p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className="w-[48px] bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer flex items-center justify-center"
                   title="Importa CSV"
                 >
                   <Upload size={20} />
@@ -213,15 +219,15 @@ const AdminDashboard = ({ userProfile, showToast }) => {
             )}
             <button
               onClick={handleExportCSV}
-              className="p-3 bg-white dark:bg-slate-800 text-blue-600 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              className="w-[48px] bg-white dark:bg-slate-800 text-blue-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
               title="Esporta CSV"
             >
               <Download size={20} />
             </button>
             <button
               onClick={toggleFilters}
-              className={`p-3 transition-all ${isFiltersOpen 
-                ? 'bg-slate-800 text-white shadow-md' 
+              className={`w-[48px] transition-all flex items-center justify-center ${isFiltersOpen 
+                ? 'bg-[#004d9d] dark:bg-[#facc15] text-white dark:text-slate-900 shadow-inner' 
                 : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
               <SlidersHorizontal size={20} />
@@ -344,7 +350,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
                     <div className="flex items-center gap-3">
                       <Avatar src={user.photoUrl} name={user.name} size="sm" />
                       <div>
-                        <p className="font-bold text-slate-800 text-sm">{formatName(user.name)}</p>
+                        <p className="font-bold text-slate-800 text-sm">{formatName(user)}</p>
                         <p className="text-xs text-slate-500">{user.email}</p>
                       </div>
                     </div>
@@ -418,7 +424,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
               <div className="flex items-center gap-3">
                 <Avatar src={user.photoUrl} name={user.name} size="md" />
                 <div>
-                  <h4 className="font-bold text-slate-800">{formatName(user.name)}</h4>
+                  <h4 className="font-bold text-slate-800">{formatName(user)}</h4>
                   <p className="text-xs text-slate-500">{user.email}</p>
                 </div>
               </div>
