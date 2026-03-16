@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonApp, IonButton, IonIcon } from '@ionic/react';
 import { notificationsOutline, downloadOutline } from 'ionicons/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -485,6 +485,7 @@ export default function App() {
               darkMode={darkMode}
               uppercaseMode={uppercaseMode}
               toggleUppercaseMode={toggleUppercaseMode}
+              showToast={showToast}
             />
             {/* Spacer for bottom nav on mobile */}
             {userProfile && location.pathname !== '/login' && (

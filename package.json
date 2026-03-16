@@ -9,7 +9,10 @@
     "dev:server": "npm run dev --prefix server",
     "dev": "node scripts/dev.js",
     "build:client": "npm run build --prefix client",
-    "build": "npm run build:client"
+    "build": "npm run build:client",
+    "deploy": "npx firebase deploy",
+    "deploy:functions": "npx firebase deploy --only functions",
+    "deploy:hosting": "npx firebase deploy --only hosting"
   },
   "devDependencies": {
     "concurrently": "^8.0.0",

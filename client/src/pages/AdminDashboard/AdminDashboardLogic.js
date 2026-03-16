@@ -4,7 +4,7 @@ import { db, appId, storage, auth } from '../../services/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 
-export const useAdminDashboard = () => {
+export const useAdminDashboard = (showToast) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -550,6 +550,14 @@ export const useAdminDashboard = () => {
       link.click();
       document.body.removeChild(link);
     }
+
+    if (showToast) {
+      showToast(
+        "Il file CSV dei volontari è stato generato ed è in fase di download.",
+        "Download Avviato",
+        "success"
+      );
+    }
   };
 
   const handleImportCSV = async (event) => {
@@ -782,12 +790,20 @@ export const useAdminDashboard = () => {
         message += `\n\nATTENZIONE: ${errors.length} righe con errori:\n` + errors.slice(0, 10).join('\n');
         if (errors.length > 10) message += `\n...e altri ${errors.length - 10} errori.`;
       }
-      setNotification({
-        isOpen: true,
-        title: errors.length > 0 ? 'Importazione con Avvisi' : 'Importazione Completata',
-        message: message,
-        type: errors.length > 0 ? 'warning' : 'success'
-      });
+      if (showToast) {
+        showToast(
+          message,
+          errors.length > 0 ? 'Importazione con Avvisi' : 'Importazione Completata',
+          errors.length > 0 ? 'warning' : 'success'
+        );
+      } else {
+        setNotification({
+          isOpen: true,
+          title: errors.length > 0 ? 'Importazione con Avvisi' : 'Importazione Completata',
+          message: message,
+          type: errors.length > 0 ? 'warning' : 'success'
+        });
+      }
       setIsImportingCSV(false);
     };
     reader.readAsText(file);

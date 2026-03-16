@@ -9,7 +9,9 @@ import {
     Plus,
     Menu,
     Settings,
-    LogOut
+    LogOut,
+    Box, // Added Box
+    Shirt // Added Shirt
 } from 'lucide-react';
 
 const AppLayout = () => {
@@ -20,9 +22,11 @@ const AppLayout = () => {
     const navigation = [
         { name: 'Home', href: '/', icon: Home },
         { name: 'Bacheca', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Eventi', href: '/events', icon: Calendar },
-        { name: 'Volontari', href: '/volunteers', icon: Users },
-        { name: 'Logistica', href: '/logistics', icon: Truck },
+        { name: 'Eventi', href: '/events', icon: Calendar }, // Keep Eventi as it's not in the snippet's replacement
+        { name: 'Personale', href: '/personnel', icon: Users }, // Changed from Volontari
+        { name: 'Magazzino', href: '/logistics', icon: Box }, // Changed from Logistica, icon changed to Box
+        { name: 'Mezzi', href: '/logistics', icon: Truck }, // Added Mezzi
+        { name: 'Divise', href: '/logistics', icon: Shirt }, // Added Divise
     ];
 
     const handleNavigation = (path) => {

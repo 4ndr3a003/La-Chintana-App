@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck, Layers, Box } from 'lucide-react';
 import logo from '../../assets/logo_chintana_fenix.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -58,7 +58,7 @@ const Header = ({ userProfile }) => {
         { path: '/events', label: 'Eventi', icon: <Calendar /> },
         { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
         { path: '/admin', label: 'Volontari', icon: <Users /> },
-        { path: '/logistics', label: 'Logistica', icon: <Truck /> },
+        { path: '/logistics', label: 'Logistica', icon: <Box /> },
       ];
     }
 

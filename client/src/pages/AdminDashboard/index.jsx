@@ -12,7 +12,7 @@ import DeleteConfirmationModal from '../../components/ui/DeleteConfirmationModal
 import { useAdminDashboard } from './AdminDashboardLogic';
 import './AdminDashboard.css';
 
-const AdminDashboard = ({ userProfile }) => {
+const AdminDashboard = ({ userProfile, showToast }) => {
   const {
     selectedUser,
     isEditing,
@@ -69,7 +69,7 @@ const AdminDashboard = ({ userProfile }) => {
     handlePhotoUpload,
     uploadCroppedImage,
     closeImageModal
-  } = useAdminDashboard();
+  } = useAdminDashboard(showToast);
 
   const formatName = (fullName) => {
     if (!fullName) return '';
@@ -137,27 +137,97 @@ const AdminDashboard = ({ userProfile }) => {
       </div>
 
       <div className="flex flex-col gap-4 mb-6">
-        <div className="flex gap-3">
+        {/* Action Row - Desktop */}
+        <div className="hidden lg:flex justify-start items-center gap-3 mb-4">
+          {canManageVolunteers(userProfile) && (
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 text-sm font-bold"
+            >
+              <PlusCircle size={18} />
+              Nuovo Volontario
+            </button>
+          )}
+
+          {/* CSV Actions */}
+          <div className="flex gap-2">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleImportCSV}
+              style={{ display: 'none' }}
+              id="csv-upload-desktop"
+            />
+            {canManageVolunteers(userProfile) && (
+              <label
+                htmlFor="csv-upload-desktop"
+                className="flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer active:scale-95 whitespace-nowrap"
+                title="Importa da CSV"
+              >
+                <Upload size={18} />
+                <span>Importa</span>
+              </label>
+            )}
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-blue-600 font-bold dark:text-blue-400 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap"
+              title="Esporta in CSV"
+            >
+              <Download size={18} />
+              <span>Esporta CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-row gap-3">
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
               placeholder="Cerca volontario..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          {/* Mobile Filter Toggle Button */}
-          <button
-            onClick={toggleFilters}
-            className={`lg:hidden flex items-center justify-center px-4 rounded-xl border transition-colors ${isFiltersOpen ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200'}`}
-          >
-            <SlidersHorizontal size={20} />
-          </button>
+          {/* Mobile Actions & Filter Toggle */}
+          <div className="lg:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+            {canManageVolunteers(userProfile) && (
+              <>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImportCSV}
+                  style={{ display: 'none' }}
+                  id="csv-upload-mobile-header"
+                />
+                <label
+                  htmlFor="csv-upload-mobile-header"
+                  className="p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  title="Importa CSV"
+                >
+                  <Upload size={20} />
+                </label>
+              </>
+            )}
+            <button
+              onClick={handleExportCSV}
+              className="p-3 bg-white dark:bg-slate-800 text-blue-600 border-r border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              title="Esporta CSV"
+            >
+              <Download size={20} />
+            </button>
+            <button
+              onClick={toggleFilters}
+              className={`p-3 transition-all ${isFiltersOpen 
+                ? 'bg-slate-800 text-white shadow-md' 
+                : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+            >
+              <SlidersHorizontal size={20} />
+            </button>
+          </div>
 
-          {/* Desktop Filters */}
           <div className="hidden lg:flex gap-4 items-center">
             {selectedUserIds.length > 0 && canManageVolunteers(userProfile) && (
               <button
@@ -184,35 +254,51 @@ const AdminDashboard = ({ userProfile }) => {
                 placeholder="Filtra per Stato"
               />
             </div>
-            {canManageVolunteers(userProfile) && (
-              <button
-                onClick={openCreate}
-                className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95"
-              >
-                <UserRoundPlus size={18} />
-                Nuovo Volontario
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Mobile Filters Content */}
-        {isFiltersOpen && (
-          <div className="lg:hidden flex flex-col gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2">
-            <CustomSelect
-              options={filterRoleOptions}
-              value={filterRole}
-              onChange={setFilterRole}
-              placeholder="Filtra per Ruolo"
-            />
-            <CustomSelect
-              options={filterStatusOptions}
-              value={filterStatus}
-              onChange={setFilterStatus}
-              placeholder="Filtra per Stato"
-            />
-          </div>
-        )}
+        {/* Mobile Filters Dropdown */}
+        <div className="relative lg:hidden">
+          {isFiltersOpen && (
+            <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-20 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-bold text-slate-700 dark:text-slate-200">Filtri</span>
+                <button
+                  onClick={() => {
+                    setFilterRole('Tutti');
+                    setFilterStatus('Tutti');
+                    setSearchTerm('');
+                  }}
+                  className="text-xs font-bold text-red-500 hover:text-red-600"
+                >
+                  Resetta
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase font-bold text-slate-400 ml-1 font-mono">Ruolo</p>
+                  <CustomSelect
+                    options={filterRoleOptions}
+                    value={filterRole}
+                    onChange={setFilterRole}
+                    placeholder="Filtra per Ruolo"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase font-bold text-slate-400 ml-1 font-mono">Stato</p>
+                  <CustomSelect
+                    options={filterStatusOptions}
+                    value={filterStatus}
+                    onChange={setFilterStatus}
+                    placeholder="Filtra per Stato"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Desktop Table View */}
@@ -389,32 +475,6 @@ const AdminDashboard = ({ userProfile }) => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Import/Export Actions */}
-      <div className="flex justify-end gap-3 mt-6 mb-20 px-4 md:px-0">
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleImportCSV}
-          style={{ display: 'none' }}
-          id="csv-upload"
-        />
-        <label htmlFor="csv-upload">
-          {canManageVolunteers(userProfile) && (
-            <div className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
-              <Upload size={18} />
-              Importa CSV
-            </div>
-          )}
-        </label>
-        <button
-          onClick={handleExportCSV}
-          className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
-        >
-          <Download size={18} />
-          Esporta CSV
-        </button>
       </div>
 
       {canManageVolunteers(userProfile) && (

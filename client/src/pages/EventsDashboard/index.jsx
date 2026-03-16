@@ -140,85 +140,119 @@ const EventsDashboard = ({ userProfile }) => {
 
 
         <div className="flex flex-col gap-4 mb-6">
-          {/* Search Bar Row */}
-          <div className="flex flex-row gap-3 mb-2">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="text"
-                placeholder="Cerca evento..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="relative">
-              <input
-                type="date"
-                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-600"
-                value={searchDate}
-                onChange={(e) => setSearchDate(e.target.value)}
-              />
-            </div>
-            {canManageContent(userProfile) && (
-              <button
-                onClick={openCreateModal}
-                className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto"
-              >
-                <CalendarPlus size={18} />
-                Nuovo Evento
-              </button>
-            )}
+        <div className="flex flex-row gap-3">
+          <div className="relative flex-grow">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="text"
+              placeholder="Cerca evento..."
+              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div className="relative hidden md:block">
+            <input
+              type="date"
+              className="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+            />
           </div>
 
-          {/* Mobile Filters Toggle */}
-          <div className="relative md:hidden">
+          {/* Mobile Filter Toggle */}
+          <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
             <button
               onClick={toggleFilters}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-200 bg-white"
+              className={`p-3 transition-all ${isFiltersOpen 
+                ? 'bg-slate-800 text-white shadow-md' 
+                : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
             >
-              <span className="font-bold text-slate-700">Filtri</span>
-              <SlidersHorizontal className="text-slate-500" size={20} />
+              <SlidersHorizontal size={20} />
             </button>
+          </div>
 
+          {canManageContent(userProfile) && (
+            <button
+              onClick={openCreateModal}
+              className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto text-sm font-bold"
+            >
+              <CalendarPlus size={18} />
+              Nuovo Evento
+            </button>
+          )}
+        </div>
+          {/* Mobile Filters Dropdown */}
+          <div className="relative md:hidden">
             {isFiltersOpen && (
-              <div className="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-xl mt-2 shadow-lg z-10 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex flex-col gap-3">
-                  <p className="font-bold text-sm text-slate-500 px-1">Tipologia</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => { setFilterType('Tutti'); toggleFilters(); }}
-                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterType === 'Tutti' ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-800 dark:border-slate-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-                    >
-                      Tutti
-                    </button>
-                    {Object.entries(EVENT_TYPES).map(([type, data]) => {
-                      const isSelected = filterType === type;
-                      let selectedClass = isSelected ? 'bg-slate-500 dark:bg-slate-600 text-white border-slate-500 dark:border-slate-600' : data.color;
-                      return (
-                        <button
-                          key={type}
-                          onClick={() => { setFilterType(type); toggleFilters(); }}
-                          className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${selectedClass} hover:brightness-95`}
-                        >
-                          {type}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="w-full h-px bg-slate-200 my-2"></div>
-                  <p className="font-bold text-sm text-slate-500 px-1">Partecipazione</p>
+              <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-20 p-4 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="font-bold text-slate-700 dark:text-slate-200 text-base">Filtri</span>
                   <button
-                    onClick={() => { setFilterParticipation(filterParticipation === 'Tutti' ? 'I miei eventi' : 'Tutti'); toggleFilters(); }}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border flex items-center justify-center gap-2 whitespace-nowrap ${filterParticipation === 'I miei eventi' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
+                    onClick={() => {
+                      setFilterType('Tutti');
+                      setFilterParticipation('Tutti');
+                      setSearchDate('');
+                      setSearchTerm('');
+                    }}
+                    className="text-xs font-bold text-red-500 hover:text-red-600"
                   >
-                    <User size={16} />
-                    Filtra i miei eventi
+                    Resetta
                   </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Tipologia</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setFilterType('Tutti')}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${filterType === 'Tutti' ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                      >
+                        Tutti
+                      </button>
+                      {Object.entries(EVENT_TYPES).map(([type, data]) => {
+                        const isSelected = filterType === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => setFilterType(type)}
+                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${isSelected ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                          >
+                            <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white dark:bg-slate-900' : data.color.replace('bg-', 'bg-')}`}></span>
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Data</p>
+                    <input
+                      type="date"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all text-sm font-medium"
+                      value={searchDate}
+                      onChange={(e) => setSearchDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Partecipazione</p>
+                    <button
+                      onClick={() => setFilterParticipation(filterParticipation === 'Tutti' ? 'I miei eventi' : 'Tutti')}
+                      className={`w-full px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${filterParticipation === 'I miei eventi' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                    >
+                      <User size={16} />
+                      {filterParticipation === 'I miei eventi' ? 'Mostra tutti' : 'Filtra i miei eventi'}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
           </div>
+
 
           {/* Desktop Filters */}
           <div className="hidden md:flex flex-wrap items-center gap-2 overflow-x-auto pb-2 no-scrollbar">

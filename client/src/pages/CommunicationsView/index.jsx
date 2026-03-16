@@ -137,18 +137,29 @@ const CommunicationsView = ({ userProfile }) => {
         </div>
 
         <div className="flex flex-col gap-4 mb-6">
-          {/* Search Bar Row */}
-          <div className="flex flex-row gap-3 mb-2">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="text"
-                placeholder="Cerca comunicazione..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        <div className="flex flex-row gap-3">
+          <div className="relative flex-grow">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="text"
+              placeholder="Cerca comunicazione..."
+              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Mobile Filter Toggle */}
+          <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+            <button
+              onClick={toggleFilters}
+              className={`p-3 transition-all ${isFiltersOpen 
+                ? 'bg-slate-800 text-white shadow-md' 
+                : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+            >
+              <SlidersHorizontal size={20} />
+            </button>
+          </div>
 
             {/* Desktop Filters */}
             <div className="hidden md:flex gap-2">
@@ -241,70 +252,77 @@ const CommunicationsView = ({ userProfile }) => {
             )}
           </div>
 
-          {/* Mobile Filters Toggle */}
+          {/* Mobile Filters Dropdown */}
           <div className="relative md:hidden">
-            <button
-              onClick={toggleFilters}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-200 bg-white"
-            >
-              <span className="font-bold text-slate-700">Filtri</span>
-              <SlidersHorizontal className="text-slate-500" size={20} />
-            </button>
-
             {isFiltersOpen && (
-              <div className="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-xl mt-2 shadow-lg z-10 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex flex-col gap-3">
-                  <p className="font-bold text-sm text-slate-500 px-1">Argomento</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => { setFilterTopic('Tutti'); toggleFilters(); }}
-                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterTopic === 'Tutti' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-                    >
-                      Tutti
-                    </button>
-                    {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map((topic) => {
-                      const isSelected = filterTopic === topic;
-                      const theme = getTheme(topic);
-
-                      let buttonClass = '';
-                      if (isSelected) {
-                        buttonClass = `${theme.dotColor} text-white border-transparent shadow-md`;
-                      } else {
-                        buttonClass = `${theme.bg} ${theme.text} ${theme.border}`;
-                      }
-
-                      return (
-                        <button
-                          key={topic}
-                          onClick={() => { setFilterTopic(topic); toggleFilters(); }}
-                          className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${buttonClass} hover:brightness-95`}
-                        >
-                          {topic}
-                        </button>
-                      );
-                    })}
+              <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-20 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">Filtri</span>
+                  <button
+                    onClick={() => {
+                      setFilterTopic('Tutti');
+                      setFilterImportance('Tutte');
+                    }}
+                    className="text-xs font-bold text-red-500 hover:text-red-600"
+                  >
+                    Resetta
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Argomento</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setFilterTopic('Tutti')}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${filterTopic === 'Tutti' ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                      >
+                        Tutti
+                      </button>
+                      {['Generale', 'Servizio', 'Formazione', 'Urgente', 'Direttivo', 'Cinofili', 'Altro'].map((topic) => {
+                        const isSelected = filterTopic === topic;
+                        const theme = getTheme(topic);
+                        return (
+                          <button
+                            key={topic}
+                            onClick={() => setFilterTopic(topic)}
+                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${isSelected ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                          >
+                            <span className={`w-2 h-2 rounded-full ${theme.dotColor}`}></span>
+                            {topic}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="w-full h-px bg-slate-200 my-2"></div>
-                  <p className="font-bold text-sm text-slate-500 px-1">Priorità</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => { setFilterImportance('Tutte'); toggleFilters(); }}
-                      className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${filterImportance === 'Tutte' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-                    >
-                      Tutte
-                    </button>
-                    {['Alta', 'Normale', 'Bassa'].map((imp) => {
-                      const isSelected = filterImportance === imp;
-                      return (
-                        <button
-                          key={imp}
-                          onClick={() => { setFilterImportance(imp); toggleFilters(); }}
-                          className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-                        >
-                          {imp}
-                        </button>
-                      );
-                    })}
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Priorità</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => setFilterImportance('Tutte')}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${filterImportance === 'Tutte' ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                      >
+                        Tutte
+                      </button>
+                      {[
+                        { val: 'Alta', color: 'bg-red-500' },
+                        { val: 'Normale', color: 'bg-blue-500' },
+                        { val: 'Bassa', color: 'bg-emerald-500' }
+                      ].map((imp) => {
+                        const isSelected = filterImportance === imp.val;
+                        return (
+                          <button
+                            key={imp.val}
+                            onClick={() => setFilterImportance(imp.val)}
+                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${isSelected ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                          >
+                            <span className={`w-2 h-2 rounded-full ${imp.color}`}></span>
+                            {imp.val}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
