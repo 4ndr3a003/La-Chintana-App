@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
-import { Edit2, Trash2, AlertTriangle, Calendar, Radio, Gauge, Truck, MoreVertical, ShieldCheck, ShieldAlert, Wrench, Circle, FileText } from 'lucide-react';
+import { Edit2, Trash2, AlertTriangle, Calendar, Radio, Gauge, Truck, MoreVertical, ShieldCheck, ShieldAlert, Wrench, Circle, FileText, Camera } from 'lucide-react';
 
 const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
 
@@ -75,6 +75,17 @@ const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
                             {/* Status Strip (Left Border equivalent) */}
                             <div className={`w-1 self-stretch rounded-full ${getStatusColor(v.status)}`}></div>
 
+                            {/* Thumbnail */}
+                            {v.photoUrl ? (
+                                <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 ring-1 ring-slate-200 dark:ring-slate-700 shadow-md">
+                                    <img src={v.photoUrl} alt={v.model} className="w-full h-full object-cover" />
+                                </div>
+                            ) : (
+                                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                                    <Truck size={20} className="text-slate-400" />
+                                </div>
+                            )}
+
                             {/* Main Info */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start mb-1">
@@ -127,6 +138,13 @@ const VehiclesTab = ({ vehicles, onEdit, onDelete, onView, searchTerm }) => {
                             <div className={`absolute top-6 left-0 w-1.5 h-12 rounded-r-lg ${getStatusColor(v.status)}`} />
 
                             <div className="p-6 pl-8 h-full flex flex-col">
+
+                                {/* Photo Banner */}
+                                {v.photoUrl && (
+                                    <div className="-mx-2 -mt-1 mb-4 h-28 rounded-xl overflow-hidden">
+                                        <img src={v.photoUrl} alt={v.model} className="w-full h-full object-cover" />
+                                    </div>
+                                )}
                                 {/* Header */}
                                 <div className="flex justify-between items-start mb-6">
                                     <div>

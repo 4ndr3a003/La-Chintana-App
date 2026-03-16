@@ -98,12 +98,20 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Vehicles
   const handleSaveVehicle = async (data) => {
-    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'vehicles');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'vehicles');
+    const { _pendingPhotoFile, ...saveData } = data;
+    // Clean placeholder
+    if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
+    
     try {
       if (editingItem) {
-        await updateDoc(doc(ref, editingItem.id), data);
+        await updateDoc(doc(colRef, editingItem.id), saveData);
       } else {
-        await addDoc(ref, { ...data, createdAt: new Date().toISOString() });
+        const newDocRef = await addDoc(colRef, { ...saveData, createdAt: new Date().toISOString() });
+        // Upload pending photo for new item
+        if (_pendingPhotoFile) {
+          await handleUploadItemPhoto('vehicles', newDocRef.id, _pendingPhotoFile);
+        }
       }
       setIsVehicleModalOpen(false);
       setEditingItem(null);
@@ -123,12 +131,18 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Equipment
   const handleSaveEquipment = async (data) => {
-    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+    const { _pendingPhotoFile, ...saveData } = data;
+    if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
+
     try {
       if (editingItem) {
-        await updateDoc(doc(ref, editingItem.id), data);
+        await updateDoc(doc(colRef, editingItem.id), saveData);
       } else {
-        await addDoc(ref, { ...data, createdAt: new Date().toISOString() });
+        const newDocRef = await addDoc(colRef, { ...saveData, createdAt: new Date().toISOString() });
+        if (_pendingPhotoFile) {
+          await handleUploadItemPhoto('equipment', newDocRef.id, _pendingPhotoFile);
+        }
       }
       setIsEquipmentModalOpen(false);
       setEditingItem(null);
@@ -148,12 +162,18 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Uniforms
   const handleSaveUniform = async (data) => {
-    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'uniforms');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'uniforms');
+    const { _pendingPhotoFile, ...saveData } = data;
+    if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
+
     try {
       if (editingItem) {
-        await updateDoc(doc(ref, editingItem.id), data);
+        await updateDoc(doc(colRef, editingItem.id), saveData);
       } else {
-        await addDoc(ref, { ...data, createdAt: new Date().toISOString() });
+        const newDocRef = await addDoc(colRef, { ...saveData, createdAt: new Date().toISOString() });
+        if (_pendingPhotoFile) {
+          await handleUploadItemPhoto('uniforms', newDocRef.id, _pendingPhotoFile);
+        }
       }
       setIsUniformModalOpen(false);
       setEditingItem(null);
@@ -436,6 +456,50 @@ export const useLogisticManagement = (userProfile, showToast) => {
     }
   };
 
+  // Upload Item Photo (generic for vehicles, equipment, uniforms)
+  const handleUploadItemPhoto = async (collectionName, itemId, file) => {
+    if (!file || !itemId || !collectionName) return null;
+
+    try {
+      const fileName = `photo_${collectionName}_${itemId}_${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `avatars/uploads/${fileName}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, itemId);
+      await updateDoc(itemRef, {
+        photoUrl: url,
+        photoFileName: fileName
+      });
+
+      return url;
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      throw error;
+    }
+  };
+
+  // Delete Item Photo
+  const handleDeleteItemPhoto = async (collectionName, itemId, photoFileName) => {
+    if (!itemId || !collectionName) return;
+
+    try {
+      if (photoFileName) {
+        const storageRef = ref(storage, `avatars/uploads/${photoFileName}`);
+        await deleteObject(storageRef).catch(() => {});
+      }
+
+      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, itemId);
+      await updateDoc(itemRef, {
+        photoUrl: '',
+        photoFileName: ''
+      });
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+      throw error;
+    }
+  };
+
   // KPI Logic
   const kpiData = {
     vehiclesOperational: vehicles.filter(v => v.status === 'Operativo').length,
@@ -490,6 +554,8 @@ export const useLogisticManagement = (userProfile, showToast) => {
     handleDeleteUniform,
     handleUploadVehicleDocument,
     handleDeleteVehicleDocument,
+    handleUploadItemPhoto,
+    handleDeleteItemPhoto,
     isImportingCSV,
     handleImportCSV,
     kpiData

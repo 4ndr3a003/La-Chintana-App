@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { X, Save, Box, Calendar, MapPin, Tag, Hash, Activity, FileText, Truck, Layers } from 'lucide-react';
+import { X, Save, Box, Calendar, MapPin, Tag, Hash, Activity, FileText, Truck, Layers, Camera, Loader2, Trash2 } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import CustomSelect from '../../../components/ui/CustomSelect';
 
@@ -21,29 +21,29 @@ const CATEGORY_OPTIONS = [
     'Altro'
 ];
 
-const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
-    const { register, handleSubmit, reset, control, formState: { errors }, watch } = useForm({
+const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles, onUploadPhoto }) => {
+    const { register, handleSubmit, reset, control, formState: { errors }, watch, setValue } = useForm({
         defaultValues: {
             name: '',
             category: 'Altro',
             quantity: 1,
-            locationType: 'Sede', // 'Sede' | 'Cementeria' | 'vehicle'
+            locationType: 'Sede',
             locationDetail: '',
             status: 'Funzionante',
             expiryDate: '',
-            notes: ''
+            notes: '',
+            photoUrl: ''
         }
     });
 
     const locationType = watch('locationType');
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+    const [photoPreview, setPhotoPreview] = useState('');
+    const photoInputRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
-                // Heuristic to determine location type from string
-                // "Mezzo: ..." -> vehicle
-                // "Cementeria ..." -> Cementeria
-                // "Sede ..." -> Sede
                 let type = 'Sede';
                 let detail = initialData.location || '';
 
@@ -63,6 +63,7 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                     locationType: type,
                     locationDetail: detail
                 });
+                setPhotoPreview(initialData.photoUrl || '');
             } else {
                 reset({
                     name: '',
@@ -72,13 +73,48 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                     locationDetail: '',
                     status: 'Funzionante',
                     expiryDate: '',
-                    notes: ''
+                    notes: '',
+                    photoUrl: ''
                 });
+                setPhotoPreview('');
             }
         }
     }, [isOpen, initialData, reset]);
 
     if (!isOpen) return null;
+
+    const handlePhotoSelect = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const localUrl = URL.createObjectURL(file);
+        setPhotoPreview(localUrl);
+
+        if (initialData?.id && onUploadPhoto) {
+            try {
+                setIsUploadingPhoto(true);
+                const url = await onUploadPhoto('equipment', initialData.id, file);
+                if (url) {
+                    setValue('photoUrl', url);
+                    setPhotoPreview(url);
+                }
+            } catch (error) {
+                console.error("Photo upload error", error);
+            } finally {
+                setIsUploadingPhoto(false);
+            }
+        } else {
+            setValue('_pendingPhotoFile', file);
+            setValue('photoUrl', '__pending__');
+        }
+        if (photoInputRef.current) photoInputRef.current.value = '';
+    };
+
+    const removePhoto = () => {
+        setPhotoPreview('');
+        setValue('photoUrl', '');
+        setValue('_pendingPhotoFile', null);
+    };
 
     const onSubmit = (data) => {
         // Format location string
@@ -87,14 +123,15 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
         if (data.locationType === 'vehicle') {
             finalLocation = `Mezzo: ${data.locationDetail}`;
         } else {
-            // Prefix with location type (Sede or Cementeria)
             const prefix = data.locationType === 'Sede' ? 'Sede' : 'Cementeria';
             finalLocation = data.locationDetail ? `${prefix} - ${data.locationDetail}` : prefix;
         }
 
+        const { _pendingPhotoFile, ...rest } = data;
         const finalData = {
-            ...data,
-            location: finalLocation
+            ...rest,
+            location: finalLocation,
+            _pendingPhotoFile
         };
         onSave(finalData);
     };
@@ -119,6 +156,55 @@ const EquipmentModal = ({ isOpen, onClose, onSave, initialData, vehicles }) => {
                 {/* Body */}
                 <div className="modal-body">
                     <form id="equipment-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
+                        {/* Photo Upload Area */}
+                        <div className="flex flex-col items-center">
+                            <input
+                                type="file"
+                                ref={photoInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handlePhotoSelect}
+                            />
+                            <div
+                                className="relative w-full h-40 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 overflow-hidden cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors group"
+                                onClick={() => !isUploadingPhoto && photoInputRef.current?.click()}
+                            >
+                                {photoPreview ? (
+                                    <>
+                                        <img src={photoPreview} alt="Foto attrezzatura" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                            <Camera size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500">
+                                        {isUploadingPhoto ? (
+                                            <Loader2 size={32} className="animate-spin text-blue-500" />
+                                        ) : (
+                                            <>
+                                                <Camera size={32} className="mb-2" />
+                                                <span className="text-xs font-bold">Aggiungi foto</span>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                                {isUploadingPhoto && photoPreview && (
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                        <Loader2 size={32} className="animate-spin text-white" />
+                                    </div>
+                                )}
+                            </div>
+                            {photoPreview && !isUploadingPhoto && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); removePhoto(); }}
+                                    className="mt-2 text-xs text-red-500 hover:text-red-700 font-bold flex items-center gap-1"
+                                >
+                                    <Trash2 size={12} /> Rimuovi foto
+                                </button>
+                            )}
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Name */}

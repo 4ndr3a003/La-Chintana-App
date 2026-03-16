@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
-import { Layers, Edit2, Trash2, MapPin, Box, Calendar, Wrench, MoreVertical, Circle, FileText } from 'lucide-react';
+import { Layers, Edit2, Trash2, MapPin, Box, Calendar, Wrench, MoreVertical, Circle, FileText, Camera } from 'lucide-react';
 
 const EquipmentTab = ({ equipment, onEdit, onDelete, onView, searchTerm }) => {
 
@@ -55,8 +55,19 @@ const EquipmentTab = ({ equipment, onEdit, onDelete, onView, searchTerm }) => {
                         className="md:hidden flex items-center p-3 gap-3 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors rounded-xl"
                         onClick={() => onView(item)}
                     >
-                        {/* Status Dot */}
-                        <div className={`w-2 h-2 rounded-full shrink-0 ${getStatusColor(item.status)}`} />
+                        {/* Status Strip */}
+                        <div className={`w-1 self-stretch rounded-full ${getStatusColor(item.status)}`} />
+
+                        {/* Thumbnail */}
+                        {item.photoUrl ? (
+                            <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 ring-1 ring-slate-200 dark:ring-slate-700 shadow-md">
+                                <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                                <Box size={20} className="text-slate-400" />
+                            </div>
+                        )}
 
                         {/* Main Info */}
                         <div className="flex-1 min-w-0">
@@ -102,10 +113,17 @@ const EquipmentTab = ({ equipment, onEdit, onDelete, onView, searchTerm }) => {
                         DESKTOP LAYOUT (>= md) - CARD
                     */}
                     <div className="hidden md:block">
-                        {/* Status Dot */}
-                        <div className={`absolute top-6 right-6 w-3 h-3 rounded-full ${getStatusColor(item.status)}`} />
+                        {/* Status Strip */}
+                        <div className={`absolute top-6 left-0 w-1.5 h-12 rounded-r-lg ${getStatusColor(item.status)}`} />
 
                         <div className="p-6 pl-8 h-full flex flex-col">
+
+                            {/* Photo Banner */}
+                            {item.photoUrl && (
+                                <div className="-mx-2 -mt-1 mb-4 h-28 rounded-xl overflow-hidden">
+                                    <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                                </div>
+                            )}
 
                             {/* Header */}
                             <div className="mb-4 pr-6">

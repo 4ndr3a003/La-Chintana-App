@@ -11,10 +11,16 @@ const EquipmentDetailsModal = ({ isOpen, onClose, equipment }) => {
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header Image / Pattern */}
-                <div className="h-24 bg-[#facc15] relative">
+                <div className="h-32 relative overflow-hidden">
+                    {equipment.photoUrl ? (
+                        <img src={equipment.photoUrl} alt={equipment.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full bg-[#facc15]" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 text-slate-800 rounded-full transition-colors backdrop-blur-md"
+                        className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 text-white rounded-full transition-colors backdrop-blur-md"
                     >
                         <X size={20} />
                     </button>

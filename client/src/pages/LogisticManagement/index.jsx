@@ -75,6 +75,7 @@ const LogisticManagement = ({ userProfile, showToast }) => {
         handleDeleteUniform,
         handleUploadVehicleDocument,
         handleDeleteVehicleDocument,
+        handleUploadItemPhoto,
         filterLocation,
         setFilterLocation,
         isFiltersOpen,
@@ -591,6 +592,7 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                 onClose={() => setIsVehicleModalOpen(false)}
                 onSave={handleSaveVehicle}
                 initialData={editingItem}
+                onUploadPhoto={handleUploadItemPhoto}
             />
 
             <VehicleDetailsModal
@@ -607,6 +609,7 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                 onSave={handleSaveEquipment}
                 initialData={editingItem}
                 vehicles={vehicles}
+                onUploadPhoto={handleUploadItemPhoto}
             />
 
             <EquipmentDetailsModal
@@ -620,6 +623,7 @@ const LogisticManagement = ({ userProfile, showToast }) => {
                 onClose={() => setIsUniformModalOpen(false)}
                 onSave={handleSaveUniform}
                 initialData={editingItem}
+                onUploadPhoto={handleUploadItemPhoto}
             />
 
             <UniformDetailsModal

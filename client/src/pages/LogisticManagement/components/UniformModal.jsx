@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { X, Save, Shirt, Hash, FileText, User } from 'lucide-react';
+import { X, Save, Shirt, Hash, FileText, Camera, Loader2, Trash2 } from 'lucide-react';
 import CustomSelect from '../../../components/ui/CustomSelect';
 
 const UNIFORM_STATUSES = [
@@ -27,22 +27,28 @@ const UNIFORM_SEASONS = [
     { value: '4 Stagioni', label: '4 Stagioni' }
 ];
 
-const UniformModal = ({ isOpen, onClose, onSave, initialData }) => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
+const UniformModal = ({ isOpen, onClose, onSave, initialData, onUploadPhoto }) => {
+    const { register, handleSubmit, reset, control, formState: { errors }, setValue, watch } = useForm({
         defaultValues: {
             name: '',
             size: 'M',
             season: '4 Stagioni',
             status: 'Nuova',
             quantity: 1,
-            notes: ''
+            notes: '',
+            photoUrl: ''
         }
     });
+
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+    const [photoPreview, setPhotoPreview] = useState('');
+    const photoInputRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
                 reset({ ...initialData });
+                setPhotoPreview(initialData.photoUrl || '');
             } else {
                 reset({
                     name: '',
@@ -50,16 +56,53 @@ const UniformModal = ({ isOpen, onClose, onSave, initialData }) => {
                     season: '4 Stagioni',
                     status: 'Nuova',
                     quantity: 1,
-                    notes: ''
+                    notes: '',
+                    photoUrl: ''
                 });
+                setPhotoPreview('');
             }
         }
     }, [isOpen, initialData, reset]);
 
     if (!isOpen) return null;
 
+    const handlePhotoSelect = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const localUrl = URL.createObjectURL(file);
+        setPhotoPreview(localUrl);
+
+        if (initialData?.id && onUploadPhoto) {
+            try {
+                setIsUploadingPhoto(true);
+                const url = await onUploadPhoto('uniforms', initialData.id, file);
+                if (url) {
+                    setValue('photoUrl', url);
+                    setPhotoPreview(url);
+                }
+            } catch (error) {
+                console.error("Photo upload error", error);
+            } finally {
+                setIsUploadingPhoto(false);
+            }
+        } else {
+            setValue('_pendingPhotoFile', file);
+            setValue('photoUrl', '__pending__');
+        }
+        if (photoInputRef.current) photoInputRef.current.value = '';
+    };
+
+    const removePhoto = () => {
+        setPhotoPreview('');
+        setValue('photoUrl', '');
+        setValue('_pendingPhotoFile', null);
+    };
+
     const onSubmit = (data) => {
-        onSave(data);
+        const { _pendingPhotoFile, ...submitData } = data;
+        submitData._pendingPhotoFile = _pendingPhotoFile;
+        onSave(submitData);
     };
 
     return (
@@ -82,6 +125,55 @@ const UniformModal = ({ isOpen, onClose, onSave, initialData }) => {
                 {/* Body */}
                 <div className="modal-body">
                     <form id="uniform-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+                        {/* Photo Upload Area */}
+                        <div className="flex flex-col items-center">
+                            <input
+                                type="file"
+                                ref={photoInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handlePhotoSelect}
+                            />
+                            <div
+                                className="relative w-full h-40 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 overflow-hidden cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors group"
+                                onClick={() => !isUploadingPhoto && photoInputRef.current?.click()}
+                            >
+                                {photoPreview ? (
+                                    <>
+                                        <img src={photoPreview} alt="Foto divisa" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                            <Camera size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500">
+                                        {isUploadingPhoto ? (
+                                            <Loader2 size={32} className="animate-spin text-blue-500" />
+                                        ) : (
+                                            <>
+                                                <Camera size={32} className="mb-2" />
+                                                <span className="text-xs font-bold">Aggiungi foto</span>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                                {isUploadingPhoto && photoPreview && (
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                        <Loader2 size={32} className="animate-spin text-white" />
+                                    </div>
+                                )}
+                            </div>
+                            {photoPreview && !isUploadingPhoto && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); removePhoto(); }}
+                                    className="mt-2 text-xs text-red-500 hover:text-red-700 font-bold flex items-center gap-1"
+                                >
+                                    <Trash2 size={12} /> Rimuovi foto
+                                </button>
+                            )}
+                        </div>
 
                         {/* Name */}
                         <div>

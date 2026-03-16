@@ -214,13 +214,22 @@ const EventsDashboard = ({ userProfile }) => {
                       </button>
                       {Object.entries(EVENT_TYPES).map(([type, data]) => {
                         const isSelected = filterType === type;
+                        
+                        // Solid colors for better visibility on small dots
+                        let solidColor = 'bg-slate-500';
+                        if (type === 'Servizio') solidColor = 'bg-amber-500';
+                        else if (type === 'Esercitazione') solidColor = 'bg-blue-500';
+                        else if (type === 'Emergenza') solidColor = 'bg-red-500';
+                        else if (type === 'Formazione') solidColor = 'bg-emerald-500';
+                        else if (type === 'Riunione') solidColor = 'bg-slate-500';
+
                         return (
                           <button
                             key={type}
                             onClick={() => setFilterType(type)}
-                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${isSelected ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
+                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${isSelected ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 border-none' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}
                           >
-                            <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white dark:bg-slate-900' : data.color.replace('bg-', 'bg-')}`}></span>
+                            <span className={`w-3 h-3 rounded-full shadow-sm ${isSelected ? 'bg-white dark:bg-slate-900' : solidColor}`}></span>
                             {type}
                           </button>
                         );
