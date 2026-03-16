@@ -268,3 +268,177 @@ exports.syncUserRole = functions.firestore
       return null;
     }
   });
+
+// --- iCalendar Feed Cloud Function ---
+exports.calendarFeed = functions.https.onRequest(async (req, res) => {
+  // Set CORS headers
+  res.set('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    // Use the default appId or get it from query params
+    const appId = req.query.appId || 'default-app-id';
+    const userId = req.query.userId || null;
+
+    // Read all events from Firestore
+    const eventsRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('events');
+    const snapshot = await eventsRef.get();
+
+    const events = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      events.push({ id: doc.id, ...data });
+    });
+
+    // Filter: only public events (visibility 'Tutti' or undefined)
+    // AND if userId is provided, only events where user is participating
+    const filteredEvents = events.filter(e => {
+      const visibility = e.visibility || 'Tutti';
+      if (visibility !== 'Tutti') return false;
+      
+      if (userId) {
+        // Check if user is in top-level participants or any shift participants
+        const inTopLevel = e.participants && e.participants.includes(userId);
+        const inShifts = e.shifts && e.shifts.some(s => s.participants && s.participants.includes(userId));
+        return inTopLevel || inShifts;
+      }
+      
+      return true;
+    });
+
+    // Helper: format Date to iCal DTSTART/DTEND format (YYYYMMDDTHHmmssZ)
+    const formatICalDate = (date) => {
+      return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    };
+
+    // Helper: escape iCal text values
+    const escapeICalText = (text) => {
+      if (!text) return '';
+      return text
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\n/g, '\\n');
+    };
+
+    // Build iCalendar content
+    let ical = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//La Chintana Fenix//Eventi//IT',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      `X-WR-CALNAME:La Chintana Fenix - ${userId ? 'I Miei Turni' : 'Eventi'}`,
+      'X-WR-TIMEZONE:Europe/Rome',
+      // Timezone definition for Europe/Rome
+      'BEGIN:VTIMEZONE',
+      'TZID:Europe/Rome',
+      'BEGIN:STANDARD',
+      'DTSTART:19701025T030000',
+      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10',
+      'TZOFFSETFROM:+0200',
+      'TZOFFSETTO:+0100',
+      'TZNAME:CET',
+      'END:STANDARD',
+      'BEGIN:DAYLIGHT',
+      'DTSTART:19700329T020000',
+      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3',
+      'TZOFFSETFROM:+0100',
+      'TZOFFSETTO:+0200',
+      'TZNAME:CEST',
+      'END:DAYLIGHT',
+      'END:VTIMEZONE',
+    ];
+
+    filteredEvents.forEach(event => {
+      const startDate = new Date(event.date);
+      
+      // If the event has shifts, create a VEVENT for each shift
+      if (event.shifts && event.shifts.length > 0) {
+        event.shifts.forEach((shift, idx) => {
+          // If filtering by user, only show the shift the user is in
+          if (userId && (!shift.participants || !shift.participants.includes(userId))) {
+            return;
+          }
+
+          const shiftDate = new Date(event.date);
+          
+          // Parse shift start/end times
+          if (shift.startTime) {
+            const [sh, sm] = shift.startTime.split(':');
+            shiftDate.setHours(parseInt(sh), parseInt(sm), 0, 0);
+          }
+          
+          let endDate = new Date(shiftDate);
+          if (shift.endTime) {
+            const [eh, em] = shift.endTime.split(':');
+            endDate.setHours(parseInt(eh), parseInt(em), 0, 0);
+            // Handle overnight shifts
+            if (endDate <= shiftDate) {
+              endDate.setDate(endDate.getDate() + 1);
+            }
+          } else {
+            endDate = new Date(shiftDate.getTime() + 2 * 60 * 60 * 1000); // 2h default
+          }
+
+          const shiftLabel = `Turno ${idx + 1}`;
+          const description = [
+            `Tipo: ${event.type || 'Evento'}`,
+            shift.startTime && shift.endTime ? `Orario: ${shift.startTime} - ${shift.endTime}` : '',
+            shift.maxParticipants ? `Max Partecipanti: ${shift.maxParticipants}` : '',
+            event.description || ''
+          ].filter(Boolean).join('\\n');
+
+          ical.push('BEGIN:VEVENT');
+          ical.push(`UID:${event.id}-shift${idx}@chintana-events-handler.firebaseapp.com`);
+          ical.push(`DTSTAMP:${formatICalDate(new Date())}`);
+          ical.push(`DTSTART:${formatICalDate(shiftDate)}`);
+          ical.push(`DTEND:${formatICalDate(endDate)}`);
+          ical.push(`SUMMARY:${escapeICalText(event.title)} (${shiftLabel})`);
+          if (event.location) ical.push(`LOCATION:${escapeICalText(event.location)}`);
+          ical.push(`DESCRIPTION:${escapeICalText(description)}`);
+          ical.push(`URL:https://chintana-events-handler.firebaseapp.com/events?eventId=${event.id}`);
+          ical.push('END:VEVENT');
+        });
+      } else {
+        // Single event (no shifts)
+        let endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Default 2h duration
+
+        const description = [
+          `Tipo: ${event.type || 'Evento'}`,
+          event.description || ''
+        ].filter(Boolean).join('\\n');
+
+        ical.push('BEGIN:VEVENT');
+        ical.push(`UID:${event.id}@chintana-events-handler.firebaseapp.com`);
+        ical.push(`DTSTAMP:${formatICalDate(new Date())}`);
+        ical.push(`DTSTART:${formatICalDate(startDate)}`);
+        ical.push(`DTEND:${formatICalDate(endDate)}`);
+        ical.push(`SUMMARY:${escapeICalText(event.title)}`);
+        if (event.location) ical.push(`LOCATION:${escapeICalText(event.location)}`);
+        ical.push(`DESCRIPTION:${escapeICalText(description)}`);
+        ical.push(`URL:https://chintana-events-handler.firebaseapp.com/events?eventId=${event.id}`);
+        ical.push('END:VEVENT');
+      }
+    });
+
+    ical.push('END:VCALENDAR');
+
+    const icalContent = ical.join('\r\n');
+
+    // Set headers for iCal download
+    res.set('Content-Type', 'text/calendar; charset=utf-8');
+    res.set('Content-Disposition', 'inline; filename="la-chintana-eventi.ics"');
+    res.set('Cache-Control', 'public, max-age=300'); // Cache 5 min
+    res.status(200).send(icalContent);
+
+  } catch (error) {
+    console.error('Error generating iCal feed:', error);
+    res.status(500).send('Error generating calendar feed');
+  }
+});

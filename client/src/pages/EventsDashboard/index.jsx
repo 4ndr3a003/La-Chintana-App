@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, List, ChevronDown, PlusCircle, CalendarPlus, X, AlertTriangle, User, Search, SlidersHorizontal } from 'lucide-react';
+import { Calendar, List, ChevronDown, PlusCircle, CalendarPlus, X, AlertTriangle, User, Search, SlidersHorizontal, Share2, Copy, Check, ExternalLink } from 'lucide-react';
+import { SiGoogle, SiApple } from 'react-icons/si';
 import { hasAdminAccess, EVENT_TYPES, canManageContent, EVENT_VISIBILITY } from '../../utils/constants';
+import { appId } from '../../services/firebase';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CalendarGrid from '../../components/events/CalendarGrid';
@@ -54,6 +56,40 @@ const EventsDashboard = ({ userProfile }) => {
     eventId: null
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
+
+  // Calendar Export Modal State
+  const [isCalendarExportOpen, setIsCalendarExportOpen] = React.useState(false);
+  const [exportMode, setExportMode] = React.useState('all'); // 'all' or 'mine'
+  const [copied, setCopied] = React.useState(false);
+
+  const getCalendarFeedUrl = () => {
+    let url = `${window.location.origin}/api/calendar.ics?appId=${appId}`;
+    if (exportMode === 'mine' && userProfile?.id) {
+      url += `&userId=${userProfile.id}`;
+    }
+    return url;
+  };
+
+  const CALENDAR_FEED_URL = getCalendarFeedUrl();
+  const GOOGLE_CALENDAR_ADD_URL = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(CALENDAR_FEED_URL.replace('https://', 'webcal://').replace('http://', 'webcal://'))}`;
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(CALENDAR_FEED_URL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = CALENDAR_FEED_URL;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const openDeleteModal = (eventId) => {
     setDeleteModal({ isOpen: true, eventId });
@@ -122,67 +158,76 @@ const EventsDashboard = ({ userProfile }) => {
             </h3>
             <span className="events-count-badge whitespace-nowrap !text-[10px] md:!text-xs !px-1.5 md:!px-2 !py-0.5 md:!py-1">{filteredEvents.length} Eventi</span>
           </div>
-          <div className="view-toggle-group ml-auto shrink-0 space-x-0.5">
+          <div className="flex items-center gap-2 ml-auto shrink-0">
             <button
-              onClick={() => setViewMode('list')}
-              className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'list' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
+              onClick={() => setIsCalendarExportOpen(true)}
+              className="calendar-export-btn"
+              title="Esporta Calendario"
             >
-              <List size={18} />
+              <Share2 size={18} />
             </button>
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'calendar' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
-            >
-              <Calendar size={18} />
-            </button>
+            <div className="view-toggle-group space-x-0.5">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'list' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
+              >
+                <List size={18} />
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`view-toggle-btn !p-1.5 md:!p-3 ${viewMode === 'calendar' ? 'view-toggle-btn-active' : 'view-toggle-btn-inactive'}`}
+              >
+                <Calendar size={18} />
+              </button>
+            </div>
           </div>
         </div>
 
 
         <div className="flex flex-col gap-4 mb-6">
-        <div className="flex flex-row gap-3">
-          <div className="relative flex-grow">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-            <input
-              type="text"
-              placeholder="Cerca evento..."
-              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <div className="relative hidden md:block">
-            <input
-              type="date"
-              className="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
-              value={searchDate}
-              onChange={(e) => setSearchDate(e.target.value)}
-            />
-          </div>
+          <div className="flex flex-row gap-3">
+            <div className="relative flex-grow">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                type="text"
+                placeholder="Cerca evento..."
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
-          {/* Mobile Filter Toggle */}
-          <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm h-[46px]">
-            <button
-              onClick={toggleFilters}
-              className={`w-[48px] transition-all flex items-center justify-center ${isFiltersOpen 
-                ? 'bg-[#004d9d] dark:bg-[#facc15] text-white dark:text-slate-900 shadow-inner' 
-                : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-            >
-              <SlidersHorizontal size={20} />
-            </button>
-          </div>
+            <div className="relative hidden md:block">
+              <input
+                type="date"
+                className="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-white transition-all font-medium"
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+              />
+            </div>
 
-          {canManageContent(userProfile) && (
-            <button
-              onClick={openCreateModal}
-              className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto text-sm font-bold"
-            >
-              <CalendarPlus size={18} />
-              Nuovo Evento
-            </button>
-          )}
-        </div>
+            {/* Mobile Filter Toggle */}
+            <div className="md:hidden flex border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm h-[46px]">
+              <button
+                onClick={toggleFilters}
+                className={`w-[48px] transition-all flex items-center justify-center ${isFiltersOpen
+                  ? 'bg-[#004d9d] dark:bg-[#facc15] text-white dark:text-slate-900 shadow-inner'
+                  : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+              >
+                <SlidersHorizontal size={20} />
+              </button>
+            </div>
+
+            {canManageContent(userProfile) && (
+              <button
+                onClick={openCreateModal}
+                className="hidden md:flex items-center gap-2 bg-blue-600 dark:bg-[#facc15] hover:bg-blue-700 text-white dark:!text-[#0f172a] px-4 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 shrink-0 ml-auto text-sm font-bold"
+              >
+                <CalendarPlus size={18} />
+                Nuovo Evento
+              </button>
+            )}
+          </div>
           {/* Mobile Filters Dropdown */}
           <div className="relative md:hidden">
             {isFiltersOpen && (
@@ -201,7 +246,7 @@ const EventsDashboard = ({ userProfile }) => {
                     Resetta
                   </button>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <p className="text-[10px] uppercase font-bold text-slate-400 ml-1">Tipologia</p>
@@ -214,7 +259,7 @@ const EventsDashboard = ({ userProfile }) => {
                       </button>
                       {Object.entries(EVENT_TYPES).map(([type, data]) => {
                         const isSelected = filterType === type;
-                        
+
                         // Solid colors for better visibility on small dots
                         let solidColor = 'bg-slate-500';
                         if (type === 'Servizio') solidColor = 'bg-amber-500';
@@ -554,6 +599,116 @@ const EventsDashboard = ({ userProfile }) => {
           </div>
         )
       }
+
+      {/* Calendar Export Modal */}
+      {isCalendarExportOpen && (
+        <div className="modal-overlay animate-in fade-in" onClick={() => setIsCalendarExportOpen(false)}>
+          <div className="calendar-export-modal" onClick={(e) => e.stopPropagation()}>
+
+            {/* Premium Header with Gradient */}
+            <div className="cal-export-header">
+              <div className="cal-export-header-content">
+                <div className="cal-export-header-icon">
+                  <Calendar size={24} />
+                </div>
+                <div>
+                  <h3 className="cal-export-header-title">Sincronizza Calendario</h3>
+                  <p className="cal-export-header-sub">{exportMode === 'all' ? 'Tutti gli eventi pubblici' : 'Solo i turni a cui partecipi'}</p>
+                </div>
+              </div>
+              <button onClick={() => setIsCalendarExportOpen(false)} className="cal-export-close-btn">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="cal-export-body">
+              {/* Export Mode Toggle */}
+              <div className="cal-export-toggle-box">
+                <button
+                  onClick={() => setExportMode('all')}
+                  className={`cal-export-toggle-btn ${exportMode === 'all' ? 'cal-export-toggle-btn--active' : ''}`}
+                >
+                  Tutti gli eventi
+                </button>
+                <button
+                  onClick={() => setExportMode('mine')}
+                  className={`cal-export-toggle-btn ${exportMode === 'mine' ? 'cal-export-toggle-btn--active' : ''}`}
+                >
+                  Solo i miei turni
+                </button>
+              </div>
+
+              {/* Feed URL Copy Section */}
+              <div className="cal-export-url-box">
+                <label className="cal-export-url-label">Link del feed</label>
+                <div className="cal-export-url-row">
+                  <input
+                    type="text"
+                    readOnly
+                    value={CALENDAR_FEED_URL}
+                    className="cal-export-url-input"
+                    onClick={(e) => e.target.select()}
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className={`cal-export-copy-btn ${copied ? 'cal-export-copy-btn--copied' : ''}`}
+                  >
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                    {copied ? 'Copiato!' : 'Copia'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="cal-export-actions">
+
+                {/* Google Calendar */}
+                <a
+                  href={GOOGLE_CALENDAR_ADD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cal-export-action-card cal-export-action-google"
+                >
+                  <div className="cal-export-action-icon-wrap cal-export-action-icon-google">
+                    <SiGoogle color="#4285F4" size={24} />
+                  </div>
+                  <div className="cal-export-action-text">
+                    <span className="cal-export-action-name">Google Calendar</span>
+                    <span className="cal-export-action-hint">Aggiungi con un click</span>
+                  </div>
+                  <ExternalLink size={16} className="cal-export-action-arrow" />
+                </a>
+
+                {/* Apple Calendar */}
+                <a
+                  href={CALENDAR_FEED_URL.replace('https://', 'webcal://').replace('http://', 'webcal://')}
+                  className="cal-export-action-card cal-export-action-apple"
+                >
+                  <div className="cal-export-action-icon-wrap cal-export-action-icon-apple">
+                    <SiApple color="#000" size={24} />
+                  </div>
+                  <div className="cal-export-action-text">
+                    <span className="cal-export-action-name">Apple Calendar</span>
+                    <span className="cal-export-action-hint">Apri con Calendario</span>
+                  </div>
+                  <ExternalLink size={16} className="cal-export-action-arrow" />
+                </a>
+
+              </div>
+
+              {/* How-to footer */}
+              <div className="cal-export-footer">
+                <p className="cal-export-footer-title">Aggiunta manuale</p>
+                <p className="cal-export-footer-text">
+                  Copia il link sopra → Apri il tuo calendario → <strong>Aggiungi calendario da URL</strong> → Incolla il link.
+                  Il calendario si sincronizzerà periodicamente.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div >
   );
 };

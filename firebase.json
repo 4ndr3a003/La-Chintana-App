@@ -26,6 +26,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/calendar.ics",
+        "function": "calendarFeed"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

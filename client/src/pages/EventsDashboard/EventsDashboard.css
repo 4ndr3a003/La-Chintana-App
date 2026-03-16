@@ -381,3 +381,392 @@ html.dark .form-submit-btn {
     color: var(--color-slate-50);
     /* Dark Blue Text on Light Blue Button */
 }
+
+/* ═══════════════════════════════════════════════
+   CALENDAR EXPORT STYLES
+   ═══════════════════════════════════════════════ */
+
+.calendar-export-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 0.625rem;
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-500);
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.calendar-export-btn:hover {
+    background-color: var(--color-pc-blue);
+    color: white;
+    transform: scale(1.05);
+}
+
+html.dark .calendar-export-btn {
+    background-color: var(--color-slate-700, #334155);
+    color: var(--color-slate-400);
+}
+
+html.dark .calendar-export-btn:hover {
+    background-color: var(--color-pc-yellow);
+    color: var(--color-slate-900);
+}
+
+@media (min-width: 768px) {
+    .calendar-export-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 0.75rem;
+    }
+}
+
+/* ── Modal Container ── */
+.calendar-export-modal {
+    width: 100%;
+    max-width: 26rem;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+/* ── Gradient Header ── */
+.cal-export-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--color-pc-yellow);
+    border-bottom: 3px solid var(--color-pc-yellow-600);
+    color: var(--color-slate-800);
+}
+
+.cal-export-header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.cal-export-header-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-pc-blue);
+}
+
+.cal-export-header-title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.cal-export-header-sub {
+    font-size: 0.8125rem;
+    opacity: 0.7;
+    font-weight: 600;
+    margin-top: 0.125rem;
+}
+
+.cal-export-close-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-slate-800);
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.cal-export-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ── Toggle Section ── */
+.cal-export-toggle-box {
+    background: white;
+    padding: 0.5rem;
+    border-radius: 0.875rem;
+    border: 1.5px solid var(--color-slate-100);
+    display: flex;
+    gap: 0.25rem;
+}
+
+html.dark .cal-export-toggle-box {
+    background: var(--color-slate-100);
+}
+
+.cal-export-toggle-btn {
+    flex: 1;
+    padding: 0.625rem;
+    border-radius: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-slate-500);
+    transition: all 0.2s;
+}
+
+.cal-export-toggle-btn--active {
+    background: var(--color-pc-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+html.dark .cal-export-toggle-btn--active {
+    background: var(--color-pc-yellow);
+    color: var(--color-slate-900);
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.2);
+}
+
+/* ── Body ── */
+.cal-export-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    background: var(--color-slate-50, #f8fafc);
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    overflow-y: auto;
+}
+
+html.dark .cal-export-body {
+    background: var(--color-slate-50);
+}
+
+.cal-export-desc {
+    font-size: 0.8125rem;
+    color: var(--color-slate-500);
+    line-height: 1.5;
+}
+
+html.dark .cal-export-desc {
+    color: var(--color-slate-400);
+}
+
+/* ── URL Copy Box ── */
+.cal-export-url-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.cal-export-url-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-slate-400);
+}
+
+.cal-export-url-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.cal-export-url-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-white);
+    border: 1.5px solid var(--color-slate-200);
+    border-radius: 0.625rem;
+    font-size: 0.6875rem;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    color: var(--color-slate-600);
+    text-overflow: ellipsis;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.cal-export-url-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+html.dark .cal-export-url-input {
+    background: var(--color-slate-100, #1e293b) !important;
+    border-color: var(--color-slate-200);
+    color: #e2e8f0;
+}
+
+.cal-export-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    background: var(--color-pc-blue, #2563eb);
+    color: white;
+    border-radius: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.cal-export-copy-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+}
+
+.cal-export-copy-btn--copied {
+    background: #16a34a !important;
+    color: white !important;
+}
+
+html.dark .cal-export-copy-btn {
+    background: var(--color-pc-yellow);
+    color: var(--color-slate-900);
+}
+
+/* ── Action Cards ── */
+.cal-export-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.cal-export-action-card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.875rem;
+    border: 1.5px solid var(--color-slate-200);
+    background: var(--color-white);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.cal-export-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .cal-export-action-card {
+    background: var(--color-slate-100, #1e293b);
+    border-color: var(--color-slate-200);
+}
+
+/* Google card hover */
+.cal-export-action-google:hover {
+    border-color: #4285F4;
+    box-shadow: 0 6px 20px rgba(66, 133, 244, 0.15);
+}
+
+/* Apple card hover */
+.cal-export-action-apple:hover {
+    border-color: #FF3B30;
+    box-shadow: 0 6px 20px rgba(255, 59, 48, 0.15);
+}
+
+.cal-export-action-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.cal-export-action-icon-google {
+    background: #eef4ff;
+}
+
+html.dark .cal-export-action-icon-google {
+    background: rgba(66, 133, 244, 0.15);
+}
+
+.cal-export-action-icon-apple {
+    background: #fff5f5;
+}
+
+html.dark .cal-export-action-icon-apple {
+    background: rgba(255, 59, 48, 0.15);
+}
+
+.cal-export-action-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.cal-export-action-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-slate-800);
+}
+
+html.dark .cal-export-action-name {
+    color: #e2e8f0;
+}
+
+.cal-export-action-hint {
+    font-size: 0.75rem;
+    color: var(--color-slate-400);
+}
+
+.cal-export-action-arrow {
+    color: var(--color-slate-300);
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.cal-export-action-card:hover .cal-export-action-arrow {
+    transform: translate(2px, -2px);
+    color: var(--color-slate-500);
+}
+
+/* ── Footer ── */
+.cal-export-footer {
+    border-top: 1px solid var(--color-slate-200);
+    padding-top: 0.875rem;
+}
+
+html.dark .cal-export-footer {
+    border-color: var(--color-slate-200);
+}
+
+.cal-export-footer-title {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-slate-400);
+    margin-bottom: 0.375rem;
+}
+
+.cal-export-footer-text {
+    font-size: 0.75rem;
+    color: var(--color-slate-400);
+    line-height: 1.5;
+}
+
+.cal-export-footer-text strong {
+    color: var(--color-slate-600);
+    font-weight: 600;
+}
+
+html.dark .cal-export-footer-text strong {
+    color: #cbd5e1;
+}
+

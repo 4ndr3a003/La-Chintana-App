@@ -11,7 +11,7 @@ const UniformDetailsModal = ({ isOpen, onClose, uniform }) => {
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header Pattern */}
-                <div className="h-32 relative overflow-hidden">
+                <div className="h-32 relative">
                     {uniform.photoUrl ? (
                         <img src={uniform.photoUrl} alt={uniform.name} className="w-full h-full object-cover" />
                     ) : (
@@ -24,7 +24,7 @@ const UniformDetailsModal = ({ isOpen, onClose, uniform }) => {
                     >
                         <X size={20} />
                     </button>
-                    <div className="absolute -bottom-8 left-6">
+                    <div className="absolute -bottom-8 left-6 z-10">
                         <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-lg border-4 border-white dark:border-slate-900">
                             <Shirt size={32} className="text-slate-800 dark:text-slate-200" />
                         </div>
