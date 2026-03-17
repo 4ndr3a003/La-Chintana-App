@@ -295,25 +295,36 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
       events.push({ id: doc.id, ...data });
     });
 
-    // Filter: only public events (visibility 'Tutti' or undefined)
-    // AND if userId is provided, only events where user is participating
+    // Filter events:
+    // 1. If userId is provided, show events where user is participating (regardless of visibility)
+    // 2. If no userId, show only public events ('Tutti' or undefined)
     const filteredEvents = events.filter(e => {
+      const isParticipant = (e.participants && e.participants.includes(userId)) || 
+                           (e.shifts && e.shifts.some(s => s.participants && s.participants.includes(userId)));
+      
+      if (userId && isParticipant) return true;
+      
       const visibility = e.visibility || 'Tutti';
-      if (visibility !== 'Tutti') return false;
-      
-      if (userId) {
-        // Check if user is in top-level participants or any shift participants
-        const inTopLevel = e.participants && e.participants.includes(userId);
-        const inShifts = e.shifts && e.shifts.some(s => s.participants && s.participants.includes(userId));
-        return inTopLevel || inShifts;
-      }
-      
-      return true;
+      return visibility === 'Tutti';
     });
 
     // Helper: format Date to iCal DTSTART/DTEND format (YYYYMMDDTHHmmssZ)
     const formatICalDate = (date) => {
       return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    };
+
+    // Helper: format Date to iCal local time format (YYYYMMDDTHHmmss)
+    const formatICalLocal = (date) => {
+      // Italian time is UTC+1 (Winter) or UTC+2 (Summer)
+      // We use the timezone definition in the VCALENDAR to let the client handle it,
+      // but for shifts we need to construct a date object that represents the local time.
+      const pad = (n) => n.toString().padStart(2, '0');
+      return date.getFullYear() +
+             pad(date.getMonth() + 1) +
+             pad(date.getDate()) + 'T' +
+             pad(date.getHours()) +
+             pad(date.getMinutes()) +
+             pad(date.getSeconds());
     };
 
     // Helper: escape iCal text values
@@ -335,28 +346,28 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
       'METHOD:PUBLISH',
       `X-WR-CALNAME:La Chintana Fenix - ${userId ? 'I Miei Turni' : 'Eventi'}`,
       'X-WR-TIMEZONE:Europe/Rome',
-      // Timezone definition for Europe/Rome
       'BEGIN:VTIMEZONE',
       'TZID:Europe/Rome',
-      'BEGIN:STANDARD',
-      'DTSTART:19701025T030000',
-      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10',
-      'TZOFFSETFROM:+0200',
-      'TZOFFSETTO:+0100',
-      'TZNAME:CET',
-      'END:STANDARD',
+      'X-LIC-LOCATION:Europe/Rome',
       'BEGIN:DAYLIGHT',
-      'DTSTART:19700329T020000',
-      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3',
       'TZOFFSETFROM:+0100',
       'TZOFFSETTO:+0200',
       'TZNAME:CEST',
+      'DTSTART:19700329T020000',
+      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3',
       'END:DAYLIGHT',
+      'BEGIN:STANDARD',
+      'TZOFFSETFROM:+0200',
+      'TZOFFSETTO:+0100',
+      'TZNAME:CET',
+      'DTSTART:19701025T030000',
+      'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10',
+      'END:STANDARD',
       'END:VTIMEZONE',
     ];
 
     filteredEvents.forEach(event => {
-      const startDate = new Date(event.date);
+      const baseDate = new Date(event.date);
       
       // If the event has shifts, create a VEVENT for each shift
       if (event.shifts && event.shifts.length > 0) {
@@ -368,7 +379,7 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
 
           const shiftDate = new Date(event.date);
           
-          // Parse shift start/end times
+          // Parse shift start/end times (assumed to be in Europe/Rome)
           if (shift.startTime) {
             const [sh, sm] = shift.startTime.split(':');
             shiftDate.setHours(parseInt(sh), parseInt(sm), 0, 0);
@@ -378,7 +389,6 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
           if (shift.endTime) {
             const [eh, em] = shift.endTime.split(':');
             endDate.setHours(parseInt(eh), parseInt(em), 0, 0);
-            // Handle overnight shifts
             if (endDate <= shiftDate) {
               endDate.setDate(endDate.getDate() + 1);
             }
@@ -397,8 +407,9 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
           ical.push('BEGIN:VEVENT');
           ical.push(`UID:${event.id}-shift${idx}@chintana-events-handler.firebaseapp.com`);
           ical.push(`DTSTAMP:${formatICalDate(new Date())}`);
-          ical.push(`DTSTART:${formatICalDate(shiftDate)}`);
-          ical.push(`DTEND:${formatICalDate(endDate)}`);
+          // Using TZID for floating local time as specified in VTIMEZONE
+          ical.push(`DTSTART;TZID=Europe/Rome:${formatICalLocal(shiftDate)}`);
+          ical.push(`DTEND;TZID=Europe/Rome:${formatICalLocal(endDate)}`);
           ical.push(`SUMMARY:${escapeICalText(event.title)} (${shiftLabel})`);
           if (event.location) ical.push(`LOCATION:${escapeICalText(event.location)}`);
           ical.push(`DESCRIPTION:${escapeICalText(description)}`);
@@ -407,7 +418,7 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
         });
       } else {
         // Single event (no shifts)
-        let endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Default 2h duration
+        let endDate = new Date(baseDate.getTime() + 2 * 60 * 60 * 1000); 
 
         const description = [
           `Tipo: ${event.type || 'Evento'}`,
@@ -417,7 +428,8 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
         ical.push('BEGIN:VEVENT');
         ical.push(`UID:${event.id}@chintana-events-handler.firebaseapp.com`);
         ical.push(`DTSTAMP:${formatICalDate(new Date())}`);
-        ical.push(`DTSTART:${formatICalDate(startDate)}`);
+        // Base events are usually created with ISO strings which are UTC
+        ical.push(`DTSTART:${formatICalDate(baseDate)}`);
         ical.push(`DTEND:${formatICalDate(endDate)}`);
         ical.push(`SUMMARY:${escapeICalText(event.title)}`);
         if (event.location) ical.push(`LOCATION:${escapeICalText(event.location)}`);
@@ -426,6 +438,7 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
         ical.push('END:VEVENT');
       }
     });
+
 
     ical.push('END:VCALENDAR');
 

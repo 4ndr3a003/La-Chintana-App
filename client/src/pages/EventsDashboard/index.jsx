@@ -61,9 +61,10 @@ const EventsDashboard = ({ userProfile }) => {
   const [isCalendarExportOpen, setIsCalendarExportOpen] = React.useState(false);
   const [exportMode, setExportMode] = React.useState('all'); // 'all' or 'mine'
   const [copied, setCopied] = React.useState(false);
+  const [v, setV] = React.useState(1); // Version for cache busting
 
   const getCalendarFeedUrl = () => {
-    let url = `${window.location.origin}/api/calendar.ics?appId=${appId}`;
+    let url = `${window.location.origin}/api/calendar.ics?appId=${appId}&v=${v}`;
     if (exportMode === 'mine' && userProfile?.id) {
       url += `&userId=${userProfile.id}`;
     }
@@ -90,6 +91,11 @@ const EventsDashboard = ({ userProfile }) => {
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  const handleRefreshLink = () => {
+    setV(prev => prev + 1);
+  };
+
 
   const openDeleteModal = (eventId) => {
     setDeleteModal({ isOpen: true, eventId });
@@ -657,7 +663,16 @@ const EventsDashboard = ({ userProfile }) => {
                     {copied ? 'Copiato!' : 'Copia'}
                   </button>
                 </div>
+                <div className="flex justify-end mt-2">
+                  <button 
+                    onClick={handleRefreshLink}
+                    className="text-[10px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded-md transition-colors"
+                  >
+                    Non lo vedi su Google? Rigenera link
+                  </button>
+                </div>
               </div>
+
 
               {/* Action Buttons */}
               <div className="cal-export-actions">
