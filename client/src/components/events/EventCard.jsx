@@ -159,6 +159,17 @@ const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onC
                   </p>
                 )}
 
+                {showParticipants && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Creato da:</span>
+                    {event.createdBy && allProfiles[event.createdBy] ? (
+                      <span className="text-sm font-bold text-slate-700">{allProfiles[event.createdBy].name}</span>
+                    ) : (
+                      <span className="text-sm font-medium text-slate-400 italic">Sistema</span>
+                    )}
+                  </div>
+                )}
+
                 {!showParticipants && (
                   <div className={`mt-auto pt-3 border-t ${theme.borderColor} flex items-center justify-between`}>
                     <span className="text-xs font-bold text-slate-500">Partecipanti</span>
