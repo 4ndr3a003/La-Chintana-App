@@ -176,42 +176,89 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(15, 23, 42, 0.4);
+    background-color: rgba(15, 23, 42, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
-    padding: 1rem;
+    z-index: 1000;
     backdrop-filter: blur(4px);
+    /* Simplified to match rest of app */
+    padding: 1rem;
 }
 
 .modal-content-wrapper {
     width: 100%;
     max-width: 32rem;
     position: relative;
+    height: auto;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 1.25rem;
+    /* Standardized radius */
+    overflow: hidden;
+    background: var(--color-white);
+    animation: modal-appear 0.2s ease-out;
+}
+
+@keyframes modal-appear {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .modal-content-wrapper.modal-wide {
-    max-width: 42rem;
+    max-width: 48rem;
+}
+
+/* Mobile Fit: ensure it doesn't hit top/bottom and stays clear of bottom nav */
+@media (max-width: 768px) {
+    .modal-content-wrapper {
+        height: 65vh;
+        max-height: 65vh;
+        border-radius: 1rem;
+    }
 }
 
 .modal-close-btn-large {
     position: absolute;
-    top: -3rem;
-    right: 0;
-    color: var(--color-white);
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 100;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .modal-close-btn-large:hover {
-    color: var(--color-slate-200);
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.modal-close-btn-large:active {
+    transform: scale(0.95);
 }
 
 
 
-.modal-container {
+/* Replaced by global .modal-content and max-w-2xl */
+/* .modal-container {
     background-color: var(--color-slate-50);
     border-radius: 1.5rem;
     width: 100%;
@@ -221,7 +268,7 @@
     flex-direction: column;
     max-height: 90vh;
     overflow: hidden;
-}
+} */
 
 .modal-header {
     padding: 1rem 1.5rem;
@@ -341,14 +388,16 @@
     }
 }
 
-/* Stili mobile per il modale di aggiunta evento */
+/* Stili mobile per il modale di aggiunta evento e visualizzazione */
 @media (max-width: 767px) {
     .modal-overlay {
         z-index: 150;
     }
 
-    .modal-container {
-        max-height: calc(100vh - 12rem);
+    .modal-container,
+    .modal-content-wrapper {
+        max-height: calc(100vh - 8rem);
+        margin-top: 2rem;
     }
 }
 
@@ -429,7 +478,7 @@ html.dark .calendar-export-btn:hover {
     max-width: 26rem;
     border-radius: 1.25rem;
     overflow: hidden;
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.05);
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
     max-height: 90vh;
@@ -769,4 +818,25 @@ html.dark .cal-export-footer {
 html.dark .cal-export-footer-text strong {
     color: #cbd5e1;
 }
-
+
+/* ── Premium Scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-slate-200);
+    border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-slate-300);
+}
+
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-slate-200);
+}

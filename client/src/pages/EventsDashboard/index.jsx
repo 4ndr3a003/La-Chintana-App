@@ -442,7 +442,7 @@ const EventsDashboard = ({ userProfile }) => {
                 onClick={() => setSelectedEvent(null)}
                 className="modal-close-btn-large"
               >
-                <X size={32} />
+                <X size={20} />
               </button>
               <EventCard
                 event={selectedEvent}
@@ -481,8 +481,8 @@ const EventsDashboard = ({ userProfile }) => {
 
       {
         isCreateModalOpen && (
-          <div className="modal-overlay animate-in fade-in" onClick={() => setIsCreateModalOpen(false)}>
-            <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-overlay animate-in fade-in edit-create-modal" onClick={() => setIsCreateModalOpen(false)}>
+            <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3 className="modal-title flex items-center gap-2">
                   {isEditing ? <Calendar size={24} className="text-blue-600" /> : <CalendarPlus size={24} className="text-blue-600" />}
