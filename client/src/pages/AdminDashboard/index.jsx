@@ -136,13 +136,11 @@ const AdminDashboard = ({ userProfile, showToast }) => {
         </div>
       )}
       <div className="admin-dashboard-header">
-        <h3 className="dashboard-title">
-          <Users className="text-blue-600" size={28} /> Gestione Volontari
-        </h3>
-        <span className="user-count-badge">{filteredUsers.length} Volontari</span>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight"><Users className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> Gestione Volontari
+          </h1>
       </div>
 
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col gap-4 mb-6 !mt-0">
         {/* Action Row - Desktop */}
         <div className="hidden lg:flex justify-start items-center gap-3 mb-4">
           {canManageVolunteers(userProfile) && (
@@ -1078,3 +1076,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
 };
 
 export default AdminDashboard;
+
+
+
+

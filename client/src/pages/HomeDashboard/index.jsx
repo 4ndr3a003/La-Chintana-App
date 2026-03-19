@@ -31,7 +31,7 @@ const HomeDashboard = ({ userProfile }) => {
                     {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </span>
                 </div>
-                <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 leading-tight">Ciao, {userProfile.name}</h1>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight">Ciao, {userProfile.name}</h1>
                 <p className="text-slate-600 font-medium text-xs md:text-sm hidden md:block mt-0.5 opacity-80">
                   Benvenuto nel portale operativo de "La Chintana Fenix"
                 </p>
@@ -164,4 +164,5 @@ const HomeDashboard = ({ userProfile }) => {
 };
 
 export default HomeDashboard;
+
 

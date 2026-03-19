@@ -56,7 +56,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                         >
                             <ArrowLeft size={20} className="text-slate-600" />
                         </button>
-                        <h1 className="header-title">Pannello di Controllo</h1>
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight"><ShieldAlert className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> Pannello di Controllo</h1>
                     </div>
                 </div>
             </header>
@@ -297,3 +297,5 @@ const DirettivoDashboard = ({ userProfile }) => {
 };
 
 export default DirettivoDashboard;
+
+

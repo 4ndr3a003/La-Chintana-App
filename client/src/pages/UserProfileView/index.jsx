@@ -1,6 +1,6 @@
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Camera, LogOut, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle, Lock, FileText, Globe, Activity, Briefcase } from 'lucide-react';
+import { Camera, LogOut, User, Mail, Calendar, MapPin, CreditCard, Phone, Home, AlertTriangle, Lock, FileText, Globe, Activity, Briefcase } from 'lucide-react';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
@@ -39,7 +39,7 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-[var(--color-slate-50)] p-4 md:p-8 font-sans">
-      <h1 className="text-3xl font-extrabold text-[var(--color-slate-900)] mb-8">Profilo Volontario</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 mb-8 leading-tight"><User className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> Profilo Volontario</h1>
 
       {isModalOpen && (
         <div
@@ -404,3 +404,4 @@ const UserProfileView = ({ userProfile, onLogout }) => {
 };
 
 export default UserProfileView;
+

@@ -159,10 +159,10 @@ const EventsDashboard = ({ userProfile }) => {
       <div className="events-header">
         <div className="events-title-row flex-nowrap gap-2 overflow-hidden">
           <div className="events-title-group !gap-2 flex-shrink min-w-0">
-            <h3 className="events-title !text-base md:!text-xl whitespace-nowrap overflow-hidden text-ellipsis">
-              <Calendar className="text-blue-600 shrink-0" size={20} /> <span className="truncate">Calendario Attività</span>
-            </h3>
-            <span className="events-count-badge whitespace-nowrap !text-[10px] md:!text-xs !px-1.5 md:!px-2 !py-0.5 md:!py-1">{filteredEvents.length} Eventi</span>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 whitespace-nowrap overflow-hidden text-ellipsis leading-tight">
+                <Calendar className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> <span className="truncate">Calendario Attività</span>
+              </h1>
+            
           </div>
           <div className="flex items-center gap-2 ml-auto shrink-0">
             <button

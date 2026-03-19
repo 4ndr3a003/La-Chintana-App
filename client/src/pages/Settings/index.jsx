@@ -68,11 +68,9 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
   return (
     <div className="min-h-[80vh] relative">
       <div className="flex flex-col gap-4 px-1 mb-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap justify-between items-center gap-3">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <SettingsIcon className="text-blue-600" size={28} /> Impostazioni
-            </h3>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight"><SettingsIcon className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> Impostazioni</h1>
           </div>
         </div>
       </div>
@@ -262,3 +260,5 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
 };
 
 export default Settings;
+
+

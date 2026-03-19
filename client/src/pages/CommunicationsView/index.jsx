@@ -127,12 +127,10 @@ const CommunicationsView = ({ userProfile }) => {
   return (
     <div className="comm-container">
       <div className="comm-header mb-6">
-        <div className="comm-title-row mb-4 flex justify-between items-center">
+        <div className="comm-title-row mb-4 flex flex-wrap justify-between items-center gap-3">
           <div className="flex items-center gap-3">
-            <h3 className="comm-title text-3xl font-extrabold text-slate-800 flex items-center gap-2">
-              <MessageSquare className="text-blue-600" size={32} /> Comunicazioni
-            </h3>
-            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">{filteredMessages.length}</span>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight"><MessageSquare className="text-blue-600 shrink-0 w-6 h-6 sm:w-8 sm:h-8" /> Comunicazioni</h1>
+            
           </div>
         </div>
 
@@ -522,3 +520,5 @@ const CommunicationsView = ({ userProfile }) => {
 };
 
 export default CommunicationsView;
+
+
