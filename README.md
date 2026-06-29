@@ -1,6 +1,6 @@
-# 🛡️ La Chintana Fenix - Portale Protezione Civile
+# 🛡️ Gestionale Associativo PC - Portale Protezione Civile
 
-Applicazione gestionale moderna per il coordinamento dei volontari della Protezione Civile **"La Chintana Fenix"**. Il sistema unifica la gestione operativa, le comunicazioni, la logistica e le attività di volontariato in un'unica piattaforma accessibile via **Web (PWA)** e **App Mobile Android** (via Capacitor).
+Applicazione gestionale multi-tenant moderna per il coordinamento dei volontari di diverse associazioni della Protezione Civile. Il sistema unifica la gestione operativa, le comunicazioni, la logistica e le attività di volontariato in un'unica piattaforma accessibile via **Web (PWA)** e **App Mobile Android** (via Capacitor).
 
 ---
 
@@ -26,8 +26,17 @@ Il progetto è strutturato come **monorepo** con i seguenti componenti:
 
 ---
 
+### 🏢 Architettura Multi-Tenant e Gestione Associazioni
+-   **Selezione dell'Associazione (Hub)**: La schermata iniziale di benvenuto mostra esclusivamente la lista delle associazioni a cui accedere, offrendo un hub ordinato e pulito.
+-   **Gestione Associazioni (Superadmin Dashboard)**: Accessibile all'amministratore per creare, modificare ed eliminare associazioni.
+-   **Dati dell'Associazione**: Possibilità di impostare il nome, il logo e la città di riferimento per ciascun tenant.
+-   **Eliminazione Protetta**: L'eliminazione di un'associazione richiede l'inserimento della password dell'account amministratore globale (`admin@mail.com`) a scopo di sicurezza.
+
+---
+
 ### 🏠 Home Dashboard
--   **Banner di Benvenuto**: Saluto personalizzato con avatar, data corrente e ruolo dell'utente.
+-   **Banner di Benvenuto**: Saluto personalizzato con avatar, data corrente, ruolo dell'utente e il nome dell'associazione corrente a cui si è connessi.
+-   **Meteo Dinamico**: Mostra il meteo locale in base alla città configurata per l'associazione corrente (geocodificata tramite Open-Meteo API).
 -   **Evento Imminente**: Visualizzazione dell'evento più prossimo con card interattiva. Le emergenze vengono evidenziate con un'animazione a impulsi rossi.
 -   **Calendario Disponibilità**: Widget calendario mensile con navigazione tra mesi e visualizzazione degli eventi pianificati.
 -   **Comunicazioni Recenti**: Lista delle ultime comunicazioni ricevute nella sidebar laterale (o sotto la sezione eventi su mobile).
@@ -40,9 +49,14 @@ Il progetto è strutturato come **monorepo** con i seguenti componenti:
 #### Ruoli Gerarchici
 | Ruolo | Permessi |
 |---|---|
-| **Presidente** | Super-admin con controllo totale. Può resettare le password degli utenti. |
+| **Amministratore di Sistema** (`admin@mail.com`) | Gestione globale delle associazioni (Superadmin) e abilitato allo **Switch Profile** per impersonare qualsiasi volontario. |
+| **Presidente** | Controllo totale a livello di singola associazione. Può resettare le password degli utenti. |
 | **Direttivo** | Gestione operativa completa: eventi, comunicazioni, volontari, logistica. Ruoli interni: Vicepresidente, Segretario, Tesoriere, Consigliere, Responsabile Mezzi, Responsabile Unità Cinofila, Responsabile Cucina. |
 | **Volontario** | Accesso a eventi, comunicazioni, profilo personale e impostazioni. Può avere il ruolo speciale "Cinofilo". |
+
+#### 🔄 Switch Profile (Impersonation)
+-   **Accesso Rapido**: Riservato solo per l'account `admin@mail.com`. Di fianco ad ogni volontario nell'elenco di gestione (`/admin`) è presente un pulsante per effettuare lo switch di profilo ed impersonare l'utente.
+-   **Ritorno Istantaneo**: Durante l'impersonificazione, viene mostrato un pulsante fluttuante a schermo ("Torna all'account Admin") per ripristinare all'istante la sessione principale di amministratore.
 
 #### Pannello Amministrazione Volontari (`/admin`)
 -   **CRUD Completo**: Creazione, lettura, modifica ed eliminazione di profili volontari.
@@ -63,6 +77,7 @@ Il progetto è strutturato come **monorepo** con i seguenti componenti:
 -   **Selezione Multipla e Eliminazione di Massa**: Checkbox per selezione e pulsante di eliminazione batch.
 -   **Esportazione CSV**: Download dei dati volontari come file CSV.
 -   **Importazione CSV**: Upload file CSV per aggiornamento/creazione massiva di profili.
+-   **Switch Profile**: Pulsante dedicato accanto a ciascun volontario (visibile solo a `admin@mail.com`) per accedere temporaneamente a quel profilo.
 -   **Layout Responsive**: Vista tabella su desktop, vista card su mobile con pulsante floating per aggiungere.
 
 ---
@@ -98,7 +113,7 @@ Il progetto è strutturato come **monorepo** con i seguenti componenti:
     -   Eventi in corso e in programma con grafico trend a 6 mesi.
     -   Nuove iscrizioni nel mese corrente con grafico trend a 6 mesi.
     -   Allerte urgenti che richiedono attenzione.
--   **Widget Meteo**: Integrazione meteo per informazioni operative.
+-   **Widget Meteo**: Visualizzazione meteo per informazioni operative basata sulla città configurata per l'associazione corrente (con integrazione geocoding ed Open-Meteo).
 -   **Widget Scadenze**: Elenco delle certificazioni e documenti in scadenza di tutti i volontari.
 -   **Impostazioni Validità**: Configurazione della durata di validità predefinita (in anni) per ogni tipo di certificazione.
 -   **Bacheca Programmazione**: Board per annotazioni operative (tipo Evento o Avviso) con creazione, visualizzazione e cancellazione.
