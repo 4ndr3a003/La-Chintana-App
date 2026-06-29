@@ -1,9 +1,9 @@
 {
-    "short_name": "La Chintana Fenix",
-    "name": "La Chintana Fenix - Protezione Civile",
+    "short_name": "Gestionale Associativo PC",
+    "name": "Gestionale Associativo PC - Protezione Civile",
     "icons": [
         {
-            "src": "logo_chintana_fenix.png",
+            "src": "logo_app.png",
             "sizes": "64x64 32x32 24x24 16x16",
             "type": "image/png"
         },

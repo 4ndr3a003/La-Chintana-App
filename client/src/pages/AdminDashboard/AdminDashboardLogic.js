@@ -4,7 +4,7 @@ import { db, appId, storage, auth } from '../../services/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
 
-export const useAdminDashboard = (showToast) => {
+export const useAdminDashboard = (userProfile, showToast) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,10 +48,15 @@ export const useAdminDashboard = (showToast) => {
 
   useEffect(() => {
     // 1. Fetch Users
-    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'));
+    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'));
     const unsub = onSnapshot(q, (snap) => {
       const usersList = [];
-      snap.forEach(doc => usersList.push({ id: doc.id, ...doc.data() }));
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.email !== 'admin@mail.com') {
+          usersList.push({ id: doc.id, ...data });
+        }
+      });
 
       // Ordina per cognome
       usersList.sort((a, b) => {
@@ -69,7 +74,7 @@ export const useAdminDashboard = (showToast) => {
     });
 
     // 2. Fetch Validity Settings
-    const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+    const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'settings', 'validity');
     const unsubSettings = onSnapshot(settingsRef, (snap) => {
       if (snap.exists()) {
         setValiditySettings(snap.data());
@@ -266,12 +271,12 @@ export const useAdminDashboard = (showToast) => {
 
     try {
       if (isEditing && selectedUser) {
-        const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', selectedUser.id);
+        const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', selectedUser.id);
         await updateDoc(userRef, userData);
         setIsEditing(false);
         setSelectedUser(null);
       } else if (isCreating) {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'), userData);
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'), userData);
         setIsCreating(false);
       }
     } catch (error) {
@@ -382,7 +387,7 @@ export const useAdminDashboard = (showToast) => {
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userToDelete.id));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', userToDelete.id));
       setIsDeleteModalOpen(false);
       setUserToDelete(null);
       setNotification({ isOpen: true, title: 'Successo', message: "Volontario eliminato con successo.", type: 'success' });
@@ -432,7 +437,7 @@ export const useAdminDashboard = (showToast) => {
   const confirmDeleteSelected = async () => {
     try {
       const promises = selectedUserIds.map(id =>
-        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', id))
+        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', id))
       );
       await Promise.all(promises);
       setIsBulkDeleteModalOpen(false);
@@ -774,7 +779,7 @@ export const useAdminDashboard = (showToast) => {
 
           if (Object.keys(updatedFields).length > 0) {
             try {
-              const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', existingUser.id);
+              const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', existingUser.id);
               await updateDoc(userRef, updatedFields);
               updatedCount++;
             } catch (error) {
@@ -793,7 +798,7 @@ export const useAdminDashboard = (showToast) => {
           userData.status = calculateStatus(userData);
 
           try {
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'), userData);
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'), userData);
             importedCount++;
           } catch (error) {
             console.error("Error importing user:", userData.email, error);

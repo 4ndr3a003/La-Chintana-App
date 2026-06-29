@@ -28,7 +28,7 @@ export const useCommunicationsView = (userProfile) => {
 
   useEffect(() => {
     const q = query(
-      collection(db, 'artifacts', appId, 'public', 'data', 'communications'),
+      collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications'),
       orderBy('date', 'desc')
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -122,12 +122,12 @@ export const useCommunicationsView = (userProfile) => {
     setIsSubmitting(true);
     try {
       if (isEditing && currentCommId) {
-        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'communications', currentCommId), {
+        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications', currentCommId), {
           ...newComm,
           date: new Date().toISOString()
         });
       } else {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'communications'), {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications'), {
           ...newComm,
           date: new Date().toISOString(),
           authorId: userProfile.id,
@@ -178,7 +178,7 @@ export const useCommunicationsView = (userProfile) => {
   const confirmDeleteComm = async () => {
     if (!commToDelete) return;
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'communications', commToDelete));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications', commToDelete));
       if (selectedMessage?.id === commToDelete) setSelectedMessage(null);
       setIsDeleteModalOpen(false);
       setCommToDelete(null);

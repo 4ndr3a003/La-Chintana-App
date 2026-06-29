@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { query, collection, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { query, collection, where, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
 import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants';
 
@@ -9,7 +9,19 @@ export const useHomeDashboard = (userProfile) => {
   const [recentComms, setRecentComms] = useState([]);
   const [monthEvents, setMonthEvents] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [associationName, setAssociationName] = useState('');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userProfile?.associationId) return;
+    const assocRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId);
+    const unsubAssoc = onSnapshot(assocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setAssociationName(docSnap.data().name || '');
+      }
+    });
+    return () => unsubAssoc();
+  }, [userProfile?.associationId]);
 
   useEffect(() => {
     const now = new Date().toISOString();
@@ -25,7 +37,7 @@ export const useHomeDashboard = (userProfile) => {
 
     // 1. Unified query for future events
     const qEvents = query(
-      collection(db, 'artifacts', appId, 'public', 'data', 'events'),
+      collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'),
       where('date', '>=', now),
       orderBy('date', 'asc')
     );
@@ -71,7 +83,7 @@ export const useHomeDashboard = (userProfile) => {
 
     // 2. Recent Communications (Ordered by Importance then Date)
     const qComms = query(
-      collection(db, 'artifacts', appId, 'public', 'data', 'communications'),
+      collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications'),
       orderBy('date', 'desc'),
       limit(10)
     );
@@ -124,7 +136,7 @@ export const useHomeDashboard = (userProfile) => {
     const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
     const qMonthEvents = query(
-      collection(db, 'artifacts', appId, 'public', 'data', 'events'),
+      collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'),
       where('date', '>=', startOfMonth),
       where('date', '<=', endOfMonth)
     );
@@ -171,6 +183,7 @@ export const useHomeDashboard = (userProfile) => {
     monthEvents,
     currentMonth,
     changeMonth,
+    associationName,
     loading
   };
 };

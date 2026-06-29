@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
 import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck, Layers, Box } from 'lucide-react';
-import logo from '../../assets/logo_chintana_fenix.png';
+import logo from '../../assets/logo_app.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
 import ProfileMenu from './ProfileMenu';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db, appId } from '../../services/firebase';
 
 const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref) => (
   <IonButton
@@ -47,6 +49,7 @@ const Header = ({ userProfile }) => {
   const navContainerRef = useRef(null);
   const navRefs = useRef({});
   const notifButtonRef = useRef(null);
+  const [associationInfo, setAssociationInfo] = useState(null);
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileButtonRef = useRef(null);
@@ -68,6 +71,18 @@ const Header = ({ userProfile }) => {
       { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
     ];
   }, [userProfile]);
+
+  useEffect(() => {
+    if (userProfile?.associationId) {
+      const assocRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId);
+      const unsubscribe = onSnapshot(assocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setAssociationInfo(docSnap.data());
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [userProfile?.associationId]);
 
   useEffect(() => {
     const updatePill = () => {
@@ -115,10 +130,19 @@ const Header = ({ userProfile }) => {
           <IonButtons slot="start">
             <IonButton onClick={() => navigate('/')} fill="clear" className="h-auto hover:opacity-80 transition-opacity">
               <div className="flex items-center gap-2 md:gap-3.5">
-                <img src={logo} alt="Logo" className="h-12 w-auto drop-shadow-sm" />
+                <img 
+                  src={associationInfo?.logoUrl || logo} 
+                  alt="Logo" 
+                  className="h-12 w-auto max-w-[120px] object-contain drop-shadow-sm" 
+                  style={associationInfo?.logoUrl ? { borderRadius: '8px' } : {}}
+                />
                 <div className="leading-none text-left block">
-                  <h1 className="text-base sm:text-lg font-black tracking-tighter text-white">LA CHINTANA FENIX</h1>
-                  <p className="text-[0.5625rem] sm:text-[0.625rem] text-yellow-400 font-bold uppercase tracking-widest leading-tight">Protezione Civile</p>
+                  <h1 className="text-base sm:text-lg font-black tracking-tighter text-white">
+                    {associationInfo?.name ? associationInfo.name.toUpperCase() : "GESTIONALE ASSOCIATIVO PC"}
+                  </h1>
+                  <p className="text-[0.5625rem] sm:text-[0.625rem] text-yellow-400 font-bold uppercase tracking-widest leading-tight">
+                    Protezione Civile
+                  </p>
                 </div>
               </div>
             </IonButton>
@@ -213,6 +237,7 @@ const Header = ({ userProfile }) => {
                   isOpen={isProfileMenuOpen}
                   onClose={() => setIsProfileMenuOpen(false)}
                   anchorRef={profileButtonRef}
+                  userProfile={userProfile}
                 />
               </div>
             </div>

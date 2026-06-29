@@ -3,7 +3,7 @@ import { query, collection, onSnapshot, orderBy, addDoc, deleteDoc, doc, serverT
 import { db, appId } from '../../services/firebase';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
 
-export const useDirettivoDashboard = () => {
+export const useDirettivoDashboard = (userProfile) => {
     const [stats, setStats] = useState({
         volunteers: { total: 0, active: 0, inactive: 0, newThisMonth: 0, trend: [] },
         events: { total: 0, inProgress: 0, upcoming: 0, past: 0, emergencies: 0, trend: [] },
@@ -19,7 +19,7 @@ export const useDirettivoDashboard = () => {
 
     useEffect(() => {
         // 1. Fetch Volunteers
-        const qVolunteers = query(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'));
+        const qVolunteers = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'));
         const unsubVolunteers = onSnapshot(qVolunteers, (snap) => {
             let total = 0;
             let active = 0;
@@ -35,25 +35,25 @@ export const useDirettivoDashboard = () => {
 
             snap.forEach(doc => {
                 const data = doc.data();
-                usersList.push({ id: doc.id, ...data });
+                if (data.email !== 'admin@mail.com') {
+                    usersList.push({ id: doc.id, ...data });
 
+                    if (!data.isHidden) {
+                        total++;
+                        if (data.status === 'Operativo') active++;
+                        else inactive++;
 
+                        if (data.joinedAt) {
+                            const joinDate = new Date(data.joinedAt);
+                            if (joinDate.getMonth() === currentMonth && joinDate.getFullYear() === currentYear) {
+                                newThisMonth++;
+                            }
 
-                if (!data.isHidden) {
-                    total++;
-                    if (data.status === 'Operativo') active++;
-                    else inactive++;
-
-                    if (data.joinedAt) {
-                        const joinDate = new Date(data.joinedAt);
-                        if (joinDate.getMonth() === currentMonth && joinDate.getFullYear() === currentYear) {
-                            newThisMonth++;
-                        }
-
-                        // Calculate trend
-                        const monthDiff = (currentYear - joinDate.getFullYear()) * 12 + (currentMonth - joinDate.getMonth());
-                        if (monthDiff >= 0 && monthDiff < 6) {
-                            memberTrend[5 - monthDiff]++;
+                            // Calculate trend
+                            const monthDiff = (currentYear - joinDate.getFullYear()) * 12 + (currentMonth - joinDate.getMonth());
+                            if (monthDiff >= 0 && monthDiff < 6) {
+                                memberTrend[5 - monthDiff]++;
+                            }
                         }
                     }
                 }
@@ -68,7 +68,7 @@ export const useDirettivoDashboard = () => {
         });
 
         // 2. Fetch Events & Calculate Monthly Stats
-        const qEvents = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
+        const qEvents = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'));
         const unsubEvents = onSnapshot(qEvents, (snap) => {
             let total = 0;
             let inProgress = 0;
@@ -116,7 +116,7 @@ export const useDirettivoDashboard = () => {
         });
 
         // 3. Fetch Communications
-        const qComms = query(collection(db, 'artifacts', appId, 'public', 'data', 'communications'));
+        const qComms = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications'));
         const unsubComms = onSnapshot(qComms, (snap) => {
             let total = 0;
             let urgent = 0;
@@ -135,7 +135,7 @@ export const useDirettivoDashboard = () => {
         });
 
         // 4. Fetch Planning Notes
-        const qNotes = query(collection(db, 'artifacts', appId, 'public', 'data', 'planning_notes'), orderBy('createdAt', 'desc'));
+        const qNotes = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'planning_notes'), orderBy('createdAt', 'desc'));
         const unsubNotes = onSnapshot(qNotes, (snap) => {
             const notes = [];
             snap.forEach(doc => {
@@ -147,7 +147,7 @@ export const useDirettivoDashboard = () => {
         // 5. Fetch Validity Settings
         const fetchSettings = async () => {
             try {
-                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'settings', 'validity');
                 const snap = await getDoc(settingsRef);
                 if (snap.exists()) {
                     setValiditySettings(snap.data());
@@ -179,14 +179,14 @@ export const useDirettivoDashboard = () => {
 
     const updateValiditySettings = async (newSettings) => {
         try {
-            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'validity');
+            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'settings', 'validity');
             // Ensure path exists (settings/validity might need parent doc creation if purely nested but here it's collection 'settings' not existing yet maybe? 
             // Actually 'public/data/settings' is col/doc/subcol? No, structure is artifacts/appId/public/data. 
             // So 'settings' is a doc ID in 'data' collection? Or 'settings' is a collection in 'data' doc?
-            // The query above used collection(db, 'artifacts', appId, 'public', 'data', 'profiles').
+            // The query above used collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles').
             // So 'data' is a collection. 'profiles' is a document? NO.
             // 'profiles' is a collection inside 'data' document?
-            // Wait, original query: collection(db, 'artifacts', appId, 'public', 'data', 'profiles') -> This means:
+            // Wait, original query: collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles') -> This means:
             // Coll: artifacts -> Doc: appId -> Coll: public -> Doc: data -> Coll: profiles.
             // So we want: Coll: artifacts -> Doc: appId -> Coll: public -> Doc: data -> Coll: settings -> Doc: validity.
 
@@ -255,7 +255,7 @@ export const useDirettivoDashboard = () => {
                 });
 
                 if (userUpdated) {
-                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', user.id);
+                    const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', user.id);
 
                     if (currentBatchCount >= MAX_BATCH_SIZE) {
                         batches.push(writeBatch(db));
@@ -282,7 +282,7 @@ export const useDirettivoDashboard = () => {
     const addNote = async (text, type) => {
         if (!text.trim()) return;
         try {
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'planning_notes'), {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'planning_notes'), {
                 text,
                 type, // 'event' or 'comm'
                 createdAt: serverTimestamp(),
@@ -295,7 +295,7 @@ export const useDirettivoDashboard = () => {
 
     const deleteNote = async (id) => {
         try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'planning_notes', id));
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'planning_notes', id));
         } catch (error) {
             console.error("Error deleting note:", error);
         }

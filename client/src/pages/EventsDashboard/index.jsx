@@ -64,7 +64,7 @@ const EventsDashboard = ({ userProfile }) => {
   const [v, setV] = React.useState(1); // Version for cache busting
 
   const getCalendarFeedUrl = () => {
-    let url = `${window.location.origin}/api/calendar.ics?appId=${appId}&v=${v}`;
+    let url = `${window.location.origin}/api/calendar.ics?appId=${appId}&associationId=${userProfile.associationId}&v=${v}`;
     if (exportMode === 'mine' && userProfile?.id) {
       url += `&userId=${userProfile.id}`;
     }

@@ -72,7 +72,7 @@ export const useUserProfileView = (userProfile) => {
           await uploadBytes(storageRef, blob);
           const url = await getDownloadURL(storageRef);
 
-          const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+          const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles', userProfile.id);
           await updateDoc(userRef, { photoUrl: url });
         } catch (error) {
           console.error("Error during blob upload/doc update:", error);

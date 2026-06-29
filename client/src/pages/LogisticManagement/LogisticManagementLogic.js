@@ -31,12 +31,12 @@ export const useLogisticManagement = (userProfile, showToast) => {
   useEffect(() => {
     if (!userProfile) return;
 
-    const vehiclesRef = collection(db, 'artifacts', appId, 'public', 'data', 'vehicles');
+    const vehiclesRef = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles');
     // Using deep path consistent with other data
     // artifacts/{appId}/public/data/vehicles
     // artifacts/{appId}/public/data/equipment
 
-    const vQuery = collection(db, 'artifacts', appId, 'public', 'data', 'vehicles');
+    const vQuery = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles');
 
     const unsubVehicles = onSnapshot(vQuery, (snapshot) => {
       const vList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -56,7 +56,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
       setLoading(false);
     });
 
-    const eQuery = collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+    const eQuery = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'equipment');
     const unsubEquipment = onSnapshot(eQuery, (snapshot) => {
       const eList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setEquipment(eList);
@@ -73,7 +73,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
       console.error("Error fetching equipment", err);
     });
 
-    const uQuery = collection(db, 'artifacts', appId, 'public', 'data', 'uniforms');
+    const uQuery = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'uniforms');
     const unsubUniforms = onSnapshot(uQuery, (snapshot) => {
       const uList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setUniforms(uList);
@@ -98,7 +98,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Vehicles
   const handleSaveVehicle = async (data) => {
-    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'vehicles');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles');
     const { _pendingPhotoFile, ...saveData } = data;
     // Clean placeholder
     if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
@@ -123,7 +123,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   const handleDeleteVehicle = async (id) => {
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', id));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles', id));
     } catch (error) {
       console.error("Error deleting vehicle:", error);
     }
@@ -131,7 +131,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Equipment
   const handleSaveEquipment = async (data) => {
-    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'equipment');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'equipment');
     const { _pendingPhotoFile, ...saveData } = data;
     if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
 
@@ -154,7 +154,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   const handleDeleteEquipment = async (id) => {
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'equipment', id));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'equipment', id));
     } catch (error) {
       console.error("Error deleting equipment:", error);
     }
@@ -162,7 +162,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   // CRUD Uniforms
   const handleSaveUniform = async (data) => {
-    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'uniforms');
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'uniforms');
     const { _pendingPhotoFile, ...saveData } = data;
     if (saveData.photoUrl === '__pending__') saveData.photoUrl = '';
 
@@ -185,7 +185,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
   const handleDeleteUniform = async (id) => {
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'uniforms', id));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'uniforms', id));
     } catch (error) {
       console.error("Error deleting uniform:", error);
     }
@@ -210,7 +210,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
       };
 
       // update firestore
-      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', vehicleId);
+      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles', vehicleId);
       const vehicleData = vehicles.find(v => v.id === vehicleId);
       const currentDocs = vehicleData?.documents || [];
       
@@ -395,7 +395,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
 
             if (matchIndex >= 0) {
                const existingItem = activeTab === 'vehicles' ? vehicles[matchIndex] : activeTab === 'equipment' ? equipment[matchIndex] : uniforms[matchIndex];
-               const ref = doc(db, 'artifacts', appId, 'public', 'data', collectionName, existingItem.id);
+               const ref = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, collectionName, existingItem.id);
                // keep existing documents if updating vehicles
                if (activeTab === 'vehicles') {
                    itemData.documents = existingItem.documents || [];
@@ -403,7 +403,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
                await updateDoc(ref, itemData);
                updatedCount++;
             } else {
-                const ref = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                const ref = collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, collectionName);
                 await addDoc(ref, { ...itemData, createdAt: new Date().toISOString() });
                 importedCount++;
             }
@@ -442,7 +442,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
       const storageRef = ref(storage, `avatars/uploads/${documentId}`);
       await deleteObject(storageRef);
 
-      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'vehicles', vehicleId);
+      const vehicleRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'vehicles', vehicleId);
       const vehicleData = vehicles.find(v => v.id === vehicleId);
       const currentDocs = vehicleData?.documents || [];
       const updatedDocs = currentDocs.filter(d => d.id !== documentId);
@@ -466,7 +466,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, itemId);
+      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, collectionName, itemId);
       await updateDoc(itemRef, {
         photoUrl: url,
         photoFileName: fileName
@@ -489,7 +489,7 @@ export const useLogisticManagement = (userProfile, showToast) => {
         await deleteObject(storageRef).catch(() => {});
       }
 
-      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, itemId);
+      const itemRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, collectionName, itemId);
       await updateDoc(itemRef, {
         photoUrl: '',
         photoFileName: ''

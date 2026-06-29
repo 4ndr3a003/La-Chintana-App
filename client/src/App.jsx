@@ -19,6 +19,7 @@ export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [activeProfileId, setActiveProfileId] = useState(localStorage.getItem('pc_profile_id'));
+  const [activeAssociationId, setActiveAssociationId] = useState(localStorage.getItem('pc_association_id'));
   const [loading, setLoading] = useState(true);
 
   // Custom Toast State
@@ -151,9 +152,10 @@ export default function App() {
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setAuthUser(currentUser);
-      // We don't need to check activeProfileId here for loading state
-      // because the profile sync effect will handle it or we handle it below
-      if (!localStorage.getItem('pc_profile_id')) setLoading(false);
+      // If either profile ID or association ID is missing, we aren't fully logged in
+      if (!localStorage.getItem('pc_profile_id') || !localStorage.getItem('pc_association_id')) {
+        setLoading(false);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -164,18 +166,30 @@ export default function App() {
       return;
     }
 
-    const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', activeProfileId);
+    if (!activeAssociationId) {
+      // Legacy session without associationId, force logout
+      localStorage.removeItem('pc_profile_id');
+      setActiveProfileId(null);
+      setUserProfile(null);
+      setLoading(false);
+      navigate('/login');
+      return;
+    }
+
+    const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', activeAssociationId, 'profiles', activeProfileId);
 
     const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
-        setUserProfile({ id: docSnap.id, ...docSnap.data() });
+        setUserProfile({ id: docSnap.id, associationId: activeAssociationId, ...docSnap.data() });
         // If on login page and profile loaded, go to dashboard
         if (location.pathname === '/login') {
           navigate('/');
         }
       } else {
         localStorage.removeItem('pc_profile_id');
+        localStorage.removeItem('pc_association_id');
         setActiveProfileId(null);
+        setActiveAssociationId(null);
         setUserProfile(null);
         navigate('/login');
       }
@@ -186,7 +200,7 @@ export default function App() {
     });
 
     return () => unsubscribeProfile();
-  }, [authUser, activeProfileId, navigate, location.pathname]);
+  }, [authUser, activeProfileId, activeAssociationId, navigate, location.pathname]);
 
   const [fcmToken, setFcmToken] = useState(null);
 
@@ -279,7 +293,7 @@ export default function App() {
 
     const saveToken = async () => {
       try {
-        const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+        const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', activeAssociationId, 'profiles', userProfile.id);
         await updateDoc(profileRef, {
           fcmTokens: arrayUnion(fcmToken)
         });
@@ -419,8 +433,8 @@ export default function App() {
     try {
       if (fcmToken) {
         // 1. Remove from Firestore
-        if (userProfile && userProfile.id) {
-          const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', userProfile.id);
+        if (userProfile && userProfile.id && activeAssociationId) {
+          const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', activeAssociationId, 'profiles', userProfile.id);
           await updateDoc(profileRef, {
             fcmTokens: arrayRemove(fcmToken)
           });
@@ -441,13 +455,19 @@ export default function App() {
 
   const handleLogout = async () => {
     localStorage.removeItem('pc_profile_id');
+    localStorage.removeItem('pc_association_id');
     setActiveProfileId(null);
+    setActiveAssociationId(null);
     setUserProfile(null);
     navigate('/login');
   };
 
-  const handleLoginSuccess = (profileId) => {
+  const handleLoginSuccess = (profileId, associationId) => {
     localStorage.setItem('pc_profile_id', profileId);
+    if (associationId) {
+      localStorage.setItem('pc_association_id', associationId);
+      setActiveAssociationId(associationId);
+    }
     setActiveProfileId(profileId);
     setLoading(true);
     navigate('/');
@@ -563,6 +583,23 @@ export default function App() {
           duration={5000}
           onClick={toastInfo.onClick}
         />
+
+        {/* Impersonation Return Button */}
+        {localStorage.getItem('pc_admin_profile_id') && (
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999]">
+            <button
+              onClick={() => {
+                const adminId = localStorage.getItem('pc_admin_profile_id');
+                localStorage.setItem('pc_profile_id', adminId);
+                localStorage.removeItem('pc_admin_profile_id');
+                window.location.href = '/';
+              }}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full shadow-2xl shadow-indigo-500/50 font-extrabold border-2 border-white dark:border-slate-800 transition-all flex items-center gap-2 animate-bounce"
+            >
+              Torna all'account Admin
+            </button>
+          </div>
+        )}
       </div>
     </IonApp>
   );

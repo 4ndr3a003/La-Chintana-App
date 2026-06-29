@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Settings, UserCircle, LogOut } from 'lucide-react';
+import { Settings, UserCircle, LogOut, Building } from 'lucide-react';
 
-const ProfileMenu = ({ isOpen, onClose, anchorRef }) => {
+const ProfileMenu = ({ isOpen, onClose, anchorRef, userProfile }) => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
 
@@ -76,6 +76,18 @@ const ProfileMenu = ({ isOpen, onClose, anchorRef }) => {
                     <Settings size={18} />
                     Impostazioni
                 </button>
+                {userProfile?.email === 'admin@mail.com' && (
+                    <button
+                        onClick={() => {
+                            navigate('/superadmin');
+                            onClose();
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 rounded-xl transition-colors border-t border-slate-100"
+                    >
+                        <Building size={18} />
+                        Gestione Associazioni
+                    </button>
+                )}
             </div>
         </div>,
         document.body

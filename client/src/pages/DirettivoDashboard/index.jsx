@@ -17,7 +17,7 @@ import ValiditySettingsWidget from '../../components/ValiditySettingsWidget/Vali
 
 const DirettivoDashboard = ({ userProfile }) => {
     const navigate = useNavigate();
-    const { stats, monthlyStats, planningNotes, addNote, deleteNote, loading, users, validitySettings, updateValiditySettings } = useDirettivoDashboard();
+    const { stats, monthlyStats, planningNotes, addNote, deleteNote, loading, users, validitySettings, updateValiditySettings } = useDirettivoDashboard(userProfile);
     const [newNote, setNewNote] = useState('');
     const [noteType, setNoteType] = useState('event');
 
@@ -172,7 +172,7 @@ const DirettivoDashboard = ({ userProfile }) => {
                     <div className={`left-column ${activeTab !== 'operative' ? 'mobile-hidden' : ''}`}>
 
                         <section>
-                            <WeatherWidget />
+                            <WeatherWidget userProfile={userProfile} />
                         </section>
 
                         {/* DESKTOP LAYOUT (>= 1024px) - Side by Side, no unified card */}

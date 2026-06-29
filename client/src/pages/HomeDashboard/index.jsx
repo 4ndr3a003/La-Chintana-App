@@ -11,7 +11,7 @@ import HeaderInfoWidget from '../../components/ui/HeaderInfoWidget';
 import './HomeDashboard.css';
 
 const HomeDashboard = ({ userProfile }) => {
-  const { nextEvent, nextEmergency, recentComms, monthEvents, currentMonth, changeMonth, loading } = useHomeDashboard(userProfile);
+  const { nextEvent, nextEmergency, recentComms, monthEvents, currentMonth, changeMonth, associationName, loading } = useHomeDashboard(userProfile);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
 
   return (
@@ -33,7 +33,7 @@ const HomeDashboard = ({ userProfile }) => {
                 </div>
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3 leading-tight">Ciao, {userProfile.name}</h1>
                 <p className="text-slate-600 font-medium text-xs md:text-sm hidden md:block mt-0.5 opacity-80">
-                  Benvenuto nel portale operativo de "La Chintana Fenix"
+                  Benvenuto nel portale operativo di "{associationName || 'Gestionale Associativo PC'}"
                 </p>
               </div>
             </div>

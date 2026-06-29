@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db, appId } from '../../services/firebase';
 import {
     CloudRain,
     Sun,
@@ -15,22 +17,55 @@ import {
 } from 'lucide-react';
 import './WeatherWidget.css';
 
-const WeatherWidget = () => {
+const WeatherWidget = ({ userProfile }) => {
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [alerts, setAlerts] = useState([]);
     const [loadingAlerts, setLoadingAlerts] = useState(true);
+    const [coords, setCoords] = useState(null);
 
-    // Hardcoded location for Morano sul Po (AL)
-    const MORANO_COORDS = { lat: 45.1667, lon: 8.3667, name: 'Morano sul Po (AL)' };
+    // Hardcoded fallback location for Morano sul Po (AL)
+    const DEFAULT_COORDS = { lat: 45.1667, lon: 8.3667, name: 'Morano sul Po' };
 
     useEffect(() => {
-        const fetchWeather = async () => {
+        const fetchLocationAndWeather = async () => {
+            let city = 'Morano sul Po';
+            let currentCoords = DEFAULT_COORDS;
+
+            if (userProfile?.associationId) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId));
+                    if (docSnap.exists() && docSnap.data().city) {
+                        city = docSnap.data().city;
+                    }
+                } catch (e) {
+                    console.error("Error fetching city:", e);
+                }
+            }
+
+            try {
+                const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=it`);
+                if (geoRes.ok) {
+                    const geoData = await geoRes.json();
+                    if (geoData.results && geoData.results.length > 0) {
+                        currentCoords = {
+                            lat: geoData.results[0].latitude,
+                            lon: geoData.results[0].longitude,
+                            name: city
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Geocoding error:", e);
+            }
+            
+            setCoords(currentCoords);
+
             try {
                 // Fetch Weather from Open-Meteo
                 const response = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${MORANO_COORDS.lat}&longitude=${MORANO_COORDS.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`
+                    `https://api.open-meteo.com/v1/forecast?latitude=${currentCoords.lat}&longitude=${currentCoords.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`
                 );
 
                 if (!response.ok) throw new Error('Meteo unavailable');
@@ -107,9 +142,9 @@ const WeatherWidget = () => {
             }
         };
 
-        fetchWeather();
+        fetchLocationAndWeather();
         fetchArpaAlerts();
-    }, []);
+    }, [userProfile?.associationId]);
 
     // WMO Weather interpretation codes
     const getWeatherIcon = (code) => {
@@ -162,7 +197,7 @@ const WeatherWidget = () => {
             <div className="weather-header">
                 <div className="weather-location">
                     <MapPin size={16} />
-                    <span>{MORANO_COORDS.name}</span>
+                    <span>{coords ? coords.name : DEFAULT_COORDS.name}</span>
                 </div>
                 {/* Status Indicator */}
                 <div className={`text-xs font-bold px-2 py-1 rounded-full ${alerts.length > 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>

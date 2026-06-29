@@ -19,16 +19,23 @@ let db;
 let messaging;
 
 try {
-  const serviceAccount = require('./serviceAccountKey.json');
-  initializeApp({
-    credential: cert(serviceAccount)
-  });
+  if (process.env.FIRESTORE_EMULATOR_HOST) {
+    initializeApp({
+      projectId: 'chintana-events-handler'
+    });
+    console.log("Firebase Admin initialized for local emulator");
+  } else {
+    const serviceAccount = require('./serviceAccountKey.json');
+    initializeApp({
+      credential: cert(serviceAccount)
+    });
+    console.log("Firebase Admin initialized successfully with Service Account");
+  }
   db = getFirestore();
   messaging = getMessaging();
-  console.log("Firebase Admin initialized successfully");
 } catch (error) {
-  console.warn("Warning: serviceAccountKey.json not found or invalid. Notifications will not work.");
-  console.warn("Please download it from Firebase Console and place it in the server folder.");
+  console.warn("Warning: Failed to initialize Firebase Admin. Error:", error.message);
+  console.warn("Please check your configuration or make sure serviceAccountKey.json is present for production mode.");
 }
 
 app.use(cors());
@@ -39,15 +46,15 @@ app.post('/api/send-notification', async (req, res) => {
     return res.status(500).json({ error: 'Firebase Admin not initialized' });
   }
 
-  const { title, body, appId } = req.body;
+  const { title, body, appId, associationId } = req.body;
 
-  if (!title || !body || !appId) {
-    return res.status(400).json({ error: 'Missing title, body, or appId' });
+  if (!title || !body || !appId || !associationId) {
+    return res.status(400).json({ error: 'Missing title, body, appId, or associationId' });
   }
 
   try {
     // 1. Get all profiles to find tokens
-    const profilesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('profiles');
+    const profilesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('associations').doc(associationId).collection('profiles');
     const snapshot = await profilesRef.get();
 
     const tokens = [];

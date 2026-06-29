@@ -14,7 +14,7 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
     try {
       // 1. Check if target profile exists
       const q = query(
-        collection(db, 'artifacts', appId, 'public', 'data', 'profiles'),
+        collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'),
         where('email', '==', targetEmail)
       );
       const snapshot = await getDocs(q);
@@ -27,7 +27,7 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
       } else {
         if (isHiddenCreate) {
           // Create Dev
-          const newDocRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'), {
+          const newDocRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'), {
             name: 'Super Admin',
             email: targetEmail,
             password: 'devTestUser123!',

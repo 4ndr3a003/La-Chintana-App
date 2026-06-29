@@ -175,52 +175,95 @@ Modulo completo per la gestione di asset, diviso in **3 tab**:
 
 ---
 
-## 🛠️ Installazione e Setup
+## 🛠️ Sviluppo Locale e Firebase Emulator Suite
 
-### Prerequisiti
--   Node.js (v18+ raccomandato)
--   npm
+Per lo sviluppo e il testing locale senza intaccare il database di produzione, utilizziamo la **Firebase Local Emulator Suite**. Questo sistema emula in locale Firestore, Authentication, Storage, Functions e Hosting.
+
+### 📋 Prerequisiti
+-   Node.js (v18+) e npm
 -   Firebase CLI (`npm install -g firebase-tools`)
-
-### 1. Setup Client (Frontend)
-```bash
-cd client
-npm install
-```
-Configura le variabili d'ambiente creando un file `.env` nella cartella `client` con le chiavi del tuo progetto Firebase.
-
-### 2. Setup Server (Opzionale)
-Il server Express è necessario se si desidera utilizzare le API manuali per le notifiche.
-```bash
-cd server
-npm install
-```
-*Nota: Scarica `serviceAccountKey.json` dalla console Firebase e posizionalo nella cartella `server/`.*
-
-### 3. Setup Functions (Backend)
-```bash
-cd functions
-npm install
-```
+-   **Java JRE/JDK** (necessario per far girare gli emulatori locali di Firestore/Storage). Verifica con `java -version` o installalo con `brew install openjdk`.
 
 ---
 
-## ▶️ Avvio Sviluppo
+### 1. Configurazione Iniziale
 
-### Frontend (Web App)
-Lancia l'applicazione in modalità sviluppo (con Hot Module Replacement):
+#### Client (Frontend)
+1. Installa le dipendenze:
+   ```bash
+   cd client
+   npm install
+   ```
+2. In sviluppo locale, se avviato con `npm run dev`, il client si collegherà automaticamente agli emulatori locali se rileva l'ambiente di sviluppo. Le credenziali di Firebase sono configurate in [firebase.js](file:///Users/andrea/App%20Personali/La-Chintana-App/client/src/services/firebase.js).
+
+#### Server (Backend Express)
+1. Installa le dipendenze:
+   ```bash
+   cd server
+   npm install
+   ```
+2. Crea un file `.env` dentro la cartella `/server` per forzare l'SDK Admin ad agganciarsi agli emulatori locali:
+   ```env
+   PORT=3000
+   FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+   FIREBASE_AUTH_EMULATOR_HOST="127.0.0.1:9099"
+   FIREBASE_STORAGE_EMULATOR_HOST="127.0.0.1:9199"
+   ```
+   *Nota: Quando sono presenti queste variabili d'ambiente, il server non necessita della chiave di produzione `serviceAccountKey.json` per funzionare in locale.*
+
+#### Cloud Functions
+1. Installa le dipendenze:
+   ```bash
+   cd functions
+   npm install
+   ```
+
+---
+
+### 2. Sincronizzazione Dati da Produzione (Opzionale)
+
+Se hai bisogno dei dati reali di produzione per testare localmente:
+
+1. **Esportazione Utenti (Auth)**:
+   ```bash
+   firebase auth:export utenti_produzione.json --project chintana-events-handler
+   ```
+2. **Sincronizzazione Firestore**:
+   * Assicurati di scaricare la chiave `serviceAccountKey.json` dalla Firebase Console (Impostazioni Progetto -> Account di Servizio).
+   * Posizionala temporaneamente nella cartella `/server`.
+   * Avvia gli emulatori (vedi sezione successiva) e in un altro terminale avvia il processo di copia automatica:
+     ```bash
+     cd server
+     npm run dev
+     ```
+     *Lo script copierà ricorsivamente l'intera struttura di produzione sul tuo emulatore locale.*
+
+---
+
+### 3. ▶️ Avvio del Flusso di Sviluppo
+
+Avvia i seguenti servizi in terminali separati per avviare l'intero ambiente locale:
+
+#### Terminale 1: Emulatori Firebase
+```bash
+firebase emulators:start --import=./emulator-data --export-on-exit
+```
+-   **Emulator UI**: Accedi a `http://127.0.0.1:4000` per gestire graficamente Firestore, Auth e Storage locali.
+-   **Persistenza dei Dati**: I flag `--import` e `--export-on-exit` fanno sì che tutti i dati creati o modificati in locale (utenti e documenti) non vadano persi quando spegni l'emulatore.
+
+#### Terminale 2: Server API Custom
+```bash
+cd server
+npm run dev
+```
+Il server girerà su `http://localhost:3000` collegato al database locale dell'emulatore.
+
+#### Terminale 3: Client Frontend (Vite)
 ```bash
 cd client
 npm run dev
 ```
-L'app sarà accessibile su `http://localhost:5173`.
-
-### Server API
-```bash
-cd server
-node index.js
-```
-Il server girerà su `http://localhost:3000`.
+La PWA sarà accessibile su `http://localhost:5173`. Si collegherà in automatico agli emulatori locali.
 
 ---
 

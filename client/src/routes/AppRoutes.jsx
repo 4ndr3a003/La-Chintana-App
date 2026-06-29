@@ -12,6 +12,7 @@ import AdminDashboard from '../pages/AdminDashboard';
 import DirettivoDashboard from '../pages/DirettivoDashboard';
 import Settings from '../pages/Settings';
 import LogisticManagement from '../pages/LogisticManagement';
+import SuperadminDashboardView from '../pages/SuperadminDashboardView';
 import { hasAdminAccess } from '../utils/constants';
 
 const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode, uppercaseMode, toggleUppercaseMode, showToast }) => {
@@ -84,6 +85,16 @@ const AppRoutes = ({ userProfile, onLoginSuccess, onLogout, enableNotifications,
                 <ProtectedRoute userProfile={userProfile}>
                     {hasAdminAccess(userProfile) ? (
                         <DirettivoDashboard userProfile={userProfile} />
+                    ) : (
+                        <Navigate to="/" replace />
+                    )}
+                </ProtectedRoute>
+            } />
+
+            <Route path="/superadmin" element={
+                <ProtectedRoute userProfile={userProfile}>
+                    {userProfile?.email === 'admin@mail.com' ? (
+                        <SuperadminDashboardView userProfile={userProfile} onLoginSuccess={onLoginSuccess} />
                     ) : (
                         <Navigate to="/" replace />
                     )}

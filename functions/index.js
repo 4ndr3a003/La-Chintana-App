@@ -6,7 +6,7 @@ const db = admin.firestore();
 const messaging = admin.messaging();
 
 // Helper function to send notifications
-async function sendNotificationToAll(appId, title, body, options = {}, data = {}) {
+async function sendNotificationToAll(appId, associationId, title, body, options = {}, data = {}) {
   try {
     // 0. Constants (Mirroring Client Constants)
     const EVENT_VISIBILITY = {
@@ -16,8 +16,8 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
     };
 
     // 1. Get all profiles to find tokens
-    // Path: artifacts/{appId}/public/data/profiles
-    const profilesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('profiles');
+    // Path: artifacts/{appId}/public/data/associations/{associationId}/profiles
+    const profilesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('associations').doc(associationId).collection('profiles');
     const snapshot = await profilesRef.get();
 
     const tokens = [];
@@ -123,9 +123,10 @@ async function sendNotificationToAll(appId, title, body, options = {}, data = {}
 }
 
 // Trigger: New Event Created
-exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/data/events/{eventId}").onCreate(async (snap, context) => {
+exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/data/associations/{associationId}/events/{eventId}").onCreate(async (snap, context) => {
   const data = snap.data();
   const appId = context.params.appId;
+  const associationId = context.params.associationId;
   const eventId = context.params.eventId;
 
   // Format date for display
@@ -172,13 +173,14 @@ exports.onEventCreated = functions.firestore.document("artifacts/{appId}/public/
     };
   }
 
-  await sendNotificationToAll(appId, title, body, { targetFilter }, payloadData);
+  await sendNotificationToAll(appId, associationId, title, body, { targetFilter }, payloadData);
 });
 
 // Trigger: New Communication Created
-exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}/public/data/communications/{commId}").onCreate(async (snap, context) => {
+exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}/public/data/associations/{associationId}/communications/{commId}").onCreate(async (snap, context) => {
   const data = snap.data();
   const appId = context.params.appId;
+  const associationId = context.params.associationId;
   const commId = context.params.commId;
 
   let title = `Nuova Comunicazione: ${data.title}`;
@@ -229,12 +231,12 @@ exports.onCommunicationCreated = functions.firestore.document("artifacts/{appId}
   }
 
   // Pass filter in options
-  await sendNotificationToAll(appId, title, body, { ...options, targetFilter }, payloadData);
+  await sendNotificationToAll(appId, associationId, title, body, { ...options, targetFilter }, payloadData);
 });
 
 // Sync user role to custom claims
 exports.syncUserRole = functions.firestore
-  .document("artifacts/{appId}/public/data/profiles/{userId}")
+  .document("artifacts/{appId}/public/data/associations/{associationId}/profiles/{userId}")
   .onWrite(async (change, context) => {
     const userData = change.after.exists ? change.after.data() : null;
     const oldUserData = change.before.exists ? change.before.data() : null;
@@ -283,10 +285,11 @@ exports.calendarFeed = functions.https.onRequest(async (req, res) => {
   try {
     // Use the default appId or get it from query params
     const appId = req.query.appId || 'default-app-id';
+    const associationId = req.query.associationId || 'assoc_chintana';
     const userId = req.query.userId || null;
 
     // Read all events from Firestore
-    const eventsRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('events');
+    const eventsRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('associations').doc(associationId).collection('events');
     const snapshot = await eventsRef.get();
 
     const events = [];

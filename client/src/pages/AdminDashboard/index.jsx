@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera, FileText, Globe, Activity, Briefcase } from 'lucide-react';
+import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera, FileText, Globe, Activity, Briefcase, LogIn } from 'lucide-react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
@@ -69,7 +69,7 @@ const AdminDashboard = ({ userProfile, showToast }) => {
     handlePhotoUpload,
     uploadCroppedImage,
     closeImageModal
-  } = useAdminDashboard(showToast);
+  } = useAdminDashboard(userProfile, showToast);
 
   const formatName = (user) => {
     // Usa i campi separati se disponibili per supportare nomi composti
@@ -392,6 +392,20 @@ const AdminDashboard = ({ userProfile, showToast }) => {
                           <Edit2 size={18} />
                         </button>
                       )}
+                      {userProfile?.email === 'admin@mail.com' && user.id !== userProfile.id && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            localStorage.setItem('pc_admin_profile_id', userProfile.id);
+                            localStorage.setItem('pc_profile_id', user.id);
+                            window.location.href = '/';
+                          }}
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                          title="Accedi come questo utente"
+                        >
+                          <LogIn size={18} />
+                        </button>
+                      )}
                       {canManageVolunteers(userProfile) && user.role !== ROLES.PRESIDENT && (
                         <button
                           onClick={() => handleDeleteUser(user)}
@@ -433,6 +447,20 @@ const AdminDashboard = ({ userProfile, showToast }) => {
                     className="p-2 text-slate-400 hover:text-[var(--color-pc-blue-700)] bg-slate-50 rounded-full"
                   >
                     <Edit2 size={16} />
+                  </button>
+                )}
+                {userProfile?.email === 'admin@mail.com' && user.id !== userProfile.id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      localStorage.setItem('pc_admin_profile_id', userProfile.id);
+                      localStorage.setItem('pc_profile_id', user.id);
+                      window.location.href = '/';
+                    }}
+                    className="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-full"
+                    title="Accedi come questo utente"
+                  >
+                    <LogIn size={16} />
                   </button>
                 )}
                 {canManageVolunteers(userProfile) && user.role !== ROLES.PRESIDENT && (

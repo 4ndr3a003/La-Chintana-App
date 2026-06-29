@@ -10,21 +10,58 @@ import {
     CheckCircle,
     XCircle
 } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db, appId } from '../../services/firebase';
 
 const HeaderInfoWidget = ({ userProfile }) => {
     const [weather, setWeather] = useState(null);
     const [alertLevel, setAlertLevel] = useState('green'); // green, yellow, orange, red
     const [loading, setLoading] = useState(true);
 
-    // Morano sul Po coordinates
-    const MORANO_COORDS = { lat: 45.1667, lon: 8.3667 };
+    const [cityName, setCityName] = useState('Morano');
 
     useEffect(() => {
         const fetchData = async () => {
+            let city = 'Morano sul Po';
+            let lat = 45.1667;
+            let lon = 8.3667;
+
+            if (userProfile?.associationId) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId));
+                    if (docSnap.exists() && docSnap.data().city) {
+                        city = docSnap.data().city;
+                    }
+                } catch (e) {
+                    console.error("Error fetching association city:", e);
+                }
+            }
+
+            try {
+                const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=it`);
+                if (geoRes.ok) {
+                    const geoData = await geoRes.json();
+                    if (geoData.results && geoData.results.length > 0) {
+                        lat = geoData.results[0].latitude;
+                        lon = geoData.results[0].longitude;
+                        // Use short name for badge, like "Morano" or first word of city
+                        const shortName = geoData.results[0].name.split(' ')[0];
+                        setCityName(shortName);
+                    } else {
+                        setCityName(city.split(' ')[0]);
+                    }
+                } else {
+                    setCityName(city.split(' ')[0]);
+                }
+            } catch (e) {
+                console.error("Geocoding error in HeaderInfoWidget:", e);
+                setCityName(city.split(' ')[0]);
+            }
+
             try {
                 // Fetch weather
                 const weatherRes = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${MORANO_COORDS.lat}&longitude=${MORANO_COORDS.lon}&current=temperature_2m,weather_code&timezone=auto`
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
                 );
                 if (weatherRes.ok) {
                     const data = await weatherRes.json();
@@ -60,7 +97,7 @@ const HeaderInfoWidget = ({ userProfile }) => {
         };
 
         fetchData();
-    }, []);
+    }, [userProfile?.associationId]);
 
     // Weather icon based on WMO code
     const getWeatherIcon = (code) => {
@@ -125,7 +162,7 @@ const HeaderInfoWidget = ({ userProfile }) => {
                     </div>
                     <div className="flex flex-col">
                         <span className="font-extrabold text-sm md:text-lg text-slate-800 leading-tight">{Math.round(weather.temperature_2m)}°</span>
-                        <span className="text-[8px] md:text-[10px] text-slate-500 font-medium uppercase tracking-wide hidden md:block">Morano</span>
+                        <span className="text-[8px] md:text-[10px] text-slate-500 font-medium uppercase tracking-wide hidden md:block">{cityName}</span>
                     </div>
                 </div>
             )}

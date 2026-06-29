@@ -23,7 +23,7 @@ export const useEventsDashboard = (userProfile) => {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
+    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'));
     const unsubEvents = onSnapshot(q, (snap) => {
       const upcoming = [];
       const past = [];
@@ -34,6 +34,21 @@ export const useEventsDashboard = (userProfile) => {
         const eventDate = new Date(data.date);
         const eventObj = { id: doc.id, ...data };
 
+        // 1. SECURITY/VISIBILITY FILTER
+        const isDirettivoEvent = eventObj.type === 'Direttivo';
+        const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
+
+        if (isDirettivoEvent && !isBoardOrPresident) return;
+
+        const visibility = eventObj.visibility || EVENT_VISIBILITY.ALL;
+        if (visibility === EVENT_VISIBILITY.BOARD_ONLY && !isBoardOrPresident) return;
+        
+        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
+          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
+          if (!isK9 && !isBoardOrPresident) return;
+        }
+
+        // 2. PARTITION EVENTS
         if (eventDate >= today) {
           upcoming.push(eventObj);
         } else {
@@ -48,7 +63,7 @@ export const useEventsDashboard = (userProfile) => {
       setPastEvents(past);
     });
 
-    const qProfiles = query(collection(db, 'artifacts', appId, 'public', 'data', 'profiles'));
+    const qProfiles = query(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'));
     const unsubProfiles = onSnapshot(qProfiles, (snap) => {
       const profilesMap = {};
       snap.forEach(doc => profilesMap[doc.id] = doc.data());
@@ -71,7 +86,7 @@ export const useEventsDashboard = (userProfile) => {
   }, [upcomingEvents, pastEvents, selectedEvent]);
 
   const toggleParticipation = async (event, shiftId = null) => {
-    const eventRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', event.id);
+    const eventRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events', event.id);
     let updates = {};
 
     if (event.shifts && event.shifts.length > 0 && shiftId) {
@@ -188,9 +203,9 @@ export const useEventsDashboard = (userProfile) => {
       };
 
       if (isEditing && currentEventId) {
-        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', currentEventId), eventData);
+        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events', currentEventId), eventData);
       } else {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'), {
           ...eventData,
           participants: [],
           createdBy: userProfile.id
@@ -206,7 +221,7 @@ export const useEventsDashboard = (userProfile) => {
 
   const deleteEvent = async (eventId) => {
     try {
-      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId));
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events', eventId));
       if (selectedEvent?.id === eventId) setSelectedEvent(null);
     } catch (error) {
       console.error(error);
@@ -225,26 +240,8 @@ export const useEventsDashboard = (userProfile) => {
       if (eventDate !== searchDate) return false;
     }
 
-    // Check visibility for 'Direttivo' type
-    const isDirettivoEvent = event.type === 'Direttivo';
-    const isBoardOrPresident = userProfile?.role === 'direttivo' || userProfile?.role === 'presidente';
-
-    if (isDirettivoEvent && !isBoardOrPresident) {
-      return false;
-    }
-
-    // New Visibility Logic
-    const visibility = event.visibility || EVENT_VISIBILITY.ALL;
-
-    if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
-      if (!isBoardOrPresident) return false;
-    }
-
-    if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-      const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
-      if (!isK9 && !isBoardOrPresident) return false;
-    }
-
+    // Security visibility filtering is already done in the onSnapshot listener for both upcoming and past events.
+    // Here we only need to apply the user-selected UI filters:
     return true;
   });
 

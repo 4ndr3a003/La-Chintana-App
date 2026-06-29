@@ -71,7 +71,7 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
 
         // Queries for Events and Communications
         const eventsQuery = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'events'),
+            collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'events'),
             orderBy('date', 'desc'), // Sort by event date (approximation of "newness" for future events) or created? 
             // Ideally we'd have a createdAt, but date is a good proxy for "upcoming/recent" releavance.
             // Let's stick to 'date' as per existing logic, or better yet, if we want "recently added", we might miss it if we don't store createdAt.
@@ -80,7 +80,7 @@ const NotificationPanel = ({ isOpen, onClose, userProfile, anchorRef }) => {
         );
 
         const commsQuery = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'communications'),
+            collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'communications'),
             orderBy('date', 'desc'),
             limit(10)
         );
