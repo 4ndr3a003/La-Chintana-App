@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, PlusCircle, Shield, ArrowLeft, Edit3, X, Trash2 } from 'lucide-react';
+import { ArrowRight, Building2, PlusCircle, Shield, ArrowLeft, Edit3, X, Trash2, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSuperadminDashboardView } from './SuperadminDashboardViewLogic';
 
@@ -93,6 +93,16 @@ const SuperadminDashboardView = ({ userProfile, onLoginSuccess }) => {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/superadmin/settings/${assoc.associationId}`);
+                          }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-700 text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all duration-300"
+                          title="Impostazioni Associazione"
+                        >
+                          <Settings className="w-5 h-5" />
+                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

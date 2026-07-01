@@ -3,9 +3,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { db, storage, appId, auth } from '../../services/firebase';
-import { SPECIALIZATIONS_DATA } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 export const useUserProfileView = (userProfile) => {
+  const { specializations: SPECIALIZATIONS_DATA } = useAppSettings();
   const [uploading, setUploading] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ unit: '%', width: 50, aspect: 1 });

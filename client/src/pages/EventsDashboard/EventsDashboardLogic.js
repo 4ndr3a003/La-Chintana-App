@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { query, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useEventsDashboard = (userProfile) => {
+  const { eventVisibility: EVENT_VISIBILITY, eventVisibilityOptions, volunteerRoles: VOLUNTEER_ROLES } = useAppSettings();
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
   const [allProfiles, setAllProfiles] = useState({});
@@ -19,7 +20,7 @@ export const useEventsDashboard = (userProfile) => {
   const [currentEventId, setCurrentEventId] = useState(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
-    title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [], visibility: EVENT_VISIBILITY.ALL
+    title: '', date: '', time: '', location: '', type: 'Servizio', description: '', shifts: [], visibility: EVENT_VISIBILITY.ALL || 'Tutti'
   });
 
   useEffect(() => {
@@ -40,12 +41,22 @@ export const useEventsDashboard = (userProfile) => {
 
         if (isDirettivoEvent && !isBoardOrPresident) return;
 
-        const visibility = eventObj.visibility || EVENT_VISIBILITY.ALL;
-        if (visibility === EVENT_VISIBILITY.BOARD_ONLY && !isBoardOrPresident) return;
+        const visibilityLabel = eventObj.visibility || EVENT_VISIBILITY.ALL;
+        const visOption = eventVisibilityOptions?.find(opt => opt.label === visibilityLabel);
         
-        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
-          if (!isK9 && !isBoardOrPresident) return;
+        if (visOption && visOption.allowedRoles && visOption.allowedRoles.length > 0) {
+          const allowed = visOption.allowedRoles;
+          
+          if (!allowed.includes('BASE_ALL')) {
+            let hasAccess = false;
+            if (isBoardOrPresident && allowed.includes('BASE_BOARD')) hasAccess = true;
+            if (userProfile?.role === 'volontario' && allowed.includes('BASE_VOLUNTEER')) hasAccess = true;
+            if (userProfile?.boardRole && allowed.includes(`BOARD_${userProfile.boardRole}`)) hasAccess = true;
+            if (userProfile?.volunteerRole && allowed.includes(`VOLUNTEER_${userProfile.volunteerRole}`)) hasAccess = true;
+            if (userProfile?.specializations?.some(spec => allowed.includes(`SPEC_${spec}`))) hasAccess = true;
+            
+            if (!hasAccess) return; // exclude event
+          }
         }
 
         // 2. PARTITION EVENTS

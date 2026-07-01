@@ -14,6 +14,7 @@ import Header from './components/layout/Header';
 import MobileNav from './components/layout/MobileNav';
 import AppRoutes from './routes/AppRoutes';
 import NotificationToast from './components/ui/NotificationToast';
+import { AssociationSettingsProvider } from './context/AssociationSettingsContext';
 
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
@@ -480,127 +481,129 @@ export default function App() {
   );
 
   return (
-    <IonApp>
-      <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
-        {/* HEADER */}
-        {userProfile && location.pathname !== '/login' && (
-          <div className="flex-none z-20">
-            <Header
-              userProfile={userProfile}
-            />
+    <AssociationSettingsProvider associationId={activeAssociationId}>
+      <IonApp>
+        <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
+          {/* HEADER */}
+          {userProfile && location.pathname !== '/login' && (
+            <div className="flex-none z-20">
+              <Header
+                userProfile={userProfile}
+              />
+            </div>
+          )}
+
+          {/* MAIN CONTENT - SCROLLABLE */}
+          <div className="flex-grow overflow-y-auto z-10 relative">
+            <div className={`${location.pathname !== '/login' ? 'max-w-6xl mx-auto p-4 md:p-6 lg:p-10' : ''}`}>
+              <AppRoutes
+                userProfile={userProfile}
+                onLoginSuccess={handleLoginSuccess}
+                onLogout={handleLogout}
+                enableNotifications={enableWebNotifications}
+                disableNotifications={disableWebNotifications}
+                isNotificationsEnabled={!!fcmToken}
+                toggleDarkMode={toggleDarkMode}
+                darkMode={darkMode}
+                uppercaseMode={uppercaseMode}
+                toggleUppercaseMode={toggleUppercaseMode}
+                showToast={showToast}
+              />
+              {/* Spacer for bottom nav on mobile */}
+              {userProfile && location.pathname !== '/login' && (
+                <div className="h-24 xl:hidden"></div>
+              )}
+            </div>
           </div>
-        )}
 
-        {/* MAIN CONTENT - SCROLLABLE */}
-        <div className="flex-grow overflow-y-auto z-10 relative">
-          <div className={`${location.pathname !== '/login' ? 'max-w-6xl mx-auto p-4 md:p-6 lg:p-10' : ''}`}>
-            <AppRoutes
-              userProfile={userProfile}
-              onLoginSuccess={handleLoginSuccess}
-              onLogout={handleLogout}
-              enableNotifications={enableWebNotifications}
-              disableNotifications={disableWebNotifications}
-              isNotificationsEnabled={!!fcmToken}
-              toggleDarkMode={toggleDarkMode}
-              darkMode={darkMode}
-              uppercaseMode={uppercaseMode}
-              toggleUppercaseMode={toggleUppercaseMode}
-              showToast={showToast}
-            />
-            {/* Spacer for bottom nav on mobile */}
-            {userProfile && location.pathname !== '/login' && (
-              <div className="h-24 xl:hidden"></div>
-            )}
-          </div>
-        </div>
+          {/* Notification Permission Button (Floating) */}
+          {showNotifButton && !loading && userProfile && (
+            <div className="fixed bottom-24 right-4 z-50">
+              <IonButton
+                shape="round"
+                color="warning"
+                onClick={enableWebNotifications}
+                className="shadow-lg"
+              >
+                <IonIcon slot="start" icon={notificationsOutline} />
+                Attiva Notifiche
+              </IonButton>
+            </div>
+          )}
 
-        {/* Notification Permission Button (Floating) */}
-        {showNotifButton && !loading && userProfile && (
-          <div className="fixed bottom-24 right-4 z-50">
-            <IonButton
-              shape="round"
-              color="warning"
-              onClick={enableWebNotifications}
-              className="shadow-lg"
-            >
-              <IonIcon slot="start" icon={notificationsOutline} />
-              Attiva Notifiche
-            </IonButton>
-          </div>
-        )}
+          {/* Install App Modal */}
+          {isInstallable && showInstallModal && !loading && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-slate-100 dark:border-slate-700 transform transition-all scale-100">
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
+                    <IonIcon icon={downloadOutline} className="w-8 h-8" />
+                  </div>
 
-        {/* Install App Modal */}
-        {isInstallable && showInstallModal && !loading && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-slate-100 dark:border-slate-700 transform transition-all scale-100">
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
-                  <IonIcon icon={downloadOutline} className="w-8 h-8" />
-                </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                      Installa Applicazione
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                      Installa l'app per un'esperienza più fluida, accesso rapido e utilizzo offline.
+                    </p>
+                  </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    Installa Applicazione
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-                    Installa l'app per un'esperienza più fluida, accesso rapido e utilizzo offline.
-                  </p>
-                </div>
-
-                <div className="flex gap-3 w-full mt-2">
-                  <button
-                    onClick={() => setShowInstallModal(false)}
-                    className="flex-1 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-300 font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                  >
-                    Più tardi
-                  </button>
-                  <button
-                    onClick={installApp}
-                    className="flex-1 px-4 py-3 rounded-xl text-white font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
-                  >
-                    Installa
-                  </button>
+                  <div className="flex gap-3 w-full mt-2">
+                    <button
+                      onClick={() => setShowInstallModal(false)}
+                      className="flex-1 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-300 font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      Più tardi
+                    </button>
+                    <button
+                      onClick={installApp}
+                      className="flex-1 px-4 py-3 rounded-xl text-white font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
+                    >
+                      Installa
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* MOBILE BOTTOM NAV */}
-        {userProfile && location.pathname !== '/login' && (
-          <div className="fixed bottom-0 left-0 right-0 z-20 xl:hidden pointer-events-none">
-            <MobileNav userProfile={userProfile} />
-          </div>
-        )}
+          {/* MOBILE BOTTOM NAV */}
+          {userProfile && location.pathname !== '/login' && (
+            <div className="fixed bottom-0 left-0 right-0 z-20 xl:hidden pointer-events-none">
+              <MobileNav userProfile={userProfile} />
+            </div>
+          )}
 
-        {/* Custom Notification Toast */}
-        <NotificationToast
-          isOpen={toastInfo.isOpen}
-          onClose={hideToast}
-          message={toastInfo.message}
-          title={toastInfo.title}
-          type={toastInfo.type}
-          duration={5000}
-          onClick={toastInfo.onClick}
-        />
+          {/* Custom Notification Toast */}
+          <NotificationToast
+            isOpen={toastInfo.isOpen}
+            onClose={hideToast}
+            message={toastInfo.message}
+            title={toastInfo.title}
+            type={toastInfo.type}
+            duration={5000}
+            onClick={toastInfo.onClick}
+          />
 
-        {/* Impersonation Return Button */}
-        {localStorage.getItem('pc_admin_profile_id') && (
-          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999]">
-            <button
-              onClick={() => {
-                const adminId = localStorage.getItem('pc_admin_profile_id');
-                localStorage.setItem('pc_profile_id', adminId);
-                localStorage.removeItem('pc_admin_profile_id');
-                window.location.href = '/';
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full shadow-2xl shadow-indigo-500/50 font-extrabold border-2 border-white dark:border-slate-800 transition-all flex items-center gap-2 animate-bounce"
-            >
-              Torna all'account Admin
-            </button>
-          </div>
-        )}
-      </div>
-    </IonApp>
+          {/* Impersonation Return Button */}
+          {localStorage.getItem('pc_admin_profile_id') && (
+            <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999]">
+              <button
+                onClick={() => {
+                  const adminId = localStorage.getItem('pc_admin_profile_id');
+                  localStorage.setItem('pc_profile_id', adminId);
+                  localStorage.removeItem('pc_admin_profile_id');
+                  window.location.href = '/';
+                }}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full shadow-2xl shadow-indigo-500/50 font-extrabold border-2 border-white dark:border-slate-800 transition-all flex items-center gap-2 animate-bounce"
+              >
+                Torna all'account Admin
+              </button>
+            </div>
+          )}
+        </div>
+      </IonApp>
+    </AssociationSettingsProvider>
   );
 }

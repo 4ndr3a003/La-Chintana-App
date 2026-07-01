@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, List, ChevronDown, PlusCircle, CalendarPlus, X, AlertTriangle, User, Search, SlidersHorizontal, Share2, Copy, Check, ExternalLink } from 'lucide-react';
 import { SiGoogle, SiApple } from 'react-icons/si';
-import { hasAdminAccess, EVENT_TYPES, canManageContent, EVENT_VISIBILITY } from '../../utils/constants';
+import { hasAdminAccess, canManageContent } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import { appId } from '../../services/firebase';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -14,6 +15,7 @@ import DeleteConfirmationModal from '../../components/ui/DeleteConfirmationModal
 import './EventsDashboard.css';
 
 const EventsDashboard = ({ userProfile }) => {
+  const { eventTypes: EVENT_TYPES, eventVisibility: EVENT_VISIBILITY } = useAppSettings();
   const {
     allProfiles,
     isCreateModalOpen,

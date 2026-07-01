@@ -2,9 +2,11 @@ import React from 'react';
 import { Clock, MapPin, Users, X, CheckCircle, Trash2, Pencil, Calendar } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Avatar from '../ui/Avatar';
-import { ROLE_LABELS, ROLES, hasAdminAccess, SPECIALIZATIONS_DATA, VOLUNTEER_ROLES, EVENT_VISIBILITY } from '../../utils/constants';
+import { ROLE_LABELS, ROLES, hasAdminAccess } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 const EventCard = ({ event, userProfile, allProfiles, onToggleParticipation, onClick, showParticipants, onDelete, onEdit, isModal }) => {
+  const { specializations: SPECIALIZATIONS_DATA, volunteerRoles: VOLUNTEER_ROLES, eventVisibility: EVENT_VISIBILITY } = useAppSettings();
   const [activeTab, setActiveTab] = React.useState('details'); // 'details' or 'participants'
   const isParticipating = event.participants?.includes(userProfile.id);
   const dateObj = new Date(event.date);

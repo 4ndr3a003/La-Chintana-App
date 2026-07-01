@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { IonTabBar, IonTabButton, IonLabel } from '@ionic/react';
 import { MessageSquare, LayoutDashboard, Calendar, Users, House, Truck } from 'lucide-react';
 import { ROLES } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 const MobileNav = ({ userProfile }) => {
+  const { roles: ROLES } = useAppSettings();
   const location = useLocation();
   const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { query, collection, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants'; // Import constants
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 export const useCommunicationsView = (userProfile) => {
+  const { eventVisibility: EVENT_VISIBILITY, eventVisibilityOptions, volunteerRoles: VOLUNTEER_ROLES } = useAppSettings();
   const [messages, setMessages] = useState([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filterTopic, setFilterTopic] = useState('Tutti');
@@ -18,7 +19,7 @@ export const useCommunicationsView = (userProfile) => {
     importance: 'Normale',
     topic: 'Generale',
     expirationDate: '',
-    visibility: EVENT_VISIBILITY.ALL // Add visibility default
+    visibility: EVENT_VISIBILITY.ALL || 'Tutti' // Add visibility default
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -69,25 +70,22 @@ export const useCommunicationsView = (userProfile) => {
       return false;
     }
 
-    // 2. Visibility Field Check (New Logic)
-    const visibility = msg.visibility || EVENT_VISIBILITY.ALL;
-
-    if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
-      if (!isBoardOrPresident) return false;
-    }
-
-    if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-      // Check K9 Role
-      const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
-      // Allow if Broad/President OR K9
-      if (!isK9 && !isBoardOrPresident) {
-        // Fallback: check if topic is Cinofili (already handled above but double check logic flow)
-        // If topic is Cinofili, we might have already returned false if we strictly followed previous logic?
-        // Actually, previous logic was: if Cinofili Topic AND not Board AND not K9 -> return false.
-        // So we just need to ensure we don't accidentally hide it if it passes Topic check but fails Visibility check?
-        // No, both are restrictive. If either restricts access, we hide it.
-        // Wait, Visibility K9_ONLY implies "Only K9 (and admins)".
-        return false;
+    // 2. Visibility Field Check (New Dynamic Logic)
+    const visibilityLabel = msg.visibility || EVENT_VISIBILITY.ALL;
+    const visOption = eventVisibilityOptions?.find(opt => opt.label === visibilityLabel);
+    
+    if (visOption && visOption.allowedRoles && visOption.allowedRoles.length > 0) {
+      const allowed = visOption.allowedRoles;
+      
+      if (!allowed.includes('BASE_ALL')) {
+        let hasAccess = false;
+        if (isBoardOrPresident && allowed.includes('BASE_BOARD')) hasAccess = true;
+        if (userProfile?.role === 'volontario' && allowed.includes('BASE_VOLUNTEER')) hasAccess = true;
+        if (userProfile?.boardRole && allowed.includes(`BOARD_${userProfile.boardRole}`)) hasAccess = true;
+        if (userProfile?.volunteerRole && allowed.includes(`VOLUNTEER_${userProfile.volunteerRole}`)) hasAccess = true;
+        if (userProfile?.specializations?.some(spec => allowed.includes(`SPEC_${spec}`))) hasAccess = true;
+        
+        if (!hasAccess) return false;
       }
     }
 

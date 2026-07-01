@@ -4,10 +4,12 @@ import { Camera, LogOut, User, Mail, Calendar, MapPin, CreditCard, Phone, Home, 
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
 import { ROLES, ROLE_LABELS } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import { useUserProfileView } from './UserProfileViewLogic';
 import './UserProfileView.css';
 
 const UserProfileView = ({ userProfile, onLogout }) => {
+  const { roles: ROLES } = useAppSettings();
   const {
     uploading,
     handlePhotoUpload,

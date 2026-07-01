@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageSquare, ChevronDown, Trash2, PlusCircle, MessageSquarePlus, X, Search, SlidersHorizontal, User, AlertCircle, AlertTriangle } from 'lucide-react';
-import { hasAdminAccess, canManageContent, EVENT_VISIBILITY } from '../../utils/constants';
+import { hasAdminAccess, canManageContent } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import CommunicationCard from '../../components/communications/CommunicationCard';
@@ -77,6 +78,7 @@ const getTheme = (topic) => {
 };
 
 const CommunicationsView = ({ userProfile }) => {
+  const { eventVisibility: EVENT_VISIBILITY } = useAppSettings();
   const {
     isCreateModalOpen,
     filterTopic,

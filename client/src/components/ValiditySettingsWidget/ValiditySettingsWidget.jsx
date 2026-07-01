@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Settings, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { SPECIALIZATIONS_DATA } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import './ValiditySettingsWidget.css';
 
 const ValiditySettingsWidget = ({ settings, onUpdate, loading, headless = false }) => {
+    const { specializations: SPECIALIZATIONS_DATA } = useAppSettings();
     const [localSettings, setLocalSettings] = useState(settings || {});
     const [hasChanges, setHasChanges] = useState(false);
 

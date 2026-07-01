@@ -2,7 +2,8 @@ import React from 'react';
 import { Users, Phone, Award, Edit2, PlusCircle, UserRoundPlus, X, Shield, User, Trash2, AlertTriangle, Search, SlidersHorizontal, Download, Upload, CheckCircle, XCircle, Info, Mail, Calendar, MapPin, CreditCard, Hash, Lock, Home, RefreshCw, Camera, FileText, Globe, Activity, Briefcase, LogIn } from 'lucide-react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { ROLES, ROLE_LABELS, BOARD_ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA, canManageVolunteers } from '../../utils/constants';
+import { ROLES, ROLE_LABELS, canManageVolunteers } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Badge from '../../components/ui/Badge';
@@ -13,6 +14,7 @@ import { useAdminDashboard } from './AdminDashboardLogic';
 import './AdminDashboard.css';
 
 const AdminDashboard = ({ userProfile, showToast }) => {
+  const { boardRoles: BOARD_ROLES, volunteerRoles: VOLUNTEER_ROLES, specializations: SPECIALIZATIONS_DATA } = useAppSettings();
   const {
     selectedUser,
     isEditing,

@@ -9,6 +9,7 @@ import ProfileMenu from './ProfileMenu';
 import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref) => (
   <IonButton
@@ -49,7 +50,8 @@ const Header = ({ userProfile }) => {
   const navContainerRef = useRef(null);
   const navRefs = useRef({});
   const notifButtonRef = useRef(null);
-  const [associationInfo, setAssociationInfo] = useState(null);
+  
+  const { associationInfo } = useAppSettings();
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileButtonRef = useRef(null);
@@ -72,17 +74,7 @@ const Header = ({ userProfile }) => {
     ];
   }, [userProfile]);
 
-  useEffect(() => {
-    if (userProfile?.associationId) {
-      const assocRef = doc(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId);
-      const unsubscribe = onSnapshot(assocRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setAssociationInfo(docSnap.data());
-        }
-      });
-      return () => unsubscribe();
-    }
-  }, [userProfile?.associationId]);
+  // Branding is now globally applied by AssociationSettingsProvider
 
   useEffect(() => {
     const updatePill = () => {
@@ -118,7 +110,7 @@ const Header = ({ userProfile }) => {
       <IonToolbar
         className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10 !overflow-visible"
         style={{
-          '--background': 'var(--bg-header)',
+          '--background': 'var(--bg-header, #1e40af)',
           '--min-height': '5rem',
           '--padding-start': '1rem',
           '--padding-end': '1rem',

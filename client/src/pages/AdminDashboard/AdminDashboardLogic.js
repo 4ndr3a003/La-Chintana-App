@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { query, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db, appId, storage, auth } from '../../services/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ROLES, VOLUNTEER_ROLES, SPECIALIZATIONS_DATA } from '../../utils/constants';
+import { ROLES } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 export const useAdminDashboard = (userProfile, showToast) => {
+  const { volunteerRoles: VOLUNTEER_ROLES, specializations: SPECIALIZATIONS_DATA } = useAppSettings();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);

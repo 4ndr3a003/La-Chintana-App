@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
-import { EVENT_TYPES } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 const AvailabilityWidget = ({ currentMonth, onMonthChange, events = [], userProfile }) => {
+    const { eventTypes: EVENT_TYPES } = useAppSettings();
     const navigate = useNavigate();
 
     const monthLabel = currentMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });

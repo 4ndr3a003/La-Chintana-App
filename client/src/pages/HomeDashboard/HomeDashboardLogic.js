@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { query, collection, where, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
 import { db, appId } from '../../services/firebase';
-import { EVENT_VISIBILITY, VOLUNTEER_ROLES } from '../../utils/constants';
+import { useAppSettings } from '../../context/AssociationSettingsContext';
 
 export const useHomeDashboard = (userProfile) => {
+  const { eventVisibility: EVENT_VISIBILITY, eventVisibilityOptions, volunteerRoles: VOLUNTEER_ROLES } = useAppSettings();
   const [nextEvent, setNextEvent] = useState(null);
   const [nextEmergency, setNextEmergency] = useState(null);
   const [recentComms, setRecentComms] = useState([]);
@@ -52,18 +53,41 @@ export const useHomeDashboard = (userProfile) => {
         // Check visibility for 'Direttivo' type (Legacy)
         if (event.type === 'Direttivo' && !isBoardOrPresident) return false;
 
-        // New Visibility Logic
-        const visibility = event.visibility || EVENT_VISIBILITY.ALL;
+        // New Dynamic Visibility Logic
+        const visibilityLabel = event.visibility || EVENT_VISIBILITY.ALL;
+        
+        // Find the visibility option definition by its label
+        const visOption = eventVisibilityOptions?.find(opt => opt.label === visibilityLabel);
+        
+        if (visOption && visOption.allowedRoles && visOption.allowedRoles.length > 0) {
+          const allowed = visOption.allowedRoles;
+          
+          if (allowed.includes('BASE_ALL')) {
+            return true; // Everyone can see
+          }
 
-        if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
-          if (!isBoardOrPresident) return false;
+          let hasAccess = false;
+          
+          if (isBoardOrPresident && allowed.includes('BASE_BOARD')) {
+            hasAccess = true;
+          }
+          if (userProfile?.role === 'volontario' && allowed.includes('BASE_VOLUNTEER')) {
+            hasAccess = true;
+          }
+          if (userProfile?.boardRole && allowed.includes(`BOARD_${userProfile.boardRole}`)) {
+            hasAccess = true;
+          }
+          if (userProfile?.volunteerRole && allowed.includes(`VOLUNTEER_${userProfile.volunteerRole}`)) {
+            hasAccess = true;
+          }
+          if (userProfile?.specializations?.some(spec => allowed.includes(`SPEC_${spec}`))) {
+            hasAccess = true;
+          }
+          
+          return hasAccess;
         }
 
-        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
-          if (!isK9 && !isBoardOrPresident) return false;
-        }
-
+        // Fallback for missing/corrupt visibility definition
         return true;
       });
 
@@ -151,16 +175,26 @@ export const useHomeDashboard = (userProfile) => {
         // Check visibility for 'Direttivo' type (Legacy)
         if (event.type === 'Direttivo' && !isBoardOrPresident) return false;
 
-        // New Visibility Logic
-        const visibility = event.visibility || EVENT_VISIBILITY.ALL;
+        // New Dynamic Visibility Logic
+        const visibilityLabel = event.visibility || EVENT_VISIBILITY.ALL;
+        
+        const visOption = eventVisibilityOptions?.find(opt => opt.label === visibilityLabel);
+        
+        if (visOption && visOption.allowedRoles && visOption.allowedRoles.length > 0) {
+          const allowed = visOption.allowedRoles;
+          
+          if (allowed.includes('BASE_ALL')) {
+            return true;
+          }
 
-        if (visibility === EVENT_VISIBILITY.BOARD_ONLY) {
-          if (!isBoardOrPresident) return false;
-        }
-
-        if (visibility === EVENT_VISIBILITY.K9_ONLY) {
-          const isK9 = userProfile?.volunteerRole === VOLUNTEER_ROLES.K9;
-          if (!isK9 && !isBoardOrPresident) return false;
+          let hasAccess = false;
+          if (isBoardOrPresident && allowed.includes('BASE_BOARD')) hasAccess = true;
+          if (userProfile?.role === 'volontario' && allowed.includes('BASE_VOLUNTEER')) hasAccess = true;
+          if (userProfile?.boardRole && allowed.includes(`BOARD_${userProfile.boardRole}`)) hasAccess = true;
+          if (userProfile?.volunteerRole && allowed.includes(`VOLUNTEER_${userProfile.volunteerRole}`)) hasAccess = true;
+          if (userProfile?.specializations?.some(spec => allowed.includes(`SPEC_${spec}`))) hasAccess = true;
+          
+          return hasAccess;
         }
 
         return true;
