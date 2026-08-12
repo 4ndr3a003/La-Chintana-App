@@ -12,7 +12,8 @@
     "build": "npm run build:client",
     "deploy": "npx firebase deploy",
     "deploy:functions": "npx firebase deploy --only functions",
-    "deploy:hosting": "npx firebase deploy --only hosting"
+    "deploy:hosting": "npx firebase deploy --only hosting",
+    "sync:prod": "node server/sync-local-to-prod.js"
   },
   "devDependencies": {
     "concurrently": "^8.0.0",

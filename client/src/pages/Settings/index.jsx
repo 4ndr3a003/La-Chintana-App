@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings as SettingsIcon, Bell, BellOff, Moon, Sun, Shield } from 'lucide-react';
 import { db, appId } from '../../services/firebase';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { collection, collectionGroup, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { ROLES, IS_HIDDEN_FIELD } from '../../utils/constants';
 
 const Settings = ({ userProfile, enableNotifications, disableNotifications, isNotificationsEnabled, toggleDarkMode, darkMode, uppercaseMode, toggleUppercaseMode }) => {
@@ -12,25 +12,43 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
     }
 
     try {
-      // 1. Check if target profile exists
-      const q = query(
-        collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'),
-        where('email', '==', targetEmail)
-      );
-      const snapshot = await getDocs(q);
-
       let targetProfileId;
+      let targetAssociationId;
 
-      if (!snapshot.empty) {
-        // Profile exists, use it
-        targetProfileId = snapshot.docs[0].id;
-      } else {
-        if (isHiddenCreate) {
-          // Create Dev
+      // 1. Check in current association profiles
+      if (userProfile?.associationId) {
+        const qLocal = query(
+          collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'),
+          where('email', '==', targetEmail)
+        );
+        const snapshotLocal = await getDocs(qLocal);
+        if (!snapshotLocal.empty) {
+          targetProfileId = snapshotLocal.docs[0].id;
+          targetAssociationId = userProfile.associationId;
+        }
+      }
+
+      // 2. If not found locally, search across all profiles globally
+      if (!targetProfileId) {
+        const qGroup = query(
+          collectionGroup(db, 'profiles'),
+          where('email', '==', targetEmail)
+        );
+        const snapshotGroup = await getDocs(qGroup);
+        if (!snapshotGroup.empty) {
+          const docSnap = snapshotGroup.docs[0];
+          targetProfileId = docSnap.id;
+          targetAssociationId = docSnap.ref.parent?.parent?.id;
+        }
+      }
+
+      // 3. Create if not found and allowed
+      if (!targetProfileId) {
+        if (isHiddenCreate && userProfile?.associationId) {
           const newDocRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'associations', userProfile.associationId, 'profiles'), {
             name: 'Super Admin',
             email: targetEmail,
-            password: 'devTestUser123!',
+            password: 'admin123',
             role: ROLES.PRESIDENT,
             [IS_HIDDEN_FIELD]: true, // Hide this user
             status: 'Operativo',
@@ -44,16 +62,20 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
             certifications: {}
           });
           targetProfileId = newDocRef.id;
+          targetAssociationId = userProfile.associationId;
         } else {
           alert("Account non trovato.");
           return;
         }
       }
 
-      // 2. Perform "Login" (Switch Profile)
+      // 4. Perform "Login" (Switch Profile)
       localStorage.setItem('pc_profile_id', targetProfileId);
+      if (targetAssociationId) {
+        localStorage.setItem('pc_association_id', targetAssociationId);
+      }
 
-      // 3. Reload to apply changes
+      // 5. Reload to apply changes
       window.location.href = '/';
 
     } catch (error) {
@@ -62,7 +84,7 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
     }
   };
 
-  const handleDevSwitch = () => handleSwitchToProfile('dev.admin@lachintana.it', true);
+  const handleDevSwitch = () => handleSwitchToProfile('admin@mail.com', true);
   const handleSwitchBack = () => handleSwitchToProfile('andrea8102003@gmail.com', false);
 
   return (
@@ -135,8 +157,8 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
           </div>
         </div>
 
-        {/* Dark Mode Section - Only for Dev Admin */}
-        {userProfile?.email === 'dev.admin@lachintana.it' && (
+        {/* Dark Mode Section - Only for Dev Admin / Admin */}
+        {(userProfile?.email === 'admin@mail.com' || userProfile?.email === 'dev.admin@lachintana.it') && (
           <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-900">Aspetto</h3>
@@ -207,7 +229,7 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
           </div>
         )}
 
-        {/* Developer Zone - Switch TO Dev */}
+        {/* Developer Zone - Switch TO Admin */}
         {userProfile?.email === 'andrea8102003@gmail.com' && (
           <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
             <div className="flex justify-between items-center mb-6">
@@ -218,21 +240,21 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
             </div>
             <div className="bg-slate-50 dark:bg-[var(--color-slate-50)] p-4 rounded-2xl border border-slate-100 dark:border-slate-200 transition-colors duration-300">
               <p className="text-slate-500 text-sm mb-4">
-                Questa sezione è visibile solo al tuo account. Usa questo pulsante per passare al profilo Super Admin nascosto.
+                Questa sezione è visibile solo al tuo account. Usa questo pulsante per passare all'account Admin (admin@mail.com).
               </p>
               <button
                 onClick={handleDevSwitch}
                 className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <Shield size={20} />
-                Passa a Super Admin (Nascosto)
+                Passa ad Admin (admin@mail.com)
               </button>
             </div>
           </div>
         )}
 
-        {/* Developer Zone - Switch BACK */}
-        {userProfile?.email === 'dev.admin@lachintana.it' && (
+        {/* Developer Zone - Switch BACK to Andrea */}
+        {(userProfile?.email === 'admin@mail.com' || userProfile?.email === 'dev.admin@lachintana.it') && (
           <div className="bg-white dark:bg-[var(--color-slate-100)] rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] p-4 md:p-8 border border-slate-100 dark:border-slate-200 transition-colors duration-300">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -242,14 +264,14 @@ const Settings = ({ userProfile, enableNotifications, disableNotifications, isNo
             </div>
             <div className="bg-slate-50 dark:bg-[var(--color-slate-50)] p-4 rounded-2xl border border-slate-100 dark:border-slate-200 transition-colors duration-300">
               <p className="text-slate-500 text-sm mb-4">
-                Sei attualmente nel profilo Super Admin nascosto.
+                Sei attualmente nel profilo Admin ({userProfile?.email}).
               </p>
               <button
                 onClick={handleSwitchBack}
                 className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <Shield size={20} />
-                Torna al Profilo Andrea
+                Torna al Profilo Andrea (andrea8102003@gmail.com)
               </button>
             </div>
           </div>

@@ -8,6 +8,7 @@ const SuperadminDashboardView = ({ userProfile, onLoginSuccess }) => {
     associations,
     loading,
     actionLoading,
+    fetchError,
     handleSelectAssociation,
     handleCreateAssociation,
     isEditModalOpen,
@@ -71,6 +72,12 @@ const SuperadminDashboardView = ({ userProfile, onLoginSuccess }) => {
             {loading ? (
               <div className="flex justify-center items-center py-20 relative z-10">
                 <div className="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin shadow-lg"></div>
+              </div>
+            ) : fetchError ? (
+              <div className="text-center py-10 px-4 bg-red-50 dark:bg-red-900/20 rounded-3xl border border-red-200 dark:border-red-800 relative z-10">
+                <h3 className="text-red-700 dark:text-red-400 font-bold mb-2">Errore di caricamento</h3>
+                <p className="text-red-600 dark:text-red-300 text-sm">{fetchError}</p>
+                <p className="text-red-500/80 dark:text-red-400/80 text-xs mt-4">Invia uno screenshot di questo errore al supporto tecnico.</p>
               </div>
             ) : associations.length === 0 ? (
               <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 relative z-10">

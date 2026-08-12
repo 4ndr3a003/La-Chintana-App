@@ -8,6 +8,7 @@ export const useSuperadminDashboardView = (userProfile, onLoginSuccess) => {
   const [associations, setAssociations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAssocToEdit, setSelectedAssocToEdit] = useState(null);
@@ -60,6 +61,7 @@ export const useSuperadminDashboardView = (userProfile, onLoginSuccess) => {
         setAssociations(assocs);
       } catch (error) {
         console.error("Error fetching superadmin associations:", error);
+        setFetchError(error.message || "Errore sconosciuto durante il caricamento delle associazioni.");
       } finally {
         setLoading(false);
       }
@@ -255,6 +257,7 @@ export const useSuperadminDashboardView = (userProfile, onLoginSuccess) => {
     associations,
     loading,
     actionLoading,
+    fetchError,
     handleSelectAssociation,
     handleCreateAssociation,
     isEditModalOpen,

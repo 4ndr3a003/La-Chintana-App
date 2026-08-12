@@ -235,8 +235,9 @@ Per lo sviluppo e il testing locale senza intaccare il database di produzione, u
 
 ---
 
-### 2. Sincronizzazione Dati da Produzione (Opzionale)
+### 2. Sincronizzazione Dati (Produzione ↔ Locale)
 
+#### A. Da Produzione a Locale (Sincronizzazione Iniziale)
 Se hai bisogno dei dati reali di produzione per testare localmente:
 
 1. **Esportazione Utenti (Auth)**:
@@ -244,14 +245,26 @@ Se hai bisogno dei dati reali di produzione per testare localmente:
    firebase auth:export utenti_produzione.json --project chintana-events-handler
    ```
 2. **Sincronizzazione Firestore**:
-   * Assicurati di scaricare la chiave `serviceAccountKey.json` dalla Firebase Console (Impostazioni Progetto -> Account di Servizio).
-   * Posizionala temporaneamente nella cartella `/server`.
-   * Avvia gli emulatori (vedi sezione successiva) e in un altro terminale avvia il processo di copia automatica:
+   * Assicurati che la chiave `serviceAccountKey.json` sia presente nella cartella `/server`.
+   * Avvia gli emulatori (vedi sezione successiva) e in un altro terminale avvia lo script:
      ```bash
-     cd server
-     npm run dev
+     node server/sync-firestore.js
      ```
      *Lo script copierà ricorsivamente l'intera struttura di produzione sul tuo emulatore locale.*
+
+#### B. Da Locale a Produzione (Simulatore → Firebase Cloud)
+Se desideri spingere i dati Firestore ed i file Storage creati nell'emulatore locale verso l'ambiente di produzione reale:
+
+1. Assicurati che la chiave `serviceAccountKey.json` sia presente nella cartella `/server`.
+2. Esegui il comando di sincronizzazione dalla root del progetto:
+   ```bash
+   npm run sync:prod
+   ```
+   *oppure*:
+   ```bash
+   node server/sync-local-to-prod.js
+   ```
+   *Lo script sincronizzerà tutti i documenti Firestore e caricherà i file di Cloud Storage sul progetto di produzione.*
 
 ---
 
