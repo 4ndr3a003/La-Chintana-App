@@ -173,6 +173,12 @@
     }
 }
 
+@media (min-width: 1536px) {
+    .events-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 .modal-overlay {
     position: fixed;
     inset: 0;

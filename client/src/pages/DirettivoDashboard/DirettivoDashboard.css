@@ -46,7 +46,7 @@
 }
 
 .header-content {
-  max-width: 80rem;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding: 0 1rem;
@@ -92,7 +92,7 @@
 
 /* --- Content Layout --- */
 .dashboard-content {
-  max-width: 80rem;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding: 2rem 1rem;

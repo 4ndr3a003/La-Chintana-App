@@ -1,41 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
-import { LayoutDashboard, Calendar, MessageSquare, Users, House, Bell, Settings, UserCircle, LogOut, Truck, Layers, Box } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import logo from '../../assets/logo_app.png';
 import Avatar from '../ui/Avatar';
 import NotificationPanel from '../notifications/NotificationPanel';
 import ProfileMenu from './ProfileMenu';
-import { hasAdminAccess, ROLE_LABELS } from '../../utils/constants';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db, appId } from '../../services/firebase';
 import { useAppSettings } from '../../context/AssociationSettingsContext';
-
-const NavButton = React.forwardRef(({ children, to, active, icon, onClick }, ref) => (
-  <IonButton
-    ref={ref}
-    onClick={onClick}
-    shape="round"
-    fill="clear"
-    className={`font-bold text-sm tracking-wide transition-colors duration-300 z-10 relative ${active ? 'scale-105' : 'hover:scale-105 opacity-90 hover:opacity-100'}`}
-    style={{
-      '--background': 'transparent',
-      '--background-hover': 'transparent',
-      '--color': active ? 'var(--color-pc-blue-900)' : 'var(--color-slate-50)',
-      '--border-radius': '1.25rem',
-      '--padding-start': '1rem',
-      '--padding-end': '1rem',
-      '--box-shadow': 'none',
-      height: '2.5rem',
-      margin: '0 0.125rem'
-    }}
-  >
-    <span className="flex items-center gap-2.5 normal-case">
-      {React.cloneElement(icon, { size: 18, strokeWidth: active ? 2.5 : 2, className: `transition-colors duration-300 ${active ? 'text-blue-900 dark:text-slate-50' : 'text-blue-200 dark:text-slate-500'}` })}
-      <span className={`transition-colors duration-300 ${active ? 'text-blue-900 dark:text-slate-50' : 'text-blue-50 dark:text-slate-800'}`}>{children}</span>
-    </span>
-  </IonButton>
-));
 
 const Header = ({ userProfile }) => {
   const location = useLocation();
@@ -46,67 +17,17 @@ const Header = ({ userProfile }) => {
   };
 
   const [isNotifPanelOpen, setIsNotifPanelOpen] = useState(false);
-  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
-  const navContainerRef = useRef(null);
-  const navRefs = useRef({});
   const notifButtonRef = useRef(null);
-  
+
   const { associationInfo } = useAppSettings();
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileButtonRef = useRef(null);
 
-  const navItems = useMemo(() => {
-    if (hasAdminAccess(userProfile)) {
-      return [
-        { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
-        { path: '/events', label: 'Eventi', icon: <Calendar /> },
-        { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
-        { path: '/admin', label: 'Volontari', icon: <Users /> },
-        { path: '/logistics', label: 'Logistica', icon: <Box /> },
-      ];
-    }
-
-    return [
-      { path: '/events', label: 'Eventi', icon: <Calendar /> },
-      { path: '/', label: 'Home', icon: <House strokeWidth={1.5} /> },
-      { path: '/comms', label: 'Comunicazioni', icon: <MessageSquare /> },
-    ];
-  }, [userProfile]);
-
   // Branding is now globally applied by AssociationSettingsProvider
 
-  useEffect(() => {
-    const updatePill = () => {
-      const activeItem = navItems.find(item => isActive(item.path));
-      if (activeItem && navRefs.current[activeItem.path] && navContainerRef.current) {
-        const element = navRefs.current[activeItem.path];
-        const container = navContainerRef.current;
-
-        const eleRect = element.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-
-        setPillStyle({
-          left: eleRect.left - containerRect.left,
-          width: eleRect.width,
-          opacity: 1
-        });
-      } else {
-        setPillStyle(prev => ({ ...prev, opacity: 0 }));
-      }
-    };
-
-    const timer = setTimeout(updatePill, 50);
-    window.addEventListener('resize', updatePill);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', updatePill);
-    };
-  }, [location.pathname, navItems]);
-
   return (
-    <IonHeader className="ion-no-border pt-0 px-0 pb-0 md:pt-4 md:px-4 md:pb-2 !overflow-visible" style={{ '--background': 'transparent' }}>
+    <IonHeader className="ion-no-border pt-0 px-0 pb-0 md:pt-4 md:px-4 md:pb-2 !overflow-visible lg:hidden" style={{ '--background': 'transparent' }}>
       <IonToolbar
         className="rounded-none md:rounded-[2rem] shadow-xl backdrop-blur-xl border-b md:border border-white/10 !overflow-visible"
         style={{
@@ -140,39 +61,6 @@ const Header = ({ userProfile }) => {
             </IonButton>
           </IonButtons>
 
-          {/* Navigation Buttons - Desktop Only */}
-          <IonButtons slot="primary" className="!hidden xl:!block">
-            <div
-              ref={navContainerRef}
-              className="flex relative items-center bg-blue-900/40 p-1.5 rounded-full border border-blue-500/30 shadow-inner"
-            >
-              {/* The Pill */}
-              <div
-                className="absolute bg-yellow-500 rounded-[1.25rem] shadow-sm transition-all duration-300 ease-in-out"
-                style={{
-                  left: pillStyle.left,
-                  width: pillStyle.width,
-                  height: '2.5rem',
-                  opacity: pillStyle.opacity,
-                  top: '0.375rem'
-                }}
-              />
-
-              {navItems.map((item) => (
-                <NavButton
-                  key={item.path}
-                  to={item.path}
-                  active={isActive(item.path)}
-                  icon={item.icon}
-                  onClick={() => navigate(item.path)}
-                  ref={el => navRefs.current[item.path] = el}
-                >
-                  {item.label}
-                </NavButton>
-              ))}
-            </div>
-          </IonButtons>
-
           {/* User Profile Section */}
           <IonButtons slot="end">
             <div className="flex items-center gap-1 md:gap-3 pl-0 relative">
@@ -199,7 +87,6 @@ const Header = ({ userProfile }) => {
                 anchorRef={notifButtonRef}
               />
 
-              <div className="h-8 w-px bg-blue-500/50 hidden lg:block"></div>
               <div className="relative">
                 <IonButton
                   ref={profileButtonRef}
@@ -217,10 +104,6 @@ const Header = ({ userProfile }) => {
                   }}
                 >
                   <div className="flex items-center gap-3 py-1.5 px-1">
-                    <div className="text-right leading-none hidden lg:block group-hover:translate-x-[-0.125rem] transition-transform duration-300">
-                      <div className={`text-sm font-bold uppercase transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-900 dark:text-slate-50' : 'text-white'}`}>{userProfile.name.split(' ').slice(0, 2).join(' ')}</div>
-                      <div className={`text-[10px] font-semibold uppercase mt-0.5 transition-colors duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'text-blue-800 dark:text-slate-50' : 'text-blue-200 dark:text-slate-400'}`}>{ROLE_LABELS[userProfile.role]}</div>
-                    </div>
                     <Avatar src={userProfile.photoUrl} name={userProfile.name} size="sm" className={`ring-2 shadow-md transition-all duration-300 ${isActive('/profile') || isProfileMenuOpen ? 'ring-blue-900/20' : 'ring-blue-400/50 group-hover:ring-yellow-400'}`} />
                   </div>
                 </IonButton>

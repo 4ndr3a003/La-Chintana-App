@@ -11,6 +11,8 @@ import { Capacitor } from '@capacitor/core';
 
 // Components
 import Header from './components/layout/Header';
+import Sidebar from './components/layout/Sidebar';
+import Topbar from './components/layout/Topbar';
 import MobileNav from './components/layout/MobileNav';
 import AppRoutes from './routes/AppRoutes';
 import NotificationToast from './components/ui/NotificationToast';
@@ -480,40 +482,57 @@ export default function App() {
     </div>
   );
 
+  const showShell = !!userProfile && location.pathname !== '/login';
+
   return (
     <AssociationSettingsProvider associationId={activeAssociationId}>
       <IonApp>
-        <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
-          {/* HEADER */}
-          {userProfile && location.pathname !== '/login' && (
-            <div className="flex-none z-20">
-              <Header
-                userProfile={userProfile}
-              />
-            </div>
-          )}
+        <div className="flex h-full w-full bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
+          {/* DESKTOP SIDEBAR */}
+          {showShell && <Sidebar userProfile={userProfile} />}
 
-          {/* MAIN CONTENT - SCROLLABLE */}
-          <div className="flex-grow overflow-y-auto z-10 relative">
-            <div className={`${location.pathname !== '/login' ? 'max-w-6xl mx-auto p-4 md:p-6 lg:p-10' : ''}`}>
-              <AppRoutes
-                userProfile={userProfile}
-                onLoginSuccess={handleLoginSuccess}
-                onLogout={handleLogout}
-                enableNotifications={enableWebNotifications}
-                disableNotifications={disableWebNotifications}
-                isNotificationsEnabled={!!fcmToken}
-                toggleDarkMode={toggleDarkMode}
-                darkMode={darkMode}
-                uppercaseMode={uppercaseMode}
-                toggleUppercaseMode={toggleUppercaseMode}
-                showToast={showToast}
-              />
-              {/* Spacer for bottom nav on mobile */}
-              {userProfile && location.pathname !== '/login' && (
-                <div className="h-24 xl:hidden"></div>
-              )}
+          <div className="flex flex-col flex-1 min-w-0 h-full">
+            {/* MOBILE HEADER */}
+            {showShell && (
+              <div className="flex-none z-20">
+                <Header
+                  userProfile={userProfile}
+                />
+              </div>
+            )}
+
+            {/* DESKTOP TOPBAR */}
+            {showShell && <Topbar userProfile={userProfile} />}
+
+            {/* MAIN CONTENT - SCROLLABLE */}
+            <div className="flex-grow overflow-y-auto z-10 relative">
+              <div className={`${showShell ? 'max-w-6xl mx-auto p-4 md:p-6 lg:max-w-none lg:mx-0 lg:px-8 lg:py-8 xl:max-w-[1680px] xl:mx-auto' : ''}`}>
+                <AppRoutes
+                  userProfile={userProfile}
+                  onLoginSuccess={handleLoginSuccess}
+                  onLogout={handleLogout}
+                  enableNotifications={enableWebNotifications}
+                  disableNotifications={disableWebNotifications}
+                  isNotificationsEnabled={!!fcmToken}
+                  toggleDarkMode={toggleDarkMode}
+                  darkMode={darkMode}
+                  uppercaseMode={uppercaseMode}
+                  toggleUppercaseMode={toggleUppercaseMode}
+                  showToast={showToast}
+                />
+                {/* Spacer for bottom nav on mobile */}
+                {showShell && (
+                  <div className="h-24 lg:hidden"></div>
+                )}
+              </div>
             </div>
+
+            {/* MOBILE BOTTOM NAV */}
+            {showShell && (
+              <div className="fixed bottom-0 left-0 right-0 z-20 lg:hidden pointer-events-none">
+                <MobileNav userProfile={userProfile} />
+              </div>
+            )}
           </div>
 
           {/* Notification Permission Button (Floating) */}
@@ -565,13 +584,6 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* MOBILE BOTTOM NAV */}
-          {userProfile && location.pathname !== '/login' && (
-            <div className="fixed bottom-0 left-0 right-0 z-20 xl:hidden pointer-events-none">
-              <MobileNav userProfile={userProfile} />
             </div>
           )}
 
